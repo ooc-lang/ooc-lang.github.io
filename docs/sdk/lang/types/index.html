@@ -1,0 +1,223 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ooc &raquo; Base types in the lang package</title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="stylesheet" href="/assets/pygments.css">
+    <link href="http://fonts.googleapis.com/css?family=Radley:regular&text=OC" rel="stylesheet" type="text/css" >
+    <link href="http://fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,400,400italic,700,700italic,900,900italic" rel="stylesheet" type="text/css" >
+
+    <!-- Cool stats stuff for nanoc :) -->
+    <meta name="generator" content="nanoc 3.6.5"> 
+  </head>
+  <body>
+
+<header>
+  <div class="header-content">
+    <nav class="main">
+      <ol>
+        <li class="home"><a href="/"><img src="/assets/images/logo-nav.png" alt="Home"></a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/install/">Install</a></li>
+        <li><a href="/docs/">Documentation</a></li>
+        <li><a href="/community/">Community</a></li>
+        <li><a href="/development/">Development</a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+<div class="intro">
+  <div class="intro-content">
+    <h1>Base types in the lang package</h1>
+  </div>
+</div>
+<div class="article">
+  <article>
+    <nav class="side">
+  <div class="side-title">
+    Base types in the lang package
+  </div>
+
+  <div class="side-content">
+    
+      <p>↑ <a href="/docs/sdk/lang/">Back to The lang package</a></p>
+    
+
+    <ol class="toc"><li><a href="#base-types-in-the-lang-package">Base types in the lang package</a></li><li><a href="#object--class">Object / Class</a></li><ol><li><a href="#size-vs-instancesize">size vs instanceSize</a></li></ol><li><a href="#various-types">Various types</a></li><ol><li><a href="#bool">Bool</a></li><li><a href="#void">Void</a></li><li><a href="#pointer">Pointer</a></li><li><a href="#none">None</a></li><li><a href="#cell">Cell</a></li></ol><li><a href="#varargs">VarArgs</a></li></ol>
+  </div>
+</nav>
+
+    <div class="article-content">
+      <h2 id="base-types-in-the-lang-package">Base types in the lang package</h2>
+
+<p>Some types are useful enough that they are imported into every ooc
+module out there. For example, <code>Object</code>, which is the default super type
+of all objects.</p>
+
+<p>Integer types, both fixed-width (<code>Int32</code>, <code>Int64</code>) and variable-width
+(<code>Long</code>, <code>LLong</code>) are also in <code>lang/types</code>, along with the boolean type
+<code>Bool</code>.</p>
+
+<h2 id="object--class">Object / Class</h2>
+
+<p>The <code>Object</code> and <code>Class</code> classes are written in ooc itself, and not part
+of some separate C runtime.</p>
+
+<p>Anytime a type is referred to, you have something of type <code>Class</code>:</p>
+
+<pre><code class="language-ooc"><span class="nv">type</span> <span class="o">:=</span> <span class="nc">Int</span>
+<span class="nv">type</span> <span class="nv">name</span> <span class="c">// "Int"</span>
+<span class="nv">type</span> <span class="nv">size</span> <span class="c">// 4</span>
+<span class="nv">type</span> <span class="nv">instanceSize</span> <span class="c">// 4</span></code></pre>
+
+<p>Actually, in this case, it’s an instance of <code>IntClass</code>, as demonstrated
+by this chunk of code:</p>
+
+<pre><code class="language-ooc"><span class="nv">type</span> <span class="k">class</span> <span class="nv">name</span> <span class="c">// "IntClass"</span></code></pre>
+
+<p>Even base types have classes, although they aren’t available via the
+<code>class</code> property, unlike objects.</p>
+
+<pre><code class="language-ooc"><span class="nv">dog</span> <span class="o">:=</span> <span class="nc">Dog</span> <span class="k">new</span><span class="p">()</span>
+<span class="nv">dog</span> <span class="k">class</span> <span class="o">==</span> <span class="nc">Dog</span> <span class="c">// true</span>
+
+<span class="nv">a</span> <span class="o">:=</span> <span class="m-Decimal">42</span>
+<span class="nv">a</span> <span class="k">class</span> <span class="c">// invalid, not an object, it doesn't have fields</span></code></pre>
+
+<p>This is especially useful for generics, where classes are passed
+along with actual arguments:</p>
+
+<pre><code class="language-ooc"><span class="nv">acceptAnything</span><span class="p">:</span> <span class="k">func</span> <span class="o">&lt;</span><span class="nc">T</span><span class="o">&gt;</span> <span class="p">(</span><span class="nv">t</span><span class="p">:</span> <span class="nc">T</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nc">T</span> <span class="c">// is a subtype of Class, can access 'name', etc.</span>
+<span class="p">}</span></code></pre>
+
+<h3 id="size-vs-instancesize">size vs instanceSize</h3>
+
+<p>For basic types such as Int, Float, Char - there is no difference between size
+and instanceSize. For complex types, e.g. objects, there is a difference between
+size and instanceSize.</p>
+
+<p>For objects, <code>size</code> is always equal to the size of a pointer - since objects are
+references. However, <code>instanceSize</code> is equal to the amount of memory an object
+takes in memory.</p>
+
+<p>For more information on the subject, read about <a href="/docs/lang/classes/">ooc classes</a></p>
+
+<h2 id="various-types">Various types</h2>
+
+<h3 id="bool">Bool</h3>
+
+<p>Booleans in ooc, equal to either the boolean literal <code>true</code>, or <code>false</code>,
+are of type <code>Bool</code>.</p>
+
+<pre><code class="language-ooc"><span class="nv">b</span> <span class="o">:=</span> <span class="k">true</span></code></pre>
+
+<h3 id="void">Void</h3>
+
+<p><code>Void</code> is the type of nothing. A function that doesn’t return anything
+has a return type of <code>Void</code>, implicitly.</p>
+
+<p>It is never used explicitly throughout the SDK, it is mostly there so
+that compiler iternals work fine.</p>
+
+<h3 id="pointer">Pointer</h3>
+
+<p><code>Pointer</code> is the umbrella term for any type of pointer. When possible,
+using a more precise type such as <code>Int*</code> is desirable.</p>
+
+<h3 id="none">None</h3>
+
+<p>None can be used as an object representing nothing. It has a single
+no-argument constructor:</p>
+
+<pre><code class="language-ooc"><span class="nv">nothing</span> <span class="o">:=</span> <span class="nc">None</span> <span class="k">new</span><span class="p">()</span></code></pre>
+
+<p>It can be used in place of null when adopting a pattern-matching approach.</p>
+
+<h3 id="cell">Cell</h3>
+
+<p>Cell is documented in the <a href="/docs/sdk/structs/">structs package</a>.</p>
+
+<h2 id="varargs">VarArgs</h2>
+
+<p>This is the sdk-side implementation of variable arguments. Basically,
+it allows packing different values in the <code>VarArgs</code> structure with
+<code>_addValue</code> - although the compiler will typically write those out
+with a static initializer for efficiency.</p>
+
+<p>They can be iterated through thanks to <code>VarArgsIterator</code>:</p>
+
+<pre><code class="language-ooc"><span class="nv">something</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">args</span><span class="p">:</span> <span class="o">..</span><span class="p">.)</span> <span class="p">{</span>
+  <span class="nv">iter</span> <span class="o">:=</span> <span class="nv">args</span> <span class="nf">iterator</span><span class="p">()</span>
+  <span class="k">while</span> <span class="p">(</span><span class="nv">iter</span> <span class="nv">hasNext</span><span class="o">?</span><span class="p">())</span> <span class="p">{</span>
+    <span class="nc">T</span> <span class="o">:=</span> <span class="nv">iter</span> <span class="nf">getNextType</span><span class="p">()</span>
+    <span class="nv">match</span> <span class="nc">T</span> <span class="p">{</span>
+      <span class="k">case</span> <span class="nc">Int</span> <span class="o">=&gt;</span>
+        <span class="nv">value</span> <span class="o">:=</span> <span class="nv">iter</span> <span class="nf">next</span><span class="p">(</span><span class="nc">Int</span><span class="p">)</span>
+        <span class="c">// do something with value</span>
+      <span class="k">case</span> <span class="o">=&gt;</span>
+        <span class="nf">raise</span><span class="p">(</span><span class="s2">"Unsupported argument type: %s"</span> <span class="nf">format</span><span class="p">(</span><span class="nc">T</span> <span class="nv">name</span><span class="p">))</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre>
+
+<p>Or, more simply, with <code>each</code>:</p>
+
+<pre><code class="language-ooc"><span class="nv">something</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">args</span><span class="p">:</span> <span class="o">..</span><span class="p">.)</span> <span class="p">{</span>
+  <span class="nv">args</span> <span class="nf">each</span><span class="p">(</span><span class="o">|</span><span class="nv">arg</span><span class="o">|</span>
+    <span class="nv">match</span> <span class="nv">arg</span> <span class="p">{</span>
+      <span class="k">case</span> <span class="nv">value</span><span class="p">:</span> <span class="nc">Int</span> <span class="o">=&gt;</span>
+        <span class="c">// do something with value</span>
+      <span class="k">case</span> <span class="o">=&gt;</span>
+        <span class="nf">raise</span><span class="p">(</span><span class="s2">"Unsupported argument type"</span><span class="p">)</span>
+    <span class="p">}</span>
+  <span class="p">)</span>
+<span class="p">}</span></code></pre>
+    </div>
+  </article>
+</div>
+<footer>
+  <div class="footer-content">
+  <nav><section class="about"><h3>About</h3>
+    <ul>
+        <li><a href="/about/#history">History</a></li>
+        <li><a href="/about/#why-use-ooc">Why use ooc?</a></li>
+        <li><a href="/about/#similar-projects">Alternatives</a></li>
+    </ul></section><section class="install"><h3>Install</h3>
+    <ul>
+        <li><a href="/install/#quick-install">Quick install</a></li>
+        <li><a href="/install/#installing-from-git">Installing from Git</a></li>
+        <li><a href="/install/#post-install-instructions">Post-install instructions</a></li>
+        <li><a href="/install/#installing-sam">Installing sam</a></li>
+    </ul></section><section class="documentation"><h3>Documentation</h3>
+    <ul>
+        <li><a href="/docs/tutorial/">Tutorial</a></li>
+        <li><a href="/docs/lang/">Language</a></li>
+        <li><a href="/docs/sdk/">SDK</a></li>
+        <li><a href="/docs/tools/">Tools</a></li>
+        <li><a href="/docs/tools/rock/">Implementation</a></li>
+        <li><a href="/docs/kaputt/">Troubleshooting</a></li>
+        <li><a href="/docs/glossary/">Glossary</a></li>
+    </ul></section><section class="community"><h3>Community</h3>
+    <ul>
+        <li><a href="http://groups.google.com/group/ooc-lang">Discussion group</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/issues">Issue tracker</a></li>
+        <li><a href="irc://chat.freenode.net/#ooc-lang">IRC channel</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/wiki">Wiki</a></li>
+        <li><a href="/development/">Development</a></li>
+        <li><a href="http://pledgie.com/campaigns/21363">Donate</a></li>
+    </ul></section></nav>
+    <div class="fine-print">
+      <p>
+        ooc &copy; 2009-2015 <a href="http://amos.me/">Amos Wenger</a>. The content of this website is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0 License</a>.
+        rock is licensed under the MIT license. Design based on the <a href="http://nanoc.ws/">nanoc web site</a> by <a href="http://stoneship.org/">Denis Defreyne</a> and used with permission.
+        <a href="http://entypo.com/">Entypo</a>By Daniel Bruce.
+      </p>
+    </div>
+  </div>
+</footer>
+
+  </body>
+</html>

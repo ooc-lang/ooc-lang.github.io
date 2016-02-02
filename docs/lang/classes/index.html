@@ -1,0 +1,501 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ooc &raquo; Classes</title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="stylesheet" href="/assets/pygments.css">
+    <link href="http://fonts.googleapis.com/css?family=Radley:regular&text=OC" rel="stylesheet" type="text/css" >
+    <link href="http://fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,400,400italic,700,700italic,900,900italic" rel="stylesheet" type="text/css" >
+
+    <!-- Cool stats stuff for nanoc :) -->
+    <meta name="generator" content="nanoc 3.6.5"> 
+  </head>
+  <body>
+
+<header>
+  <div class="header-content">
+    <nav class="main">
+      <ol>
+        <li class="home"><a href="/"><img src="/assets/images/logo-nav.png" alt="Home"></a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/install/">Install</a></li>
+        <li><a href="/docs/">Documentation</a></li>
+        <li><a href="/community/">Community</a></li>
+        <li><a href="/development/">Development</a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+<div class="intro">
+  <div class="intro-content">
+    <h1>Classes</h1>
+  </div>
+</div>
+<div class="article">
+  <article>
+    <nav class="side">
+  <div class="side-title">
+    Classes
+  </div>
+
+  <div class="side-content">
+    
+      <p>↑ <a href="/docs/lang/">Back to Language</a></p>
+    
+
+    <ol class="toc"><li><a href="#classes">Classes</a></li><li><a href="#members">Members</a></li><ol><li><a href="#built-in-members">Built-in members</a></li><li><a href="#static-members">Static members</a></li><li><a href="#properties">Properties</a></li></ol><li><a href="#methods">Methods</a></li><ol><li><a href="#this-and-this">this and This</a></li><li><a href="#static-methods">Static methods</a></li></ol><li><a href="#constructors">Constructors</a></li><ol><li><a href="#initializers">Initializers</a></li></ol><li><a href="#inheritance">Inheritance</a></li><ol><li><a href="#extends">Extends</a></li><li><a href="#super">Super</a></li><li><a href="#class-hierarchy">Class hierarchy</a></li></ol><li><a href="#adding-methods-after-definition">Adding methods after definition</a></li></ol>
+  </div>
+</nav>
+
+    <div class="article-content">
+      <h2 id="classes">Classes</h2>
+
+<p>Define classes with the <code>class</code> keyword:</p>
+
+<pre><code class="language-ooc"><span class="nc">Dog</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+  <span class="nv">name</span><span class="p">:</span> <span class="nc">String</span>
+  <span class="nv">race</span><span class="p">:</span> <span class="nc">Race</span>
+
+  <span class="nv">init</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="o">=</span><span class="nv">name</span><span class="p">,</span> <span class="o">=</span><span class="nv">race</span><span class="p">)</span>
+  <span class="nv">bark</span><span class="p">:</span> <span class="k">func</span> <span class="p">{</span> <span class="s2">"Woof!"</span> <span class="nf">println</span><span class="p">()</span> <span class="p">}</span>
+<span class="p">}</span></code></pre>
+
+<p>Then, call <code>new</code> on it to make an instance of it:</p>
+
+<pre><code class="language-ooc"><span class="nv">dog</span> <span class="o">:=</span> <span class="nc">Dog</span> <span class="k">new</span><span class="p">()</span></code></pre>
+
+<p>An instance of a class is also called an object.</p>
+
+<h2 id="members">Members</h2>
+
+<p>Members are variables tied to an instance:</p>
+
+<pre><code class="language-ooc"><span class="nc">Dog</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+  <span class="c">// declare a field named 'name'</span>
+  <span class="nv">name</span><span class="p">:</span> <span class="nc">String</span>
+
+  <span class="nv">init</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="o">=</span><span class="nv">name</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="nv">d1</span> <span class="o">:=</span> <span class="nc">Dog</span> <span class="k">new</span><span class="p">(</span><span class="s2">"Rita"</span><span class="p">)</span>
+<span class="nv">d2</span> <span class="o">:=</span> <span class="nc">Dog</span> <span class="k">new</span><span class="p">(</span><span class="s2">"Igloo"</span><span class="p">)</span>
+
+<span class="s2">"d1's name is = #{d1 name}"</span> <span class="nf">println</span><span class="p">()</span>
+<span class="s2">"d2's name is = #{d2 name}"</span> <span class="nf">println</span><span class="p">()</span></code></pre>
+
+<h3 id="built-in-members">Built-in members</h3>
+
+<p>There are a few members always available on classes. You can access the
+class of any object via the <code>class</code> member. For example:</p>
+
+<pre><code class="language-ooc"><span class="c">// will be equal to 'Dog'</span>
+<span class="nv">dog</span> <span class="k">class</span> <span class="nv">name</span>
+
+<span class="c">// since objects are reference, will be the size of a pointer</span>
+<span class="nv">dog</span> <span class="k">class</span> <span class="nv">size</span>
+
+<span class="c">// the actual size of a dog object, including members</span>
+<span class="nv">dog</span> <span class="k">class</span> <span class="nv">instanceSize</span></code></pre>
+
+<h3 id="static-members">Static members</h3>
+
+<p>Static members belong to a class, rather than to an instance.</p>
+
+<pre><code class="language-ooc"><span class="nc">Node</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+  <span class="nv">count</span><span class="p">:</span> <span class="k">static</span> <span class="nc">Int</span> <span class="o">=</span> <span class="m-Decimal">0</span>
+
+  <span class="nv">init</span><span class="p">:</span> <span class="k">func</span> <span class="p">{</span>
+    <span class="nc">This</span> <span class="nv">count</span> <span class="o">+=</span> <span class="m-Decimal">1</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="nv">i</span> <span class="k">in</span> <span class="m-Decimal">0</span><span class="o">..</span><span class="m-Decimal">10</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nc">Node</span> <span class="k">new</span><span class="p">()</span>
+<span class="p">}</span>
+<span class="s2">"Number of nodes: #{Node count}"</span> <span class="nf">println</span><span class="p">()</span></code></pre>
+
+<p>In the code above, <code>count</code> is “shared” among all instances of node - hence,
+incrementing it in the constructor will be “remembered” the next time a node
+is created. So, we really are counting the number of nodes being created.</p>
+
+<p>Static fields can also be accessed without explicitly referring to <code>This</code>.
+The declare-assignment operator, <code>:=</code>, also works with the <code>static</code> keyword before
+the right-hand-side value:</p>
+
+<pre><code class="language-ooc"><span class="nc">Node</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+  <span class="nv">count</span> <span class="o">:=</span> <span class="k">static</span> <span class="m-Decimal">0</span>
+
+  <span class="nv">init</span><span class="p">:</span> <span class="k">func</span> <span class="p">{</span>
+    <span class="nv">count</span> <span class="o">+=</span> <span class="m-Decimal">1</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c">// etc.</span></code></pre>
+
+<h3 id="properties">Properties</h3>
+
+<p>The shortest and sweetest way to define a property is to use the <code>::=</code> operator:</p>
+
+<pre><code class="language-ooc"><span class="nc">Rectangle</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+  <span class="nv">width</span><span class="p">,</span> <span class="nv">height</span><span class="p">:</span> <span class="nc">Int</span>
+  <span class="nv">area</span> <span class="p">:</span><span class="o">:=</span> <span class="nv">width</span> <span class="o">*</span> <span class="nv">height</span>
+<span class="p">}</span></code></pre>
+
+<p>Contrary to a variable declaration, the value of <code>area</code> will be
+recomputed every time it is being accessed. Contrary to a function
+call, one does not need parenthesis to call its getter, nor can it
+pass any argument.</p>
+
+<p>Properties are mostly useful as shorthands for an expression that
+is often computed, but that would be overkill as a method.</p>
+
+<p>In the technical jargon, we say that properties are, <code>virtual</code>
+members that exist as read-only, write-only, or read-write behind
+getters and setters.</p>
+
+<p>Here’s an example of long-form, read-only property:</p>
+
+<pre><code class="language-ooc"><span class="nc">Person</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+  <span class="nv">lastName</span><span class="p">,</span> <span class="nv">firstName</span><span class="p">:</span> <span class="nc">String</span>
+
+  <span class="nv">fullName</span><span class="p">:</span> <span class="nc">String</span> <span class="p">{</span>
+    <span class="nv">get</span> <span class="p">{</span>
+      <span class="s2">"%s %s"</span> <span class="nf">format</span><span class="p">(</span><span class="nv">lastName</span><span class="p">,</span> <span class="nv">firstName</span><span class="p">)</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre>
+
+<p>Note that when specifying a getter, one does not need a return type,
+as it is the type of the property itself.</p>
+
+<p>Similarly, when specifying a setter, one only needs an argument name
+not its type:</p>
+
+<pre><code class="language-ooc"><span class="nc">Person</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+  <span class="nv">lastName</span><span class="p">,</span> <span class="nv">firstName</span><span class="p">:</span> <span class="nc">String</span>
+
+  <span class="nv">name</span><span class="p">:</span> <span class="nc">String</span> <span class="p">{</span>
+    <span class="nf">set</span> <span class="p">(</span><span class="nv">name</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nv">tokens</span> <span class="o">:=</span> <span class="nv">name</span> <span class="nf">split</span><span class="p">(</span><span class="s2">" "</span><span class="p">)</span>
+      <span class="nf">assert</span><span class="p">(</span><span class="nv">tokens</span> <span class="nv">size</span> <span class="o">==</span> <span class="m-Decimal">2</span><span class="p">)</span>
+      <span class="p">(</span><span class="nv">firstName</span><span class="p">,</span> <span class="nv">lastName</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="nv">tokens</span><span class="p">[</span><span class="m-Decimal">0</span><span class="p">],</span> <span class="nv">tokens</span><span class="p">[</span><span class="m-Decimal">1</span><span class="p">])</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre>
+
+<p>Empty getters and setters are valid as well, for a simple read-write property:</p>
+
+<pre><code class="language-ooc"><span class="nc">Person</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+  <span class="nv">name</span><span class="p">:</span> <span class="nc">String</span> <span class="p">{</span> <span class="nv">get</span> <span class="nv">set</span> <span class="p">}</span>
+<span class="p">}</span></code></pre>
+
+<p>The advantage is the following - since a property is only accessed via its
+getters and setters, which are methods, changing the structure of the <code>Person</code>
+class will not necessarily trigger a recompile on the modules which use it,
+nor will they need to explicitly import that module, if they get a <code>Person</code> instance
+from somewhere else.</p>
+
+<p>This is a way to work around what is known as the <a href="fragile">Fragile Base Class Problem</a>.</p>
+
+<h2 id="methods">Methods</h2>
+
+<p>Methods are function declarations in the class body, that are called
+on a particular instance:</p>
+
+<pre><code class="language-ooc"><span class="nc">Dog</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+  <span class="nv">bark</span><span class="p">:</span> <span class="k">func</span> <span class="p">{</span>
+    <span class="s2">"Woof!"</span> <span class="nf">println</span><span class="p">()</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nv">dog</span> <span class="o">:=</span> <span class="nc">Dog</span> <span class="k">new</span><span class="p">()</span>
+<span class="nv">dog</span> <span class="nf">bark</span><span class="p">()</span></code></pre>
+
+<h3 id="this-and-this">this and This</h3>
+
+<p>In a method, the special variable <code>this</code> is accessible, and refers to the object
+the method is being called on.</p>
+
+<p>Example usage of <code>this</code></p>
+
+<pre><code class="language-ooc"><span class="nc">Building</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+  <span class="nv">height</span><span class="p">:</span> <span class="nc">Int</span>
+
+  <span class="c">// argument name shadows member name</span>
+  <span class="nv">setHeight</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">height</span><span class="p">:</span> <span class="nc">Int</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">height</span> <span class="o">&lt;</span> <span class="m-Decimal">0</span> <span class="o">||</span> <span class="nv">height</span> <span class="o">&gt;</span> <span class="m-Decimal">300</span><span class="p">)</span> <span class="k">return</span>
+
+    <span class="c">// using `this` explicitly to differenciate them</span>
+    <span class="k">this</span> <span class="nv">height</span> <span class="o">=</span> <span class="nv">height</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre>
+
+<p><code>This</code>, on the other hand, refers to the type currently being defined:</p>
+
+<pre><code class="language-ooc"><span class="nc">Engine</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+  <span class="nv">logger</span> <span class="o">:=</span> <span class="nc">Log</span> <span class="nf">getLogger</span><span class="p">(</span><span class="nc">This</span> <span class="nv">name</span><span class="p">)</span>
+<span class="p">}</span></code></pre>
+
+<p>In the example above, we are using the name of the class we are currently defining,
+instead of typing out <code>"Engine"</code> directly — that way, if we rename the class, the
+code will still be valid. It’s a good way to <a href="https://en.wikipedia.org/wiki/Don%27t_repeat_yourself">avoid repeating yourself</a>.</p>
+
+<h3 id="static-methods">Static methods</h3>
+
+<p>Static methods also belong to a specific class, but they’re not tied to
+a particular instance. Hence, you don’t have access to <code>this</code> in a static
+method because it’s not called on an instance:</p>
+
+<pre><code class="language-ooc"><span class="nc">Map</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+  <span class="nv">tiles</span> <span class="o">:=</span> <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">Tile</span><span class="o">&gt;</span> <span class="k">new</span><span class="p">()</span>
+
+  <span class="nv">generate</span><span class="p">:</span> <span class="k">static</span> <span class="k">func</span> <span class="p">(</span><span class="nv">width</span><span class="p">,</span> <span class="nv">height</span><span class="p">:</span> <span class="nc">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nc">This</span> <span class="p">{</span>
+    <span class="nv">m</span> <span class="o">:=</span> <span class="nc">This</span> <span class="k">new</span><span class="p">()</span>
+    <span class="k">for</span> <span class="p">(</span><span class="nv">y</span> <span class="k">in</span> <span class="m-Decimal">0</span><span class="o">..</span><span class="nv">height</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="nv">x</span> <span class="k">in</span> <span class="m-Decimal">0</span><span class="o">..</span><span class="nv">width</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nv">m</span> <span class="nf">addTile</span><span class="p">(</span><span class="nv">x</span><span class="p">,</span> <span class="nv">y</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="nv">m</span>
+  <span class="p">}</span>
+
+  <span class="nv">addTile</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">x</span><span class="p">,</span> <span class="nv">y</span><span class="p">:</span> <span class="nc">Int</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">}</span>
+<span class="p">}</span></code></pre>
+
+<p>In some languages, <code>new</code> is a keyword used to create objects. In ooc,
+it’s just a static method doing some allocation and initialization, and
+returning a new instance. See “Constructors” for more details.</p>
+
+<h2 id="constructors">Constructors</h2>
+
+<p>Define the <code>init</code> method (with a suffix to have different constructors), and
+a <code>new</code> static method will get defined automatically.</p>
+
+<pre><code class="language-ooc"><span class="nc">Dog</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+  <span class="nv">name</span><span class="p">:</span> <span class="nc">String</span>
+
+  <span class="nv">init</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="o">=</span><span class="nv">name</span><span class="p">)</span>
+  <span class="nv">init</span><span class="p">:</span> <span class="k">func</span> <span class="nf">~default</span> <span class="p">{</span> <span class="nv">name</span> <span class="o">=</span> <span class="s2">"Fido"</span> <span class="p">}</span>
+<span class="p">}</span></code></pre>
+
+<p>For alternative instanciation strategies, defining a custom, static <code>new</code>
+method, returning an instance of type <code>This</code>, works just as well:</p>
+
+<pre><code class="language-ooc"><span class="nc">Dog</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+  <span class="nv">pool</span> <span class="o">:=</span> <span class="k">static</span> <span class="nc">Stack</span><span class="o">&lt;</span><span class="nc">This</span><span class="o">&gt;</span> <span class="k">new</span><span class="p">()</span>
+
+  <span class="k">new</span><span class="p">:</span> <span class="k">static</span> <span class="k">func</span> <span class="o">-&gt;</span> <span class="nc">This</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">pool</span> <span class="nv">empty</span><span class="o">?</span><span class="p">())</span> <span class="p">{</span>
+      <span class="nv">obj</span> <span class="o">:=</span> <span class="nc">This</span> <span class="nf">alloc</span><span class="p">()</span>
+      <span class="nv">obj</span> <span class="m-Decimal">__</span><span class="nf">defaults__</span><span class="p">()</span>
+      <span class="nv">obj</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="nv">pool</span> <span class="nf">pop</span><span class="p">()</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="nv">free</span><span class="p">:</span> <span class="k">func</span> <span class="p">{</span>
+    <span class="nv">pool</span> <span class="nf">push</span><span class="p">(</span><span class="k">this</span><span class="p">)</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre>
+
+<p>We can clearly see that the <code>alloc</code> static method here does memory allocation
+for the object, but what about <code>__defaults__</code>? It contains initializers, discussed
+in the next section.</p>
+
+<h3 id="initializers">Initializers</h3>
+
+<p>We’ve discussed methods, but not all code that belong to a class is in an explicit
+method. For example, in this code, declaration and initialization are clearly separate:</p>
+
+<pre><code class="language-ooc"><span class="nc">Group</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+  <span class="nv">number</span><span class="p">:</span> <span class="nc">Int</span>
+
+  <span class="nv">init</span><span class="p">:</span> <span class="k">func</span> <span class="p">{</span>
+    <span class="nv">number</span> <span class="o">=</span> <span class="m-Decimal">42</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre>
+
+<p>But what happens with the following code?</p>
+
+<pre><code class="language-ooc"><span class="nc">Group</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+  <span class="nv">number</span> <span class="o">:=</span> <span class="m-Decimal">42</span>
+
+  <span class="nv">init</span><span class="p">:</span> <span class="k">func</span> <span class="p">{</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre>
+
+<p>The resulting executable does the same. The class contains a field
+of type Int, initially equal to 0, but there’s an implicit <code>__defaults__</code>
+method that contains all code outside of a method, that gets executed before
+the <code>init</code> method is called.</p>
+
+<p>Above, the example is a pattern you’ll see often - however, one can put
+any amount of code directly in the class declaration:</p>
+
+<pre><code class="language-ooc"><span class="nc">Dog</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+    <span class="s2">"You made a dog!"</span> <span class="nf">println</span><span class="p">()</span>
+    <span class="nv">init</span><span class="p">:</span> <span class="k">func</span>
+<span class="p">}</span></code></pre>
+
+<p>Every time <code>Dog new()</code> is called, the <code>"You made a dog!"</code> string will get
+printed.</p>
+
+<h2 id="inheritance">Inheritance</h2>
+
+<h3 id="extends">Extends</h3>
+
+<p>Simple inheritance is achieved through the <code>extends</code> keyword:</p>
+
+<pre><code class="language-ooc"><span class="nc">Animal</span><span class="p">:</span> <span class="k">class</span> <span class="p">{}</span>
+<span class="nc">Dog</span><span class="p">:</span> <span class="k">class</span> <span class="k">extends</span> <span class="nc">Animal</span> <span class="p">{}</span></code></pre>
+
+<p>In this case, an instance of <code>Dog</code> will also be an instance of <code>Animal</code>,
+and it inherits all its methods and members.</p>
+
+<p>For example, a function expecting an <code>Animal</code> can be passed a <code>Dog</code> instead.
+That is, if your code is designed correctly. For some encyclopedic knowledge
+on the matter, check out the <a href="http://en.wikipedia.org/wiki/Liskov_substitution_principle">Liskov Substition Principle</a></p>
+
+<h3 id="super">Super</h3>
+
+<p>Calling <code>super</code> will call the definition of a method in the super-class.</p>
+
+<pre><code class="language-ooc"><span class="nc">SimpleApp</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+  <span class="nv">init</span><span class="p">:</span> <span class="k">func</span> <span class="p">{</span>
+    <span class="nf">loadConfig</span><span class="p">()</span>
+  <span class="p">}</span>
+
+  <span class="c">// ...</span>
+<span class="p">}</span>
+
+<span class="nc">NetworkedApp</span><span class="p">:</span> <span class="k">class</span> <span class="k">extends</span> <span class="nc">SimpleApp</span> <span class="p">{</span>
+  <span class="nv">init</span><span class="p">:</span> <span class="k">func</span> <span class="p">{</span>
+    <span class="k">super</span><span class="p">()</span>
+    <span class="nf">initNetworking</span><span class="p">()</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre>
+
+<p>When one just wants to relay a constructor, one can use <code>super func</code>:</p>
+
+<pre><code class="language-ooc"><span class="nc">MyException</span><span class="p">:</span> <span class="k">class</span> <span class="k">extends</span> <span class="nc">Exception</span> <span class="p">{</span>
+  <span class="nv">init</span><span class="p">:</span> <span class="k">super</span> <span class="k">func</span>
+<span class="p">}</span></code></pre>
+
+<p>Which is equivalent to the following:</p>
+
+<pre><code class="language-ooc"><span class="nc">MyException</span><span class="p">:</span> <span class="k">class</span> <span class="k">extends</span> <span class="nc">Exception</span> <span class="p">{</span>
+  <span class="nv">init</span><span class="p">:</span> <span class="k">func</span> <span class="p">{</span>
+    <span class="k">super</span><span class="p">()</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre>
+
+<p><code>super func</code> can take a suffix, and it relays argument as well. It is useful
+when you really don’t have much more to do in the constructor of the sub-class.</p>
+
+<p>Please bear in mind that <code>super func</code> is relatively hackish - it is documented
+here for completeness’ sake, but it is more of a rapid coding trick than a good
+practice, really.</p>
+
+<h3 id="class-hierarchy">Class hierarchy</h3>
+
+<p>The class hierarchy can be explored via built-in members and methods on objects
+and classes:</p>
+
+<pre><code class="language-ooc"><span class="c">// in this case, the Object class - otherwise, whatever super class it has</span>
+<span class="nv">dog</span> <span class="k">class</span> <span class="k">super</span>
+
+<span class="c">// evaluates to true</span>
+<span class="nv">dog</span> <span class="nv">instanceOf</span><span class="o">?</span><span class="p">(</span><span class="nc">Dog</span><span class="p">)</span>
+
+<span class="c">// also evaluates to true</span>
+<span class="nv">dog</span> <span class="nv">instanceOf</span><span class="o">?</span><span class="p">(</span><span class="nc">Object</span><span class="p">)</span>
+
+<span class="c">// evaluates to false</span>
+<span class="nv">dog</span> <span class="nv">instanceOf</span><span class="o">?</span><span class="p">(</span><span class="nc">Cat</span><span class="p">)</span></code></pre>
+
+<p>The equivalent of <code>instanceOf?</code> called on classes, is <code>inheritsFrom?</code></p>
+
+<pre><code class="language-ooc"><span class="c">// true</span>
+<span class="nc">Dog</span> <span class="nv">inheritsFrom</span><span class="o">?</span><span class="p">(</span><span class="nc">Dog</span><span class="p">)</span>
+
+<span class="c">// true</span>
+<span class="nc">Dog</span> <span class="nv">inheritsFrom</span><span class="o">?</span><span class="p">(</span><span class="nc">Object</span><span class="p">)</span>
+
+<span class="c">// false</span>
+<span class="nc">Dog</span> <span class="nv">inheritsFrom</span><span class="o">?</span><span class="p">(</span><span class="nc">Cat</span><span class="p">)</span></code></pre>
+
+<h2 id="adding-methods-after-definition">Adding methods after definition</h2>
+
+<p>This applies to classes, covers, and enums alike. The <code>extend</code>
+keyword can add superficial methods to any type, even if it is
+defined in another module.</p>
+
+<p>It is useful to add convenience methods of your own without having
+to modify the original library.</p>
+
+<pre><code class="language-ooc"><span class="nv">extend</span> <span class="nc">Float</span> <span class="p">{</span>
+  <span class="nv">negated</span><span class="p">:</span> <span class="k">func</span> <span class="o">-&gt;</span> <span class="nc">This</span> <span class="p">{</span> <span class="o">-</span><span class="k">this</span> <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="o">-</span><span class="mf">3.14</span> <span class="o">==</span> <span class="mf">3.14</span> <span class="nf">negated</span><span class="p">())</span> <span class="p">{</span>
+  <span class="s2">"Everything is fine"</span> <span class="nf">println</span><span class="p">()</span>
+<span class="p">}</span></code></pre>
+
+<p>Virtual properties (that do not correspond to a real instance variable,
+but rather compute their value from other information everytime) can also
+be added in an <code>extend</code> block:</p>
+
+<pre><code class="language-ooc"><span class="nv">extend</span> <span class="nc">Int</span> <span class="p">{</span>
+  <span class="nv">plusFive</span><span class="p">:</span> <span class="nc">This</span> <span class="p">{</span> <span class="nv">get</span> <span class="p">{</span>
+    <span class="k">this</span> <span class="o">+</span> <span class="m-Decimal">5</span>
+  <span class="p">}</span> <span class="p">}</span>
+<span class="p">}</span></code></pre>
+
+<p>See the <a href="#properties">Properties</a> section for more info on properties.</p>
+    </div>
+  </article>
+</div>
+<footer>
+  <div class="footer-content">
+  <nav><section class="about"><h3>About</h3>
+    <ul>
+        <li><a href="/about/#history">History</a></li>
+        <li><a href="/about/#why-use-ooc">Why use ooc?</a></li>
+        <li><a href="/about/#similar-projects">Alternatives</a></li>
+    </ul></section><section class="install"><h3>Install</h3>
+    <ul>
+        <li><a href="/install/#quick-install">Quick install</a></li>
+        <li><a href="/install/#installing-from-git">Installing from Git</a></li>
+        <li><a href="/install/#post-install-instructions">Post-install instructions</a></li>
+        <li><a href="/install/#installing-sam">Installing sam</a></li>
+    </ul></section><section class="documentation"><h3>Documentation</h3>
+    <ul>
+        <li><a href="/docs/tutorial/">Tutorial</a></li>
+        <li><a href="/docs/lang/">Language</a></li>
+        <li><a href="/docs/sdk/">SDK</a></li>
+        <li><a href="/docs/tools/">Tools</a></li>
+        <li><a href="/docs/tools/rock/">Implementation</a></li>
+        <li><a href="/docs/kaputt/">Troubleshooting</a></li>
+        <li><a href="/docs/glossary/">Glossary</a></li>
+    </ul></section><section class="community"><h3>Community</h3>
+    <ul>
+        <li><a href="http://groups.google.com/group/ooc-lang">Discussion group</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/issues">Issue tracker</a></li>
+        <li><a href="irc://chat.freenode.net/#ooc-lang">IRC channel</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/wiki">Wiki</a></li>
+        <li><a href="/development/">Development</a></li>
+        <li><a href="http://pledgie.com/campaigns/21363">Donate</a></li>
+    </ul></section></nav>
+    <div class="fine-print">
+      <p>
+        ooc &copy; 2009-2015 <a href="http://amos.me/">Amos Wenger</a>. The content of this website is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0 License</a>.
+        rock is licensed under the MIT license. Design based on the <a href="http://nanoc.ws/">nanoc web site</a> by <a href="http://stoneship.org/">Denis Defreyne</a> and used with permission.
+        <a href="http://entypo.com/">Entypo</a>By Daniel Bruce.
+      </p>
+    </div>
+  </div>
+</footer>
+
+  </body>
+</html>

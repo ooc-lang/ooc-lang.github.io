@@ -1,0 +1,197 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ooc &raquo; Drivers</title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="stylesheet" href="/assets/pygments.css">
+    <link href="http://fonts.googleapis.com/css?family=Radley:regular&text=OC" rel="stylesheet" type="text/css" >
+    <link href="http://fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,400,400italic,700,700italic,900,900italic" rel="stylesheet" type="text/css" >
+
+    <!-- Cool stats stuff for nanoc :) -->
+    <meta name="generator" content="nanoc 3.6.5"> 
+  </head>
+  <body>
+
+<header>
+  <div class="header-content">
+    <nav class="main">
+      <ol>
+        <li class="home"><a href="/"><img src="/assets/images/logo-nav.png" alt="Home"></a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/install/">Install</a></li>
+        <li><a href="/docs/">Documentation</a></li>
+        <li><a href="/community/">Community</a></li>
+        <li><a href="/development/">Development</a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+<div class="intro">
+  <div class="intro-content">
+    <h1>Drivers</h1>
+  </div>
+</div>
+<div class="article">
+  <article>
+    <nav class="side">
+  <div class="side-title">
+    Drivers
+  </div>
+
+  <div class="side-content">
+    
+      <p>↑ <a href="/docs/tools/rock/">Back to rock</a></p>
+    
+
+    <ol class="toc"><li><a href="#compilation-strategy">Compilation strategy</a></li><li><a href="#sequence-driver">Sequence driver</a></li><ol><li><a href="#parsing-only">Parsing only</a></li><li><a href="#checking-only">Checking only</a></li><li><a href="#generation-only">Generation only</a></li><li><a href="#parallelism">Parallelism</a></li><li><a href="#lib-caching">Lib-caching</a></li></ol><li><a href="#make-driver">Make driver</a></li><li><a href="#cmake-driver">CMake driver</a></li><li><a href="#android-driver">Android driver</a></li></ol>
+  </div>
+</nav>
+
+    <div class="article-content">
+      <h2 id="compilation-strategy">Compilation strategy</h2>
+
+<p>Unlike other compilers, rock takes care of building whole projects at
+a time, not just single modules. However, how much you want to let up
+to rock is your choice, thanks to different <code>drivers</code>, or compilation strategies.</p>
+
+<h2 id="sequence-driver">Sequence driver</h2>
+
+<p>This is the default driver. It’ll parse all relevant .ooc files, generate
+C files, and call the C compiler to produce object files, then link the result.</p>
+
+<p>It can be customized using the following options:</p>
+
+<h3 id="parsing-only">Parsing only</h3>
+
+<p>If you only want rock to make sure there are no syntax errors, using
+the <code>--onlyparse</code> option will work.</p>
+
+<h3 id="checking-only">Checking only</h3>
+
+<p>If you want rock to parse and make sure that the code is correct ooc
+(e.g. types correspond, all functions calls have corresponding definitions,
+etc.), the <code>--onlycheck</code> option will do that.</p>
+
+<h3 id="generation-only">Generation only</h3>
+
+<p>If you just want rock to generate C files to look at what is being done
+under the hood, the <code>--onlygen</code> option can be used. They will be output
+in the <code>rock_tmp</code> (for .c files) and <code>.libs</code> (for header files) folders by default.</p>
+
+<p>If the goal is to tinker with the </p>
+
+<h3 id="parallelism">Parallelism</h3>
+
+<p>By default, rock will attempt to max out your processors by launching C
+compiler jobs in parallel. One can adjust the level of parallelism by
+specifying <code>-jN</code> to rock, where <code>N</code> is an int. To completely disable
+parallelism (ie. behave in a purely sequential way), pass <code>-j0</code>.</p>
+
+<h3 id="lib-caching">Lib-caching</h3>
+
+<p>Lib-caching is very convenient, yet at the same time it can cause unforeseen
+issues. The basic idea is that, between two compilations, only a portion of
+generated C code is affected by the changes, there is no reason to recompile
+what hasn’t changed.</p>
+
+<p>It is active by default, which means that even though the first compilation
+might take some time, subsequent compilations will be shorter. If a compilation
+seems to fail because of the remainder of previous compilations, running <code>rock -x</code>
+should fix it up.</p>
+
+<p>To temporarily disable lib-caching, one can use the <code>--nolibcache</code> compiler
+option.</p>
+
+<h2 id="make-driver">Make driver</h2>
+
+<p>The make driver is particularly useful when an ooc project is to be compiled
+on another platform lacking the ooc toolchain (for example, when bootstrapping
+rock), or when one wants to modify the C output of rock and recompile afterwards.</p>
+
+<p>By using <code>--driver=make</code>, the compile process looks something like this:</p>
+
+<pre><code class="language-bash"><span class="c"># In project directory</span>
+rock --driver<span class="o">=</span>make
+<span class="nb">cd </span>build/
+make</code></pre>
+
+<p>The <code>build</code> directory which is generated and populated with C files and a
+stand-alone Makefile, can be packaged and distributed on other platforms.</p>
+
+<p>Note that the <code>$GC_PATH</code> environment variable might need to be adjusted for
+the exported sources to build somewhere else. It could be as simple as
+installing the Boehm GC in <code>/usr</code> and setting <code>GC_PATH</code> to <code>-lgc</code>.</p>
+
+<p>One can use <code>make clean</code> to clean the produced objects and binaries. Modifying
+sources and partial recompilation is possible. Make accepts parallelism options
+similar to rock, e.g. with 8 cores, one might want to use <code>make -j7</code>.</p>
+
+<h2 id="cmake-driver">CMake driver</h2>
+
+<p>The CMake driver is similar to the make driver but generates a <code>CMakeLists.txt</code>
+file instead. The process looks like:</p>
+
+<pre><code class="language-bash"><span class="c"># In project directory</span>
+rock --driver<span class="o">=</span>cmake
+<span class="nb">cd </span>build/
+cmake .
+make</code></pre>
+
+<p>Note that CMake is itself a build file generator. In the example above we’re
+using the default <code>Makefile</code> output of CMake, but it could be used to generate
+Visual Studio project files, XCode project files, etc.</p>
+
+<h2 id="android-driver">Android driver</h2>
+
+<p>In spirit, the Android driver (invoked with <code>--driver=android</code>) is similar to
+the make driver, excepts that instead of generating Makefiles, it will generate
+<code>Android.mk</code> files, suitable for usage with the <code>ndk-build</code> utility from the
+Android NDK toolchain.</p>
+    </div>
+  </article>
+</div>
+<footer>
+  <div class="footer-content">
+  <nav><section class="about"><h3>About</h3>
+    <ul>
+        <li><a href="/about/#history">History</a></li>
+        <li><a href="/about/#why-use-ooc">Why use ooc?</a></li>
+        <li><a href="/about/#similar-projects">Alternatives</a></li>
+    </ul></section><section class="install"><h3>Install</h3>
+    <ul>
+        <li><a href="/install/#quick-install">Quick install</a></li>
+        <li><a href="/install/#installing-from-git">Installing from Git</a></li>
+        <li><a href="/install/#post-install-instructions">Post-install instructions</a></li>
+        <li><a href="/install/#installing-sam">Installing sam</a></li>
+    </ul></section><section class="documentation"><h3>Documentation</h3>
+    <ul>
+        <li><a href="/docs/tutorial/">Tutorial</a></li>
+        <li><a href="/docs/lang/">Language</a></li>
+        <li><a href="/docs/sdk/">SDK</a></li>
+        <li><a href="/docs/tools/">Tools</a></li>
+        <li><a href="/docs/tools/rock/">Implementation</a></li>
+        <li><a href="/docs/kaputt/">Troubleshooting</a></li>
+        <li><a href="/docs/glossary/">Glossary</a></li>
+    </ul></section><section class="community"><h3>Community</h3>
+    <ul>
+        <li><a href="http://groups.google.com/group/ooc-lang">Discussion group</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/issues">Issue tracker</a></li>
+        <li><a href="irc://chat.freenode.net/#ooc-lang">IRC channel</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/wiki">Wiki</a></li>
+        <li><a href="/development/">Development</a></li>
+        <li><a href="http://pledgie.com/campaigns/21363">Donate</a></li>
+    </ul></section></nav>
+    <div class="fine-print">
+      <p>
+        ooc &copy; 2009-2015 <a href="http://amos.me/">Amos Wenger</a>. The content of this website is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0 License</a>.
+        rock is licensed under the MIT license. Design based on the <a href="http://nanoc.ws/">nanoc web site</a> by <a href="http://stoneship.org/">Denis Defreyne</a> and used with permission.
+        <a href="http://entypo.com/">Entypo</a>By Daniel Bruce.
+      </p>
+    </div>
+  </div>
+</footer>
+
+  </body>
+</html>

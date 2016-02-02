@@ -1,0 +1,570 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ooc &raquo; Release notes</title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="stylesheet" href="/assets/pygments.css">
+    <link href="http://fonts.googleapis.com/css?family=Radley:regular&text=OC" rel="stylesheet" type="text/css" >
+    <link href="http://fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,400,400italic,700,700italic,900,900italic" rel="stylesheet" type="text/css" >
+
+    <!-- Cool stats stuff for nanoc :) -->
+    <meta name="generator" content="nanoc 3.6.5"> 
+  </head>
+  <body>
+
+<header>
+  <div class="header-content">
+    <nav class="main">
+      <ol>
+        <li class="home"><a href="/"><img src="/assets/images/logo-nav.png" alt="Home"></a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/install/">Install</a></li>
+        <li><a href="/docs/">Documentation</a></li>
+        <li><a href="/community/">Community</a></li>
+        <li><a href="/development/">Development</a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+<div class="intro">
+  <div class="intro-content">
+    <h1>Release notes</h1>
+  </div>
+</div>
+<div class="article">
+  <article>
+    <nav class="side">
+  <div class="side-title">
+    Release notes
+  </div>
+
+  <div class="side-content">
+    
+
+    <ol class="toc"><li><a href="#release-2015-07-11">0.9.10 release (2015-07-11)</a></li><li><a href="#release-2014-08-17">0.9.9 release (2014-08-17)</a></li><li><a href="#release-2013-11-27">0.9.8 release (2013-11-27)</a></li><li><a href="#a-release-2013-10-14">0.9.7a release (2013-10-14)</a></li><li><a href="#release-2013-10-09">0.9.7 release (2013-10-09)</a></li><li><a href="#release-2013-02-20">0.9.6 release (2013-02-20)</a></li><li><a href="#release-2013-02-12">0.9.5 release (2013-02-12)</a></li><li><a href="#release-2012-11-21">0.9.4 release (2012-11-21)</a></li><li><a href="#release-2011-12-13">0.9.3 release (2011-12-13)</a></li><li><a href="#release-2011-09-05">0.9.2 release (2011-09-05)</a></li><li><a href="#release-2010-06-02">0.9.1 release (2010-06-02)</a></li><li><a href="#release-2010-04-23---600-downloads">0.9.0 release (2010-04-23 - 600+ downloads)</a></li><li><a href="#pre-history">pre-history</a></li></ol>
+  </div>
+</nav>
+
+    <div class="article-content">
+      <h2 id="release-2015-07-11">0.9.10 release (2015-07-11)</h2>
+
+<p>This release represents 196 commits, 178 files changed with 8520 additions and
+4468 deletions, 64 issues closed, and about 30 pull requests merged!</p>
+
+<p>It contains a lot of contributions from <a href="http://github.com/zhaihj">@zhaihj</a>, who has been maintaining their
+own fork of rock and fixing issues while I was gone. It also contains the bulk
+of the work of <a href="http://github.com/shamanas">@shamanas</a> right after 0.9.9 was released, and many reports
+from the Cogneco team, <a href="http://github.com/davidhesselbom">@davidhesselbom</a> in particular. Welcome also to <a href="http://github.com/ds84182">@ds84182</a>,
+<a href="http://github.com/ibara">@ibara</a>, and <a href="http://github.com/kirbyfan64">@kirbyfan64</a> for their first patch!</p>
+
+<p>The 0.9.10 release is codenamed “rita” because it’s the name of my dog! (– amos)
+Adopted her a week ago, and doesn’t really care for ooc generics bugs,
+but she’s lovely nonetheless</p>
+
+<p>Summary:</p>
+
+<ul>
+<li>Attempted to better comment &amp; reformat some parts of rock.</li>
+  <li>Test suite is now 164 tests strong, and uses sam’s new ‘sam-assert’
+library that has <code>describe</code> and <code>expect</code> instead of a lot of duplicated
+code and ugly exit(1) calls.</li>
+  <li>Generics bugfixes by the dozen - more things work now, but also more
+things are checked and trigger compile errors instead of runtime crashes
+or invalid C code generation.</li>
+  <li>Same goes for operator overloads</li>
+  <li>Same goes for closures</li>
+</ul><p>Features:</p>
+
+<ul>
+<li>New CMake driver, generates <code>CMakeLists.txt</code>, good enough to compile rock! (<a href="http://github.com/ooc-lang/rock/issues/847">#847</a>)</li>
+  <li>New <code>--use</code> option to force the main module to ‘use’ an ooc library. Used
+by sam to add its ‘sam-assert’ (<a href="http://github.com/ooc-lang/rock/issues/902">#902</a>)</li>
+  <li>The <code>Imports</code> directive in usefiles now supports grouped import syntax (<a href="http://github.com/ooc-lang/rock/issues/904">#904</a>)</li>
+  <li>When a call to a function is slighty wrong, rock is now a lot more helpful
+in a lot of cases (<a href="http://github.com/ooc-lang/rock/issues/894">#894</a>)</li>
+  <li>Exceptions now print the word <code>exception</code> in red when thrown. Apparently
+a big plus! (<a href="http://github.com/ooc-lang/rock/issues/862">#862</a>)</li>
+  <li>New operator, <code>??</code>, the null coalescing operator (<a href="http://github.com/ooc-lang/rock/issues/809">#809</a>)</li>
+</ul><p>Generics bugfixes:</p>
+
+<ul>
+<li>Assignment between parameterized types is now checked. (And oddly enough, the
+sdk, rock, and all tests still compile..) (<a href="http://github.com/ooc-lang/rock/issues/842">#842</a>)</li>
+  <li>Accessing a generic member used to require a cast, but not any more (<a href="http://github.com/ooc-lang/rock/issues/889">#889</a>, <a href="http://github.com/ooc-lang/rock/issues/425">#425</a>)</li>
+  <li>Properties of generic types used to cause a mysterious <code>gc_malloc</code> unresolved
+error, well, not anymore. (<a href="http://github.com/ooc-lang/rock/issues/840">#840</a>)</li>
+  <li>When matching against a parameterized type (e.g. ArrayList<t>), rock used
+to complain about the lack of typeArgs. It's now valid to have an
+unqualified parameterized type in a match (<a href="http://github.com/ooc-lang/rock/issues/802">#802</a>)</t>
+</li>
+  <li>rock doesn’t segfault on parameterized function call (which is invalid ooc) (<a href="http://github.com/ooc-lang/rock/issues/811">#811</a>, <a href="http://github.com/ooc-lang/rock/issues/833">#833</a>)</li>
+  <li>The type arg of a parameterized function is now inferred from all arguments
+of that type, not only the first. Also, an error is thrown if they’re incompatible (<a href="http://github.com/ooc-lang/rock/issues/825">#825</a>, <a href="http://github.com/ooc-lang/rock/issues/826">#826</a>)</li>
+  <li>Don’t generate unnecessary temporary variable/memcpy calls because of cast (<a href="http://github.com/ooc-lang/rock/issues/892">#892</a>)</li>
+  <li>Casting to a generic type is now forbidden (except from Pointer) (<a href="http://github.com/ooc-lang/rock/issues/891">#891</a>)</li>
+  <li>A subtle cover-template bug I really don’t want to talk about (<a href="http://github.com/ooc-lang/rock/issues/887">#887</a>)</li>
+  <li>String interpolation inside cover templates was broken (<a href="http://github.com/ooc-lang/rock/issues/886">#886</a>)</li>
+</ul><p>Bugfixes:</p>
+
+<ul>
+<li>Common root algorithm now follows C99 rules as closely as possible when
+dealing with numeric types.</li>
+  <li>Various problems related to capturing variables in nested closures are
+now fixed (<a href="http://github.com/ooc-lang/rock/issues/864">#864</a>)</li>
+  <li>murmurHash was broken because of SizeT changes, is now fixed. (<a href="http://github.com/ooc-lang/rock/issues/874">#874</a>)</li>
+  <li>Additional <code>/</code> after <code>///</code> or additional <code>*</code> after <code>/**</code> are now interpreted as
+regular comments, not oocdocs. To the ASCII art machines! (<a href="http://github.com/ooc-lang/rock/issues/829">#829</a>)</li>
+  <li>All assignment operators are now overloadable (yes, even <code>%=</code>, which doesn’t
+make any sense in C-land.. but this is not C-Land). (<a href="http://github.com/ooc-lang/rock/issues/869">#869</a>)</li>
+  <li>Casting between ooc array types is now illegal, this prevents many runtime crashes (<a href="http://github.com/ooc-lang/rock/issues/795">#795</a>)</li>
+  <li>Array literal type is now inferred from all elements (tries to find common root)
+rather than the first element (<a href="http://github.com/ooc-lang/rock/issues/881">#881</a>)</li>
+  <li>Fixed size-related bug in Array.h (missing parenthesis in C macros, grr.) (<a href="http://github.com/ooc-lang/rock/issues/878">#878</a>)</li>
+  <li>It is now possible to declare abstract operators in classes. (<a href="http://github.com/ooc-lang/rock/issues/796">#796</a>)</li>
+  <li>Top-level function definitions no longer accept ‘abstract’, ‘static’, and
+‘final’ modifiers since they don’t make sense (<a href="http://github.com/ooc-lang/rock/issues/797">#797</a>)</li>
+  <li>Cover types and ‘Object’ are now incompatible at compile-time, that will
+prevent runtime crashes (<a href="http://github.com/ooc-lang/rock/issues/803">#803</a>, <a href="http://github.com/ooc-lang/rock/issues/827">#827</a>)</li>
+  <li>Function implementation correctness is better checked (when implementing an
+interface) (<a href="http://github.com/ooc-lang/rock/issues/805">#805</a>)</li>
+  <li>Emit a warning when assigning to a field in by-value cover constructor (tl;dr
+use init: func@ if you insist on having cover constructors..) (<a href="http://github.com/ooc-lang/rock/issues/832">#832</a>)</li>
+  <li>Overloading a final function is illegal and should be a compile-time error (<a href="http://github.com/ooc-lang/rock/issues/851">#851</a>)</li>
+  <li>Overloading a constructor but swapping its arguments - if one of them was a
+FuncType - could cause a crash (crazy right?) (<a href="http://github.com/ooc-lang/rock/issues/856">#856</a>)</li>
+  <li>Declaring multiple variables via a tuple-declaration could conflict with
+function parameters. It’s now checked. (<a href="http://github.com/ooc-lang/rock/issues/863">#863</a>)</li>
+  <li>Declaring multiple variables via a tuple-declaration was sometimes shadowed
+by class members. (<a href="http://github.com/ooc-lang/rock/issues/903">#903</a>)</li>
+  <li>Using match on <code>args</code> from the main function was somehow broken (<a href="http://github.com/ooc-lang/rock/issues/866">#866</a>)</li>
+  <li>Reduce amount of warnings (only use -rdynamic on gcc, Array.h tweaks) (<a href="http://github.com/ooc-lang/rock/issues/867">#867</a>)</li>
+  <li>Turned ‘Casting pointer to a struct’ into a proper compile error rather
+than just throwing an exception (<a href="http://github.com/ooc-lang/rock/issues/893">#893</a>)</li>
+  <li>Using a composite-assign operator (+=, -=) on an expression that returned
+a generic type generated crashing C code. (<a href="http://github.com/ooc-lang/rock/issues/890">#890</a>)</li>
+  <li>Operator overloads used to be checked on use, not on definition.. (<a href="http://github.com/ooc-lang/rock/issues/888">#888</a>)</li>
+  <li>Was assuming most anonymous functions used ACS, but they don’t. (<a href="http://github.com/ooc-lang/rock/issues/885">#885</a>)</li>
+  <li>When assigning between closures, sometimes did a double-wrap, which generated
+invalid C code (<a href="http://github.com/ooc-lang/rock/issues/884">#884</a>)</li>
+  <li>Nested closures that capture something by reference were broken - the innermost
+closure was getting the address of the address. (<a href="http://github.com/ooc-lang/rock/issues/882">#882</a>)</li>
+  <li>Globally-declared Func objects are now callable (<a href="http://github.com/ooc-lang/rock/issues/876">#876</a>)</li>
+  <li>Passing an extern const to a generic function (or trying to get its address)
+resulted in a segfault at runtime (<a href="http://github.com/ooc-lang/rock/issues/897">#897</a>)</li>
+  <li>Calling a function returned from another call was broken sometimes (<a href="http://github.com/ooc-lang/rock/issues/901">#901</a>)</li>
+  <li>If-else generation was broken in version blocks sometimes (<a href="http://github.com/ooc-lang/rock/issues/534">#534</a>, <a href="http://github.com/ooc-lang/rock/issues/900">#900</a>)</li>
+  <li>EscapeSequence was not properly padding hex escapes with zeroes (<a href="http://github.com/ooc-lang/rock/issues/877">#877</a>)</li>
+  <li>Usefile searching was slightly wrong (<a href="http://github.com/ooc-lang/rock/issues/849">#849</a>)</li>
+  <li>When there’s a circular dependency, show the dependency graph (<a href="http://github.com/ooc-lang/rock/issues/850">#850</a>)</li>
+</ul><p>Docs:</p>
+
+<ul>
+<li>Default-valued parameters are now documented (<a href="http://github.com/ooc-lang/rock/issues/808">#808</a>)</li>
+  <li>Fixed doc of properties with simple getter/setter (<a href="http://github.com/ooc-lang/rock/issues/812">#812</a>)</li>
+  <li>Comments in math/Random were wrong for ‘random’ (<a href="http://github.com/ooc-lang/rock/issues/870">#870</a>)</li>
+  <li>Added mention of Sublime Text in ‘editors’ section of website (<a href="http://github.com/ooc-lang/rock/issues/871">#871</a>)</li>
+  <li>Fixed documentation of extern enum syntax (<a href="http://github.com/ooc-lang/rock/issues/899">#899</a>)</li>
+</ul><h2 id="release-2014-08-17">0.9.9 release (2014-08-17)</h2>
+
+<ul>
+<li>rock has been relicensed to MIT (<a href="http://github.com/ooc-lang/rock/issues/755">#755</a>)</li>
+  <li>Boehm GC is now properly vendored - it lives in the <code>vendor</code> directory and is installed
+  to <code>vendor-prefix</code> - the new targets <code>boehmgc</code> and <code>boehmgc-clean</code> have been added to the
+  Makefile (<a href="http://github.com/ooc-lang/rock/issues/768">#768</a>)</li>
+  <li>Changes to git workflow: the <code>master</code> branch is now bleeding-edge, <code>stable</code>
+is stable, and version branches still exist (<a href="http://github.com/ooc-lang/rock/issues/794">#794</a>)</li>
+  <li>rock now supports library precompilation - when compiling from a .use file that has
+  no Main field (<a href="http://github.com/ooc-lang/rock/issues/733">#733</a>)</li>
+  <li>io/File now has <code>find</code>, <code>rm</code>, and <code>rm_rf</code> to find files, remove files, and remove files
+  and directories recursively (<a href="http://github.com/ooc-lang/rock/issues/734">#734</a>, <a href="http://github.com/ooc-lang/rock/issues/735">#735</a>, <a href="http://github.com/ooc-lang/rock/issues/737">#737</a>, <a href="http://github.com/ooc-lang/rock/issues/738">#738</a>)</li>
+  <li>ArrayAccess type checking has been relaxed to better accomodate operator overloading
+  with non-numeric indices (<a href="http://github.com/ooc-lang/rock/issues/740">#740</a>)</li>
+  <li>SequenceDriver fixes related to archives - better incremental (re)compilation support (<a href="http://github.com/ooc-lang/rock/issues/741">#741</a>)</li>
+  <li>Don’t fopen files to check if they exist anymore (performance increase + correctness) (<a href="http://github.com/ooc-lang/rock/issues/742">#742</a>)</li>
+  <li>Numeric literal suffixes: <code>d</code> and <code>f</code> - no-suffix floating point literals now default
+  to Double, which is coherent with C/C++ (<a href="http://github.com/ooc-lang/rock/issues/749">#749</a>)</li>
+  <li>String format now supports the <code>%ull</code> specifier (<a href="http://github.com/ooc-lang/rock/issues/750">#750</a>)</li>
+  <li>C arrays declarations like <code>a: Int* = [1, 2, 3]</code> now work as expected. (<a href="http://github.com/ooc-lang/rock/issues/751">#751</a>)</li>
+  <li>Passing a pointer to a generic function will now pass the <code>Pointer</code> type, not the
+  inner type (Int, etc.) (<a href="http://github.com/ooc-lang/rock/issues/752">#752</a>)</li>
+  <li>.use files now support the <code>BinaryPath</code> directive for executable name (<a href="http://github.com/ooc-lang/rock/issues/754">#754</a>)</li>
+  <li>.use files now support the <code>OocLibPaths</code> directive to add to the ooc libs search path (<a href="http://github.com/ooc-lang/rock/issues/756">#756</a>)</li>
+  <li>Warnings about unknown version names now happen only once per unknown name (as opposed
+  to: a fuckload) (<a href="http://github.com/ooc-lang/rock/issues/757">#757</a>)</li>
+  <li>Fix for each usage on <code>Range</code> instances (<a href="http://github.com/ooc-lang/rock/issues/759">#759</a>)</li>
+  <li>Make <code>match</code> autocast work with primitive (<a href="http://github.com/ooc-lang/rock/issues/760">#760</a>)</li>
+  <li>Namespaced import fixes (<a href="http://github.com/ooc-lang/rock/issues/766">#766</a>)</li>
+  <li>Complex tuple assignment no longer clobbers left-hand-side variables (<a href="http://github.com/ooc-lang/rock/issues/774">#774</a>)</li>
+  <li>Fixed too-strict operator overloading checks for unary operators (<a href="http://github.com/ooc-lang/rock/issues/780">#780</a>)</li>
+  <li>Fixed code generation error with properties in covers (<a href="http://github.com/ooc-lang/rock/issues/781">#781</a>, <a href="http://github.com/ooc-lang/rock/issues/782">#782</a>)</li>
+  <li>Always exit with non-zero code even in quiet mode (<a href="http://github.com/ooc-lang/rock/issues/786">#786</a>)</li>
+  <li>Always print C compiler failures to stderr, even in quiet mode (<a href="http://github.com/ooc-lang/rock/issues/787">#787</a>)</li>
+  <li>Add support for main: func (args: String[]) (<a href="http://github.com/ooc-lang/rock/issues/788">#788</a>)</li>
+  <li>Add support for scientific notation in floating point literals (<a href="http://github.com/ooc-lang/rock/issues/784">#784</a>)</li>
+  <li>Code quality fixes to the <code>fancy_backtrace</code> extension (<a href="http://github.com/ooc-lang/rock/issues/779">#779</a>)</li>
+  <li>text/Shlex now has inline documentation and a test case (<a href="http://github.com/ooc-lang/rock/issues/785">#785</a>)</li>
+  <li>Various Win32 Pipe &amp; Process fixes (e.g. <a href="http://github.com/ooc-lang/rock/issues/791">#791</a>), notably, ProcessWin32 now passes
+environment variables (<a href="http://github.com/ooc-lang/rock/issues/792">#792</a>) and redirects std{in,err,out} correctly (<a href="http://github.com/ooc-lang/rock/issues/793">#793</a>)</li>
+  <li>Various luaffi backend fixes (<a href="http://github.com/ooc-lang/rock/issues/769">#769</a>, <a href="http://github.com/ooc-lang/rock/issues/770">#770</a>, <a href="http://github.com/ooc-lang/rock/issues/771">#771</a>, <a href="http://github.com/ooc-lang/rock/issues/772">#772</a>, <a href="http://github.com/ooc-lang/rock/issues/773">#773</a>)</li>
+  <li>Various performance improvements in rock’s compilation process (<a href="http://github.com/ooc-lang/rock/issues/744">#744</a>, <a href="http://github.com/ooc-lang/rock/issues/743">#743</a>)</li>
+  <li>Various test cases added and ported to Win32 (<a href="http://github.com/ooc-lang/rock/issues/790">#790</a>)</li>
+</ul><h2 id="release-2013-11-27">0.9.8 release (2013-11-27)</h2>
+
+<ul>
+<li>Added a few rock tests, they are now runnable by sam, and ran on each git push
+on Travis, see <code>test/README.md</code>.</li>
+  <li>Added interpolated string literals, using a Ruby-like syntax, <code>"Like #{this}"</code>
+</li>
+  <li>Added raw string (CString) literals, e.g. <code>c"C string here"</code>
+</li>
+  <li>
+<code>extend</code> blocks can now define properties that do not require a field definition (virtual properties)</li>
+  <li>Added another form of foreach, <code>for ((index, element) in iterable)</code>, where index is an Int from 0
+to <code>iterable size()</code>.</li>
+  <li>Added the <code>::=</code> operator for ‘property declarations from expr’, for example
+<code>fullName ::= "#{firstName} #{lastName}"</code>
+</li>
+  <li>Added a base64 encoder and decoder to the sdk.</li>
+  <li>Added –target and –host option for cross compiling, successfully tested cross-compiling from
+Linux to Windows and OSX.</li>
+  <li>Downgraded to Boehm GC 7.2e, which supports Windows threads properly, making this
+the first release in years where the GC won’t go batshit crazy if you use threads on Win32.</li>
+  <li>Fix cross-library base class problem (<a href="http://github.com/ooc-lang/rock/issues/541">#541</a>) - partial recompilation should now
+work all the time.</li>
+  <li>The <code>fancy_backtrace</code> extension now scans the PATH to find the executable
+if dladdr doesn’t return an absolute path.</li>
+  <li>The <code>Pkgs</code> directive of .use files can now be in version blocks.</li>
+  <li>Tuple assignment now works as expected. The return expression of a multi-return method
+can now be another multi-return method call.</li>
+  <li>Unary minus operator precedence fixed, behaves as intended with expressions now.</li>
+  <li>Unary plus operator added, behaves like unary minus, can be overloaded.</li>
+  <li>Unary operator overloads can now be instance methods instead of just functions.</li>
+  <li>Better error reporting, both with missing imports and braced statements.</li>
+  <li>Relative imports and imports from .use files are now restricted to their respective
+SourcePath elements.</li>
+  <li>Rock now has stricker type checking algorithms for returns from void and non-void functions.</li>
+  <li>Code generation is now faster and much less IO-intensive due to us re-using line info
+from nagaqueen instead of recomputing it each time we output a <code>#line</code> C directive.</li>
+  <li>Added banned flags and banned pthread on Win32.</li>
+  <li>Separated trails where it makes sense, this way we don’t get really weird error messages.</li>
+  <li>Floating point numbers with no digits are no longer allowed by the grammar.</li>
+  <li>Rock is less verbose by default with <code>-v</code>, use <code>-vv</code> to return to previous <code>-v</code> behavior,
+and <code>-vvv</code> to be drowned in Tinkerer messages.</li>
+  <li>Fixed a few AST generation bugs.</li>
+</ul><h2 id="a-release-2013-10-14">0.9.7a release (2013-10-14)</h2>
+
+<ul>
+<li>Fix Win32 build, some extern variables were in fact not.</li>
+</ul><h2 id="release-2013-10-09">0.9.7 release (2013-10-09)</h2>
+
+<ul>
+<li>Author names have been removed from all source files, to encourage contributions
+rather than false ownership. The AUTHORS.md file still contains all contributor names.</li>
+  <li>Improved backtrace and error condition reporting, with unmangling and pretty printing
+on OSX, Linux, and Windows. Can be found in extensions/, made with <code>make extensions</code>,
+loaded as a dynamic library if found.</li>
+  <li>Debug and production profile choosable with -pg and -pr, debug is now the default</li>
+  <li>New module: os/Dynlib for dynamic library loading</li>
+  <li>New methods: Thread yield(), Thread currentThread(), Thread isAlive?(), Thread wait~timed()</li>
+  <li>Fixed UDPSocket and all other socket stuff, cross-platform again.</li>
+  <li>Fixed line numbers on Windows.</li>
+  <li>Add closest match when we can’t resolve a call (better error reporting)</li>
+  <li>Fix weird case of additional imports that shouldn’t have been needed (resolving fix)</li>
+  <li>Translate <code>__bang</code> and <code>__quest</code> back into <code>?</code> and <code>!</code> in rock error messages</li>
+  <li>Improve error reporting inside blocks and all braced constructs (e.g. scopes)</li>
+  <li>Color error output by default</li>
+  <li>Add CString println()</li>
+  <li>Add non-blocking I/O for pipes</li>
+  <li>New PipeReader and PipeWriter implementations, extending io/Reader and io/Writer</li>
+  <li>Fix BufferWriter</li>
+  <li>Add a bunch of tests in test/</li>
+  <li>Fix Windows 64-bit support, both in sequence and make drivers</li>
+  <li>Link the GC dynamically on Windows, still not resolved that threading issue.</li>
+  <li>Make ArrayList and ArrayListIterator safer (check out of bounds operations more
+thoroughly)</li>
+  <li>File getAbsolutePath() now returns the case-sensitive path on Windows</li>
+  <li>Empty cases in merge no longer make rock crash</li>
+  <li>Allow octal sequences that don’t start with 0 in EscapeSequence</li>
+  <li>Force standard main prototype</li>
+  <li>Fix <code>&gt;&gt;=</code> and <code>&lt;&lt;=</code> operators</li>
+  <li>New method: File rebase()</li>
+  <li>mkdirs() now applies mode to all subdirectories created</li>
+  <li>Fix generic type name issue (<a href="http://github.com/ooc-lang/rock/issues/693">#693</a>)</li>
+  <li>Add abs function in math</li>
+  <li>Avoid huge memory leak with repeated clear in structs/HashMap</li>
+  <li>match now evaluates its condition only once, no matter the number of cases,
+avoiding undesired side effects.</li>
+  <li>Avoid entering an infinite loop when trying to be helpful about compiler errors.</li>
+</ul><h2 id="release-2013-02-20">0.9.6 release (2013-02-20)</h2>
+
+<ul>
+<li>Cover templates are in! Planning for cleaner arrays in 0.9.7 - in the meantime,
+fun example here: https://gist.github.com/nddrylliog/4967552 (<a href="http://github.com/nddrylliog">@nddrylliog</a>)</li>
+  <li>Version blocks in .use files - not entirely friendly to the make driver yet,
+but SequenceDriver and AndroidDriver handle those beautifully. (<a href="http://github.com/nddrylliog">@nddrylliog</a>)
+Full documentation about use files here: http://docs.ooc-lang.org/</li>
+  <li>operator@ variant (same as func@ but for operator overloads) - <a href="http://github.com/nddrylliog">@nddrylliog</a>
+</li>
+  <li>Operator overloads declaration within types, which fix some import issues.
+See <a href="http://github.com/ooc-lang/rock/issues/583">#583</a> for details: https://github.com/nddrylliog/rock/issues/583 (<a href="http://github.com/nddrylliog">@nddrylliog</a>)</li>
+  <li>Stricter warnings for field redefinition in classes (<a href="http://github.com/shamanas">@shamanas</a>)</li>
+  <li>Nested closures are more reliable (<a href="http://github.com/shamanas">@shamanas</a>)</li>
+  <li>Instead of going through an intermediate archive, rock now computes the
+dependency graph of your project to pass linker arguments in the right order (<a href="http://github.com/nddrylliog">@nddrylliog</a>)</li>
+  <li>SequenceDriver was omitting -g, which made debugging significantly harder (<a href="http://github.com/nddrylliog">@nddrylliog</a>)</li>
+  <li>Invalid uses of break and continue inside of loops are now rock errors (<a href="http://github.com/shamanas">@shamanas</a>)</li>
+  <li>For the rest, this is mostly a bugfix and internal clean-ups release -
+bugs related to generics, closures, type inference in match (<a href="http://github.com/shamanas">@shamanas</a> &amp; <a href="http://github.com/nddrylliog">@nddrylliog</a>)</li>
+  <li>The –sourcepath has been deprecated, everything goes through .use files now (<a href="http://github.com/nddrylliog">@nddrylliog</a>)</li>
+  <li>The make driver produces a ‘clean’ target to remove all binary objects now. (<a href="http://github.com/nddrylliog">@nddrylliog</a>)</li>
+</ul><h2 id="release-2013-02-12">0.9.5 release (2013-02-12)</h2>
+
+<ul>
+<li>Fixed a long-standing issue with varargs usage in ternary expressions
+(<a href="http://github.com/ooc-lang/rock/issues/311">#311</a>) by <a href="http://github.com/shamanas">@shamanas</a>
+</li>
+  <li>Processes launched in Unix systems now check for segfault (<a href="http://github.com/shamanas">@shamanas</a>)</li>
+  <li>nagaqueen (and thus rock) are now able to parse .ooc files from memory, not
+only from files. This allows nice things such as
+https://github.com/nddrylliog/scissors (<a href="http://github.com/nddrylliog">@nddrylliog</a>)</li>
+  <li>Add ‘#pragma once’ in generated headers, this makes compilation faster for
+some (gcc/clang), and header guards are still here as a fallback for old
+compilers (<a href="http://github.com/shamanas">@shamanas</a>)</li>
+  <li>‘CustomPkg’ support in .use files, see
+https://github.com/nddrylliog/rock/issues/492 - used in scissors for
+llvm-config, but also in ooc-sdl2 for sdl2-config, for example
+(<a href="http://github.com/nddrylliog">@nddrylliog</a>)</li>
+  <li>‘Linker’ support in .use files, great when using ooc-llvm because it
+requires the final linking step to be done with g++ (<a href="http://github.com/nddrylliog">@nddrylliog</a>)</li>
+  <li>Fixed a strange varargs but that was basically an off-by-one error  </li>
+  <li>Make relative ‘IncludePaths’/’LibsPaths’ work in .use files (<a href="http://github.com/nddrylliog">@nddrylliog</a>)</li>
+  <li>Display command line in case rock fails to execute a process on Win32</li>
+  <li>‘Frameworks’ support for .use files, useful when building on OSX
+(<a href="http://github.com/nddrylliog">@nddrylliog</a>)</li>
+  <li>String + Number now does concatenation again (<a href="http://github.com/shamanas">@shamanas</a>)</li>
+  <li>Fix GetTimeFormat usage on Win32, had a null byte before (<a href="http://github.com/nddrylliog">@nddrylliog</a>)</li>
+  <li>Sequence driver now uses multiple threads - 1.5x your number of processors
+by default. You can control the number of parallel jobs with ‘-j’
+(<a href="http://github.com/nddrylliog">@nddrylliog</a>)</li>
+  <li>Cleanup os/Terminal implementation, make it cross-platform again in a
+cleaner way (<a href="http://github.com/nddrylliog">@nddrylliog</a>)</li>
+  <li>Enum decls were buggy, sometimes they couldn’t be used because of undefind
+symbols, as caused by invalid generated C code - that’s now fixed.
+(<a href="http://github.com/nddrylliog">@nddrylliog</a>)</li>
+  <li>Lots of cachelib fixes, recompilation now almost always works (<a href="http://github.com/ooc-lang/rock/issues/541">#541</a> is
+still an issue), SequenceDriver is a lot cleaner, CombineDriver is gone,
+and cachelib is now the one true way - and never hangs anymore on Win32.
+(<a href="http://github.com/nddrylliog">@nddrylliog</a>)</li>
+  <li>rock releases have codenames again! This one is panda.</li>
+  <li>Add built-ins - symbols in ooc code that will get replaced while resolving.
+At the time of this release, those are: <strong>BUILD_DATETIME</strong>,
+<strong>BUILD_TARGET</strong>, <strong>BUILD_ROCK_VERSION</strong>, <strong>BUILD_ROCK_CODENAME</strong>,
+<strong>BUILD_HOSTNAME</strong>
+</li>
+  <li>Fix match-related bugs with catch-all clauses being the only ones / first
+ones (<a href="http://github.com/shamanas">@shamanas</a>)</li>
+  <li>Varargs were broken on ARM - that’s now all fixed, and ooc code runs
+beautifully on both the Raspberry PI (rock bootstraps) and ARM Android
+phones (game projects) (<a href="http://github.com/nddrylliog">@nddrylliog</a>, <a href="http://github.com/duckinator">@duckinator</a>, <a href="http://github.com/geckojsc">@geckojsc</a>)</li>
+  <li>The sdk is now a proper library with a .use file and default imports -
+instead of having ugly hardcoded hacks in the compiler instead. That makes
+swapping the default sdk with your own real easy (<a href="http://github.com/nddrylliog">@nddrylliog</a>)</li>
+  <li>$OOC_LIBS now accepts multiple paths, separated by the File separator (: on
+*nix, ; on Windows) - that’s useful when swapping SDKs, or when having to
+use different usefiles depending on the platform, to work around <a href="http://github.com/ooc-lang/rock/issues/561">#561</a>
+(<a href="http://github.com/nddrylliog">@nddrylliog</a>)</li>
+  <li>Make process launching more solid on all platforms, introducing
+os/ShellUtils that’s been imported from rock’s codebase. (<a href="http://github.com/nddrylliog">@nddrylliog</a>)</li>
+  <li>Process launching on Win32 now supports cwd (current working directory)
+(<a href="http://github.com/nddrylliog">@nddrylliog</a>)</li>
+  <li>The explain backend has been removed for a slimmer codebase. It may find a
+second life as a separate tool (<a href="http://github.com/nddrylliog">@nddrylliog</a>)</li>
+  <li>dot output (to graph dependencies between modules) has been removed, for a
+slimmer codebase. I’m afraid it’s dead for good, but it was fun while it
+lasted! (<a href="http://github.com/nddrylliog">@nddrylliog</a>)</li>
+  <li>Fix an annoying bug with properties: when we had a property access on the
+right hand side of an assignment, it assumed it was a real member. Now
+handled correctly (<a href="http://github.com/nddrylliog">@nddrylliog</a>)</li>
+  <li>‘Additionals’ support in .use files - to use .c code bases directly in your
+.ooc bindings, example: nagaqueen-generated grammar in rock.use, and
+stb_image.c in https://github.com/nddrylliog/ooc-stbi</li>
+  <li>Add ‘seek’ to the Reader interface - it’s actually handy to subclass this
+for alternative I/O, see this example with SDL_rwops:
+    https://github.com/nddrylliog/dye/blob/gles/source/dye/gritty/io.ooc
+    (<a href="http://github.com/nddrylliog">@nddrylliog</a>)</li>
+  <li>Android driver added, generate files in your jni/ directory (specify with
+-outpath), and generate Android.mk files to be used with ndk-build.
+(<a href="http://github.com/nddrylliog">@nddrylliog</a>)</li>
+</ul><h2 id="release-2012-11-21">0.9.4 release (2012-11-21)</h2>
+
+<ul>
+<li>BSD support added by <a href="http://github.com/duckinator">@duckinator</a>
+</li>
+  <li>Fixed compilation on ArchLinux x64</li>
+  <li>Fixed and ported parts of the SDK for win32 support, thanks to <a href="http://github.com/nddrylliog">@nddrylliog</a>
+</li>
+  <li>Added ‘=&gt;’ operator (not overloaded by the SDK) by <a href="http://github.com/shamanas">@shamanas</a>
+</li>
+  <li>Added File getReducedPath</li>
+  <li>Added namespace type support</li>
+  <li>Added single-line version blocks</li>
+  <li>Cleaned up rock’s codebase thanks to <a href="http://github.com/duckinator">@duckinator</a>
+</li>
+  <li>Various Makefle fixes and additions</li>
+  <li>Default main() generated by rock now returns 0 as expected</li>
+  <li>Added support for Travis-CI builds</li>
+  <li>Various scoring improvements (for function types, operators, …)</li>
+  <li>clone, merge and merge! added to HashMap by <a href="http://github.com/nddrylliog">@nddrylliog</a>
+</li>
+  <li>Nested array support added by <a href="http://github.com/shamanas">@shamanas</a>
+</li>
+  <li>Better errors for dot-args and ass-args outside of non-static methods</li>
+  <li>Lots of bugfixes by <a href="http://github.com/shamanas">@shamanas</a>, <a href="http://github.com/nddrylliog">@nddrylliog</a>, <a href="http://github.com/duckinator">@duckinator</a>, <a href="http://github.com/showstopper">@showstopper</a>, <a href="http://github.com/fredreichbier">@fredreichbier</a>
+</li>
+</ul><h2 id="release-2011-12-13">0.9.3 release (2011-12-13)</h2>
+
+<ul>
+<li>OSX support is back! Thanks <a href="http://github.com/nilium">@nilium</a> for upgrading us to the latest
+libatomic_ops (yup, it was that simple).</li>
+  <li>rock -r now doesn’t display warnings anymore, cause it’s irrelevant
+if you just want to run the program</li>
+  <li>rock -x now cleans completely the directory (.libs / rock_tmp)</li>
+  <li>rock without any options will look for a .use file and if there’s
+a “Main:” compile an executable, otherwise static and dynamic libraries</li>
+  <li>The -help message is now a lot more detailed, it explains a lot of
+debug/obscure options we’ve been keeping for ourselves up till now.</li>
+  <li>Added eachUntil() and contains?() to List</li>
+  <li>Add XPath-like selectors to HashBag</li>
+  <li>Added a convenient text/json module</li>
+  <li>FileWriter asPipe, createTempFile</li>
+  <li>Added an exponent operator (**) to the grammar, it’s not overriden
+by default for integer types, so don’t use it yet :) When everybody
+has migrated to 0.9.3, we’ll include that in 0.9.4</li>
+  <li>Again, lots of bugfixes and cleanups, lookup the commits</li>
+</ul><h2 id="release-2011-09-05">0.9.2 release (2011-09-05)</h2>
+
+<ul>
+<li>Lots of bugfixes, refactorings (see GitHub milestone), thanks to
+<a href="http://github.com/shamanas">@shamanas</a>, <a href="http://github.com/duckinator">@duckinator</a>, <a href="http://github.com/fredreichbier">@fredreichbier</a>, <a href="http://github.com/showstopper">@showstopper</a>, <a href="http://github.com/tsion">@tsion</a>, <a href="http://github.com/rofl0r">@rofl0r</a>, <a href="http://github.com/nddrylliog">@nddrylliog</a>
+</li>
+  <li>New Socket API by <a href="http://github.com/duckinator">@duckinator</a> (aka Nicholas Markwell)</li>
+  <li>FreeBSD support by <a href="http://github.com/nikobordx">@nikobordx</a>
+</li>
+  <li>Better error messages through nagaqueen fixes</li>
+  <li>Enums now start at 0 instead of 1 (a really hard change to make
+in a self-hosting compiler)</li>
+  <li>String literal optimizations - allocate once, not per-usage</li>
+  <li>New command-line options: libfolder, staticlib, dynamiclib</li>
+  <li>yajit removal, it wasn’t being used anywhere in rock</li>
+  <li>New Time methods</li>
+  <li>Somehow the SDK now includes an HTTPRequest and RestClient?
+Courtesy of <a href="http://github.com/pheuter">@pheuter</a> aka Mark Fayngersh</li>
+  <li>
+    <table><tbody><tr>
+<td>Added loop(</td>
+          <td> </td>
+          <td>…)</td>
+        </tr></tbody></table>
+</li>
+  <li>Variants of each(…) with index</li>
+  <li>main now acceps String* as parameter (<a href="http://github.com/showstopper">@showstopper</a> aka Yannic Ahrens)</li>
+  <li>version blocks now support else {} (<a href="http://github.com/nddrylliog">@nddrylliog</a> aka Amos Wenger)</li>
+  <li>Probably the biggest change, which also explains why this release took
+a whopping 15 months - newstr, ie. String is now a class, and CStrnig
+is now the cover of char*. It’s handled smoothly in many cases, thanks
+to implicit cases and related trickery but it’s a scar rock will always bear.</li>
+</ul><h2 id="release-2010-06-02">0.9.1 release (2010-06-02)</h2>
+
+<ul>
+<li>2010-05 reverse iterators / backIterator() added to collection classes
+by Noel Cower (nilium)</li>
+  <li>2010-05 lib-caching was added to rock, and partial recompilation is
+much smarter with the .libs/ directory and .cacheinfo files.
+Can be disabled with -nolibcache. Added by Amos Wenger (nddrylliog)</li>
+  <li>2010-05 ACS (awesome closure syntax) is in! Our closures capture syntax
+and even generate trampoline functions to translate generic types
+into specific types. Thanks Yannic Ahrens (showstopper) !</li>
+  <li>2010-05 oos now compiles under rock - we still have to figure out
+a good syntax for stack-allocation of C arrays.</li>
+  <li>2010-04 Added support for ooc arrays, early implementation of this
+proposal: https://lists.launchpad.net/ooc-dev/msg00146.html</li>
+</ul><h2 id="release-2010-04-23---600-downloads">0.9.0 release (2010-04-23 - 600+ downloads)</h2>
+
+<ul>
+<li>2010-04 : rock bootstraps under Gentoo, Ubuntu, Win32, OSX,
+the first release of the 0.9.x branch is out!</li>
+</ul><h2 id="pre-history">pre-history</h2>
+
+<ul>
+<li>2010-02 : rock compiles most, if not all, generic collection classes, produces correct code.
+we’re going toward self-hosting, fixing bugs as we encounter them.</li>
+  <li>2010-02 : twitter announcement: for the first time, rock, a 10k SLOC pure ooc codebase,
+compiles under Win32, and produces executables with gcc. party?</li>
+  <li>2010-01 : Copying chunks of the sdk from j/ooc to rock/custom-sdk, generics for functions are mostly implemented,
+classes still to come. Most control flow structures are implemented
+(if/else/while/foreach/match/case/break/continue), decl-assign, ‘This’, member calls, covers, etc.</li>
+  <li>2009-11 : Wohow, resolving spree. Pretty much everything resolves now, straight/member accesses/calls
+even accross different modules, with imports and all. Most of the syntax is parsed,
+except generics, and only a few AST node types are missing. The code is a lot shorter and
+clearer than j/ooc’s, I have high hopes as to the maintainability of rock. Plus, it’s still <em>fast</em>.</li>
+  <li>2009-11 : Most of the resolving architecture is now there, it resolve types at module scope
+correctly. Still need to implement planned implementations that weren’t in j/ooc
+(e.g. sharing Types per module, except for generics, to group resolves)</li>
+  <li>2009-11 : Overwhelmed by complexity, rewrote the grammar as a reusable piece, in a separate
+github project. nagaqueen (its fancy name) is now needed to make rock compile</li>
+  <li>2009-10 : Made a leg frontend, builds the AST, ported a lot of Java code with itrekkie,
+rock now compiles things =)</li>
+  <li>2009-10 : Creating the AST structure, code generation works well, putting the
+frontend on hold for a moment</li>
+  <li>2009-09 : The tokenizing code is all there, and it’s working simply great.
+Now onto constructing AST nodes.</li>
+  <li>2009-06 : Basic structure, it’s gonna be some time till it can do anything useful</li>
+</ul>
+    </div>
+  </article>
+</div>
+<footer>
+  <div class="footer-content">
+  <nav><section class="about"><h3>About</h3>
+    <ul>
+        <li><a href="/about/#history">History</a></li>
+        <li><a href="/about/#why-use-ooc">Why use ooc?</a></li>
+        <li><a href="/about/#similar-projects">Alternatives</a></li>
+    </ul></section><section class="install"><h3>Install</h3>
+    <ul>
+        <li><a href="/install/#quick-install">Quick install</a></li>
+        <li><a href="/install/#installing-from-git">Installing from Git</a></li>
+        <li><a href="/install/#post-install-instructions">Post-install instructions</a></li>
+        <li><a href="/install/#installing-sam">Installing sam</a></li>
+    </ul></section><section class="documentation"><h3>Documentation</h3>
+    <ul>
+        <li><a href="/docs/tutorial/">Tutorial</a></li>
+        <li><a href="/docs/lang/">Language</a></li>
+        <li><a href="/docs/sdk/">SDK</a></li>
+        <li><a href="/docs/tools/">Tools</a></li>
+        <li><a href="/docs/tools/rock/">Implementation</a></li>
+        <li><a href="/docs/kaputt/">Troubleshooting</a></li>
+        <li><a href="/docs/glossary/">Glossary</a></li>
+    </ul></section><section class="community"><h3>Community</h3>
+    <ul>
+        <li><a href="http://groups.google.com/group/ooc-lang">Discussion group</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/issues">Issue tracker</a></li>
+        <li><a href="irc://chat.freenode.net/#ooc-lang">IRC channel</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/wiki">Wiki</a></li>
+        <li><a href="/development/">Development</a></li>
+        <li><a href="http://pledgie.com/campaigns/21363">Donate</a></li>
+    </ul></section></nav>
+    <div class="fine-print">
+      <p>
+        ooc &copy; 2009-2015 <a href="http://amos.me/">Amos Wenger</a>. The content of this website is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0 License</a>.
+        rock is licensed under the MIT license. Design based on the <a href="http://nanoc.ws/">nanoc web site</a> by <a href="http://stoneship.org/">Denis Defreyne</a> and used with permission.
+        <a href="http://entypo.com/">Entypo</a>By Daniel Bruce.
+      </p>
+    </div>
+  </div>
+</footer>
+
+  </body>
+</html>

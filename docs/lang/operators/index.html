@@ -1,0 +1,214 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ooc &raquo; Operators</title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="stylesheet" href="/assets/pygments.css">
+    <link href="http://fonts.googleapis.com/css?family=Radley:regular&text=OC" rel="stylesheet" type="text/css" >
+    <link href="http://fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,400,400italic,700,700italic,900,900italic" rel="stylesheet" type="text/css" >
+
+    <!-- Cool stats stuff for nanoc :) -->
+    <meta name="generator" content="nanoc 3.6.5"> 
+  </head>
+  <body>
+
+<header>
+  <div class="header-content">
+    <nav class="main">
+      <ol>
+        <li class="home"><a href="/"><img src="/assets/images/logo-nav.png" alt="Home"></a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/install/">Install</a></li>
+        <li><a href="/docs/">Documentation</a></li>
+        <li><a href="/community/">Community</a></li>
+        <li><a href="/development/">Development</a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+<div class="intro">
+  <div class="intro-content">
+    <h1>Operators</h1>
+  </div>
+</div>
+<div class="article">
+  <article>
+    <nav class="side">
+  <div class="side-title">
+    Operators
+  </div>
+
+  <div class="side-content">
+    
+      <p>↑ <a href="/docs/lang/">Back to Language</a></p>
+    
+
+    <ol class="toc"><li><a href="#foreword">Foreword</a></li><li><a href="#access">Access</a></li><ol><li><a href="#array-access">Array access</a></li><li><a href="#pointers">Pointers</a></li><li><a href="#call">Call</a></li><li><a href="#member-access">Member access</a></li><li><a href="#casting">Casting</a></li></ol><li><a href="#product">Product</a></li><ol><li><a href="#binary-operators">Binary operators</a></li><li><a href="#unary-operators">Unary operators</a></li></ol><li><a href="#sum">Sum</a></li><li><a href="#shift">Shift</a></li><li><a href="#inequality">Inequality</a></li><li><a href="#equality">Equality</a></li><li><a href="#binary-and-boolean-operations">Binary and boolean operations</a></li><li><a href="#ternary">Ternary</a></li><li><a href="#assignment">Assignment</a></li><li><a href="#double-arrow">Double arrow</a></li><li><a href="#operator-overloading">Operator overloading</a></li></ol>
+  </div>
+</nav>
+
+    <div class="article-content">
+      <h2 id="foreword">Foreword</h2>
+
+<p>This lists all ooc operators, from highest precendence to lowest precedence</p>
+
+<h2 id="access">Access</h2>
+
+<h3 id="array-access">Array access</h3>
+
+<p>The array-index operator is <code>[]</code>, the array-modify operator’s short form is <code>[]=</code></p>
+
+<p>Examples:</p>
+
+<pre><code class="language-ooc"><span class="nv">arr</span><span class="p">[</span><span class="m-Decimal">0</span><span class="p">]</span> <span class="o">=</span> <span class="sc">'\n'</span>
+<span class="k">return</span> <span class="nv">arr</span><span class="p">[</span><span class="m-Decimal">0</span><span class="p">]</span></code></pre>
+
+<h3 id="pointers">Pointers</h3>
+
+<p>The address-of operator is a post-fix <code>&amp;</code>, the dereference operator is a post-fix
+<code>@</code>:</p>
+
+<pre><code class="language-ooc"><span class="nv">a</span> <span class="o">:=</span> <span class="m-Decimal">42</span>
+<span class="nv">aPtr</span> <span class="o">:=</span> <span class="nv">a</span><span class="o">&amp;</span>
+<span class="nv">aToo</span> <span class="o">:=</span> <span class="nv">aPtr</span><span class="p">@</span></code></pre>
+
+<h3 id="call">Call</h3>
+
+<p>Technically not an operator, but call is in that priority level:</p>
+
+<pre><code class="language-ooc"><span class="nv">a</span> <span class="o">:=</span> <span class="k">func</span> <span class="o">-&gt;</span> <span class="nc">Int</span> <span class="p">{</span> <span class="m-Decimal">42</span> <span class="p">}</span>
+<span class="nf">a</span><span class="p">()</span></code></pre>
+
+<h3 id="member-access">Member access</h3>
+
+<p>Also technically not an operator. Simply two identifiers side by side,
+not using dot, unlike some other programming languages:</p>
+
+<pre><code class="language-ooc"><span class="nv">dog</span> <span class="nv">name</span>
+<span class="nv">dog</span> <span class="nv">race</span></code></pre>
+
+<h3 id="casting">Casting</h3>
+
+<p>The <code>as</code> operator is used to cast from one type to the other:</p>
+
+<pre><code class="language-ooc"><span class="nv">pi</span> <span class="o">:=</span> <span class="mf">3.14</span>
+<span class="nv">roughlyPi</span> <span class="o">:=</span> <span class="nv">pi</span> <span class="k">as</span> <span class="nc">Int</span></code></pre>
+
+<h2 id="product">Product</h2>
+
+<h3 id="binary-operators">Binary operators</h3>
+
+<p>The exponent operator is <code>**</code>, the multiplication operator is <code>*</code>,
+and the division operator is <code>/</code>.</p>
+
+<h3 id="unary-operators">Unary operators</h3>
+
+<p>Logical not is a prefixed <code>!</code>, binary not is a prefixed <code>~</code>.</p>
+
+<h2 id="sum">Sum</h2>
+
+<p>The addition operator is <code>+</code>, subtraction is <code>-</code>,
+modulo is <code>%</code></p>
+
+<h2 id="shift">Shift</h2>
+
+<p>Right shift is <code>&gt;&gt;</code>, left shift is <code>&lt;&lt;</code></p>
+
+<h2 id="inequality">Inequality</h2>
+
+<p>You have your regular less than <code>&lt;</code>, greater than <code>&gt;</code>,
+less than or equal <code>&lt;=</code>, more than or equal <code>&gt;=</code>,
+but also the comparison operator <code>&lt;=&gt;</code> (evaluates to -1
+if less than, 0 if equal, 1 if greater than).</p>
+
+<h2 id="equality">Equality</h2>
+
+<p>Equality operator is <code>==</code>, inequality operator is <code>!=</code></p>
+
+<h2 id="binary-and-boolean-operations">Binary and boolean operations</h2>
+
+<p>Binary and is <code>&amp;</code>, xor is <code>^</code>, or is <code>|</code>.</p>
+
+<p>Logical and is <code>&amp;&amp;</code>, logical or is <code>||</code>.</p>
+
+<h2 id="ternary">Ternary</h2>
+
+<p>The ternary operator is <code>?:</code> as in <code>condition ? ifTrue : ifFalse</code>.</p>
+
+<h2 id="assignment">Assignment</h2>
+
+<p>The assignment operator is <code>=</code>, the following variants exist:
+<code>+=</code>, <code>-=</code>, <code>*=</code>, <code>**=</code>, <code>/=</code>, <code>&gt;&gt;=</code>, <code>&lt;&lt;=</code>, <code>^=</code>, <code>|=</code>, <code>&amp;=</code>.</p>
+
+<p>The declare-assignment operator is <code>:=</code>. And the declare-property-assignment
+operator is <code>::=</code>. For more details on these, see the <a href="/docs/lang/values/#variables">Variables</a> and
+<a href="/docs/lang/classes/#properties">Properties</a> pages.</p>
+
+<h2 id="double-arrow">Double arrow</h2>
+
+<p>The double arrow operator <code>=&gt;</code> - it must be overloaded.</p>
+
+<h2 id="operator-overloading">Operator overloading</h2>
+
+<p>Overloading an operator can be done as a function-like, using the
+<code>operator</code> keyword:</p>
+
+<pre><code class="language-ooc"><span class="k">operator</span> <span class="o">+</span> <span class="p">(</span><span class="nv">v1</span><span class="p">,</span> <span class="nv">v2</span><span class="p">:</span> <span class="nc">Vec2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nc">Vec2</span> <span class="p">{</span> <span class="nv">v1</span> <span class="nf">add</span><span class="p">(</span><span class="nv">v2</span><span class="p">)</span> <span class="p">}</span></code></pre>
+
+<p>However, if the operator is linked to a type, it’s better to declare
+it in the type itself, so that it’ll be usable even if the module containing
+the type declaration isn’t explicitly imported:</p>
+
+<pre><code class="language-ooc"><span class="nc">Vec2</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+  <span class="c">// other stuff</span>
+
+  <span class="k">operator</span> <span class="o">+</span> <span class="p">(</span><span class="nv">v</span><span class="p">:</span> <span class="nc">This</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nc">This</span> <span class="p">{</span> <span class="nf">add</span><span class="p">(</span><span class="nv">v</span><span class="p">)</span> <span class="p">}</span>
+<span class="p">}</span></code></pre>
+    </div>
+  </article>
+</div>
+<footer>
+  <div class="footer-content">
+  <nav><section class="about"><h3>About</h3>
+    <ul>
+        <li><a href="/about/#history">History</a></li>
+        <li><a href="/about/#why-use-ooc">Why use ooc?</a></li>
+        <li><a href="/about/#similar-projects">Alternatives</a></li>
+    </ul></section><section class="install"><h3>Install</h3>
+    <ul>
+        <li><a href="/install/#quick-install">Quick install</a></li>
+        <li><a href="/install/#installing-from-git">Installing from Git</a></li>
+        <li><a href="/install/#post-install-instructions">Post-install instructions</a></li>
+        <li><a href="/install/#installing-sam">Installing sam</a></li>
+    </ul></section><section class="documentation"><h3>Documentation</h3>
+    <ul>
+        <li><a href="/docs/tutorial/">Tutorial</a></li>
+        <li><a href="/docs/lang/">Language</a></li>
+        <li><a href="/docs/sdk/">SDK</a></li>
+        <li><a href="/docs/tools/">Tools</a></li>
+        <li><a href="/docs/tools/rock/">Implementation</a></li>
+        <li><a href="/docs/kaputt/">Troubleshooting</a></li>
+        <li><a href="/docs/glossary/">Glossary</a></li>
+    </ul></section><section class="community"><h3>Community</h3>
+    <ul>
+        <li><a href="http://groups.google.com/group/ooc-lang">Discussion group</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/issues">Issue tracker</a></li>
+        <li><a href="irc://chat.freenode.net/#ooc-lang">IRC channel</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/wiki">Wiki</a></li>
+        <li><a href="/development/">Development</a></li>
+        <li><a href="http://pledgie.com/campaigns/21363">Donate</a></li>
+    </ul></section></nav>
+    <div class="fine-print">
+      <p>
+        ooc &copy; 2009-2015 <a href="http://amos.me/">Amos Wenger</a>. The content of this website is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0 License</a>.
+        rock is licensed under the MIT license. Design based on the <a href="http://nanoc.ws/">nanoc web site</a> by <a href="http://stoneship.org/">Denis Defreyne</a> and used with permission.
+        <a href="http://entypo.com/">Entypo</a>By Daniel Bruce.
+      </p>
+    </div>
+  </div>
+</footer>
+
+  </body>
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ooc &raquo; Pipe</title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="stylesheet" href="/assets/pygments.css">
+    <link href="http://fonts.googleapis.com/css?family=Radley:regular&text=OC" rel="stylesheet" type="text/css" >
+    <link href="http://fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,400,400italic,700,700italic,900,900italic" rel="stylesheet" type="text/css" >
+
+    <!-- Cool stats stuff for nanoc :) -->
+    <meta name="generator" content="nanoc 3.6.5"> 
+  </head>
+  <body>
+
+<header>
+  <div class="header-content">
+    <nav class="main">
+      <ol>
+        <li class="home"><a href="/"><img src="/assets/images/logo-nav.png" alt="Home"></a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/install/">Install</a></li>
+        <li><a href="/docs/">Documentation</a></li>
+        <li><a href="/community/">Community</a></li>
+        <li><a href="/development/">Development</a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+<div class="intro">
+  <div class="intro-content">
+    <h1>Pipe</h1>
+  </div>
+</div>
+<div class="article">
+  <article>
+    <nav class="side">
+  <div class="side-title">
+    Pipe
+  </div>
+
+  <div class="side-content">
+    
+      <p>↑ <a href="/docs/sdk/os/">Back to The os package</a></p>
+    
+
+    <ol class="toc"><li><a href="#the-ospipe-module">The os/Pipe module</a></li><ol><li><a href="#reading">Reading</a></li><li><a href="#writing">Writing</a></li><li><a href="#buffering-considerations">Buffering considerations</a></li></ol><li><a href="#basic-usage">Basic usage</a></li><li><a href="#communication">Communication</a></li><ol><li><a href="#inter-thread-communication">Inter-thread communication</a></li><li><a href="#inter-process-communication">Inter-process communication</a></li><li><a href="#non-blocking-io">Non-blocking I/O</a></li></ol><li><a href="#pipes-disclaimer">Pipes disclaimer</a></li></ol>
+  </div>
+</nav>
+
+    <div class="article-content">
+      <h2 id="the-ospipe-module">The os/Pipe module</h2>
+
+<p>The Pipe module allows one to deal with pipes. Pipes are basically a pair of
+read and write file descriptors.</p>
+
+<p>The writer writes into the write file descriptor and the reader reads into the
+read file descriptor.</p>
+
+<h3 id="reading">Reading</h3>
+
+<p>A read call may either:</p>
+
+<ul>
+<li>successfully read, if there’s data in the pipe</li>
+  <li>block to wait for some more data (in blocking mode)</li>
+  <li>return immediately with no data (in non-blocking mode)</li>
+</ul><p>In non-blocking mode, one has to be careful to distinguish between the ‘no
+data’ condition and the ‘end of pipe’ condition. OS pipes don’t have a proper
+‘eof’ marker, but reading from a closed pipe will mark the Pipe class as eof
+anyway, accessible with <code>Pipe eof?()</code>.</p>
+
+<p>The <code>os/Pipe</code> package contains a <code>PipeReader</code> class, which extends the
+<code>io/Reader</code> class, for convenience.</p>
+
+<h3 id="writing">Writing</h3>
+
+<p>A write call may either:</p>
+
+<ul>
+<li>return immediately if there’s room in the pipe</li>
+  <li>block to wait for some data to be read, making room to write something (in
+blocking mode)</li>
+  <li>return immediately, having written as much as it can (in non-blocking mode)</li>
+</ul><p>The <code>os/Pipe</code> package contains a <code>PipeWriter</code> class, which extends the
+<code>io/Writer</code> class, for convenience.</p>
+
+<h3 id="buffering-considerations">Buffering considerations</h3>
+
+<p>Note that a pipe’s user has to do its own buffering when writing: in blocking
+mode, writing something too large will hang forever, and in non-blocking mode,
+only the part that fits will be written, leaving the rest unwritten.</p>
+
+<p>As a result, using a <code>PipeReader</code> or a <code>PipeReader</code> in non-blocking mode is
+unreliable.  Instead, using blocking mode inside a thread is preferrable.</p>
+
+<h2 id="basic-usage">Basic usage</h2>
+
+<p>Here’s a not so useful pipe:</p>
+
+<pre><code class="language-ooc"><span class="nv">pipe</span> <span class="o">:=</span> <span class="nc">Pipe</span> <span class="k">new</span><span class="p">()</span></code></pre>
+
+<p>We can write a string into it:</p>
+
+<pre><code class="language-ooc"><span class="nv">pipe</span> <span class="nf">write</span><span class="p">(</span><span class="s2">"Hello"</span><span class="p">)</span></code></pre>
+
+<p>And then read the result back:</p>
+
+<pre><code class="language-ooc"><span class="nv">str</span> <span class="o">:=</span> <span class="nv">pipe</span> <span class="nf">read</span><span class="p">(</span><span class="m-Decimal">128</span><span class="p">)</span>
+<span class="nv">str</span> <span class="nf">println</span><span class="p">()</span></code></pre>
+
+<p>Even though we requested 128 bytes from the pipe, only 5 bytes have been written,
+so we the call immediately returns with a String of size 5.</p>
+
+<p>We could have also read into our own buffer:</p>
+
+<pre><code class="language-ooc"><span class="nv">b</span> <span class="o">:=</span> <span class="nc">Buffer</span> <span class="k">new</span><span class="p">(</span><span class="m-Decimal">128</span><span class="p">)</span>
+<span class="nv">pipe</span> <span class="nf">read</span><span class="p">(</span><span class="nv">b</span><span class="p">)</span>
+<span class="nv">b</span> <span class="nf">println</span><span class="p">()</span></code></pre>
+
+<p>Same here, the buffer has 128 bytes capacity, but only 5 bytes have been read, and
+the buffer’s length has been set accordingly. Using a buffer is more efficient
+because fewer allocations are being done.</p>
+
+<p>Then, we shouldn’t forget to close both the reading and the writing end of the pipe</p>
+
+<pre><code class="language-ooc"><span class="nv">pipe</span> <span class="nf">close</span><span class="p">(</span><span class="sc">'r'</span><span class="p">)</span>
+<span class="nv">pipe</span> <span class="nf">close</span><span class="p">(</span><span class="sc">'w'</span><span class="p">)</span></code></pre>
+
+<p>Or simply:</p>
+
+<pre><code class="language-ooc"><span class="nv">pipe</span> <span class="nf">close</span><span class="p">()</span></code></pre>
+
+<h2 id="communication">Communication</h2>
+
+<h3 id="inter-thread-communication">Inter-thread communication</h3>
+
+<p>Pipes can be used to communicate between threads.</p>
+
+<p>Let’s create a pipe:</p>
+
+<pre><code class="language-ooc"><span class="nv">pipe</span> <span class="o">:=</span> <span class="nc">Pipe</span> <span class="k">new</span><span class="p">()</span></code></pre>
+
+<p>Then a thread that is going to read out of it until it’s closed:</p>
+
+<pre><code class="language-ooc"><span class="nv">reader</span> <span class="o">:=</span> <span class="nc">Thread</span> <span class="k">new</span><span class="p">(</span><span class="o">||</span>
+    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="nv">pipe</span> <span class="nv">eof</span><span class="o">?</span><span class="p">())</span> <span class="p">{</span>
+        <span class="nv">result</span> <span class="o">:=</span> <span class="nv">pipe</span> <span class="nf">read</span><span class="p">(</span><span class="m-Decimal">128</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">result</span><span class="p">)</span> <span class="nv">result</span> <span class="nf">print</span><span class="p">()</span>
+    <span class="p">}</span>
+    <span class="nv">pipe</span> <span class="nf">close</span><span class="p">(</span><span class="sc">'r'</span><span class="p">)</span>
+<span class="p">)</span></code></pre>
+
+<p>Then a writer path which is going to write ten hellos, one every 100
+milliseconds:</p>
+
+<pre><code class="language-ooc"><span class="nv">writer</span> <span class="o">:=</span> <span class="nc">Thread</span> <span class="k">new</span><span class="p">(</span><span class="o">||</span>
+    <span class="k">for</span> <span class="p">(</span><span class="nv">i</span> <span class="k">in</span> <span class="m-Decimal">0</span><span class="o">..</span><span class="m-Decimal">10</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">pipe</span> <span class="nf">write</span><span class="p">(</span><span class="s2">"Hello %d\n"</span> <span class="nf">format</span><span class="p">(</span><span class="nv">i</span><span class="p">))</span>
+        <span class="nc">Time</span> <span class="nf">sleepMilli</span><span class="p">(</span><span class="m-Decimal">100</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="nv">pipe</span> <span class="nf">close</span><span class="p">(</span><span class="sc">'w'</span><span class="p">)</span>
+<span class="p">)</span></code></pre>
+
+<p>Let’s start them both:</p>
+
+<pre><code class="language-ooc"><span class="nv">reader</span> <span class="nf">start</span><span class="p">();</span> <span class="nv">writer</span> <span class="nf">start</span><span class="p">()</span>
+<span class="nv">reader</span> <span class="nf">wait</span><span class="p">();</span>  <span class="nv">writer</span> <span class="nf">wait</span><span class="p">()</span></code></pre>
+
+<h3 id="inter-process-communication">Inter-process communication</h3>
+
+<p>Similarly, pipes can be (and are mostly) used to communicate with other
+processes. This is covered in the <a href="/docs/sdk/os/process/">Process</a> section.</p>
+
+<h3 id="non-blocking-io">Non-blocking I/O</h3>
+
+<p>A pipe can be set to non-blocking mode to use non-blocking read operations.
+This is used in the streaming example in the <a href="/docs/sdk/os/process/">Process</a> section.</p>
+
+<p>Let’s create a pipe in non-blocking mode for reading only:</p>
+
+<pre><code class="language-ooc"><span class="nv">pipe</span> <span class="o">:=</span> <span class="nc">Pipe</span> <span class="k">new</span><span class="p">()</span>
+<span class="nv">pipe</span> <span class="nf">setNonBlocking</span><span class="p">(</span><span class="sc">'r'</span><span class="p">)</span></code></pre>
+
+<p>Then a state variable that’ll be shared by both threads:</p>
+
+<pre><code class="language-ooc"><span class="nv">done</span> <span class="o">:=</span> <span class="k">false</span></code></pre>
+
+<p>Then we’ll make a writer thread that never closes the pipe itself (much like a
+process launched in the background that you never blockingly wait on):</p>
+
+<pre><code class="language-ooc"><span class="nv">t</span> <span class="o">:=</span> <span class="nc">Thread</span> <span class="k">new</span><span class="p">(</span><span class="o">||</span>
+  <span class="k">for</span> <span class="p">(</span><span class="nv">i</span> <span class="k">in</span> <span class="m-Decimal">0</span><span class="o">..</span><span class="m-Decimal">10</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nc">Time</span> <span class="nf">sleepSec</span><span class="p">(</span><span class="m-Decimal">1</span><span class="p">)</span>
+    <span class="nv">pipe</span> <span class="nf">write</span><span class="p">(</span><span class="s2">"Hello %d"</span> <span class="nf">format</span><span class="p">(</span><span class="nv">i</span><span class="p">))</span>
+  <span class="p">}</span>
+  <span class="nv">done</span> <span class="o">=</span> <span class="k">true</span>
+<span class="p">)</span>
+
+<span class="nv">t</span> <span class="nf">start</span><span class="p">()</span></code></pre>
+
+<p>It does set done to true after it’s done, though - much like you could know if
+a background process is still running with <code>waitNoHang</code>.</p>
+
+<p>Then we’ll read, from the main thread, as much as we can, and when we don’t receive
+anything, we’ll check if we’re done:</p>
+
+<pre><code class="language-ooc"><span class="k">while</span> <span class="p">(</span><span class="k">true</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nv">res</span> <span class="o">:=</span> <span class="nv">pipe</span> <span class="nf">read</span><span class="p">(</span><span class="m-Decimal">128</span><span class="p">)</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nv">res</span><span class="p">)</span> <span class="p">{</span>
+    <span class="s2">"Received: %s"</span> <span class="nf">printfln</span><span class="p">(</span><span class="nv">res</span><span class="p">)</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nv">done</span><span class="p">)</span> <span class="k">break</span>
+<span class="p">}</span></code></pre>
+
+<p>And let’s not forget to clean up:</p>
+
+<pre><code class="language-ooc"><span class="nv">pipe</span> <span class="nf">close</span><span class="p">()</span>
+<span class="nv">t</span> <span class="nf">wait</span><span class="p">()</span></code></pre>
+
+<p>That behaves as expected. Note that in the main thread loop we could be doing anything
+really, without blocking on the read.</p>
+
+<h2 id="pipes-disclaimer">Pipes disclaimer</h2>
+
+<p>If you have read all the way down, and you’re thinking of doing some complex
+stuff with pipes, you probably want some queuing library instead of using raw
+pipes, both for cross-platform support, performance, and ease of use.
+<a href="http://zeromq.org/">zeromq</a> is an interesting library and it has <a href="https://github.com/fasterthanlime/ooc-zeromq">ooc bindings</a>.</p>
+    </div>
+  </article>
+</div>
+<footer>
+  <div class="footer-content">
+  <nav><section class="about"><h3>About</h3>
+    <ul>
+        <li><a href="/about/#history">History</a></li>
+        <li><a href="/about/#why-use-ooc">Why use ooc?</a></li>
+        <li><a href="/about/#similar-projects">Alternatives</a></li>
+    </ul></section><section class="install"><h3>Install</h3>
+    <ul>
+        <li><a href="/install/#quick-install">Quick install</a></li>
+        <li><a href="/install/#installing-from-git">Installing from Git</a></li>
+        <li><a href="/install/#post-install-instructions">Post-install instructions</a></li>
+        <li><a href="/install/#installing-sam">Installing sam</a></li>
+    </ul></section><section class="documentation"><h3>Documentation</h3>
+    <ul>
+        <li><a href="/docs/tutorial/">Tutorial</a></li>
+        <li><a href="/docs/lang/">Language</a></li>
+        <li><a href="/docs/sdk/">SDK</a></li>
+        <li><a href="/docs/tools/">Tools</a></li>
+        <li><a href="/docs/tools/rock/">Implementation</a></li>
+        <li><a href="/docs/kaputt/">Troubleshooting</a></li>
+        <li><a href="/docs/glossary/">Glossary</a></li>
+    </ul></section><section class="community"><h3>Community</h3>
+    <ul>
+        <li><a href="http://groups.google.com/group/ooc-lang">Discussion group</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/issues">Issue tracker</a></li>
+        <li><a href="irc://chat.freenode.net/#ooc-lang">IRC channel</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/wiki">Wiki</a></li>
+        <li><a href="/development/">Development</a></li>
+        <li><a href="http://pledgie.com/campaigns/21363">Donate</a></li>
+    </ul></section></nav>
+    <div class="fine-print">
+      <p>
+        ooc &copy; 2009-2015 <a href="http://amos.me/">Amos Wenger</a>. The content of this website is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0 License</a>.
+        rock is licensed under the MIT license. Design based on the <a href="http://nanoc.ws/">nanoc web site</a> by <a href="http://stoneship.org/">Denis Defreyne</a> and used with permission.
+        <a href="http://entypo.com/">Entypo</a>By Daniel Bruce.
+      </p>
+    </div>
+  </div>
+</footer>
+
+  </body>
+</html>

@@ -1,0 +1,334 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ooc &raquo; The text package</title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="stylesheet" href="/assets/pygments.css">
+    <link href="http://fonts.googleapis.com/css?family=Radley:regular&text=OC" rel="stylesheet" type="text/css" >
+    <link href="http://fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,400,400italic,700,700italic,900,900italic" rel="stylesheet" type="text/css" >
+
+    <!-- Cool stats stuff for nanoc :) -->
+    <meta name="generator" content="nanoc 3.6.5"> 
+  </head>
+  <body>
+
+<header>
+  <div class="header-content">
+    <nav class="main">
+      <ol>
+        <li class="home"><a href="/"><img src="/assets/images/logo-nav.png" alt="Home"></a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/install/">Install</a></li>
+        <li><a href="/docs/">Documentation</a></li>
+        <li><a href="/community/">Community</a></li>
+        <li><a href="/development/">Development</a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+<div class="intro">
+  <div class="intro-content">
+    <h1>The text package</h1>
+  </div>
+</div>
+<div class="article">
+  <article>
+    <nav class="side">
+  <div class="side-title">
+    The text package
+  </div>
+
+  <div class="side-content">
+    
+      <p>↑ <a href="/docs/sdk/">Back to SDK</a></p>
+    
+
+    <ol class="toc"><li><a href="#the-text-package">The text package</a></li><li><a href="#escape-sequences">Escape sequences</a></li><li><a href="#stringtokenizer">StringTokenizer</a></li><li><a href="#stringtemplate">StringTemplate</a></li><li><a href="#shell-like-lexer">Shell-like Lexer</a></li><li><a href="#regular-expressions">Regular Expressions</a></li><li><a href="#json">JSON</a></li><ol><li><a href="#basic-reading-and-writing">Basic reading and writing</a></li><li><a href="#a-json-generation-dsl">A JSON generation DSL</a></li></ol>
+  </div>
+</nav>
+
+    <div class="article-content">
+      <h2 id="the-text-package">The text package</h2>
+
+<p>This package contains various helper classes to work with text
+and JSON.</p>
+
+<h2 id="escape-sequences">Escape sequences</h2>
+
+<p>The module <code>text/EscapeSequence</code> contains a class <code>EscapeSequence</code> which defines
+some methods to work with backslash escape sequences. In the real world, you probably
+just need the two following methods:</p>
+
+<p><code>escape</code> takes a string and converts all special characters to escape sequences.
+In this context, special characters are:</p>
+
+<ul>
+<li>non-printable characters</li>
+  <li>single and double quotes</li>
+  <li>backslashes</li>
+</ul><p>Use it like this:</p>
+
+<pre><code class="language-ooc"><span class="nv">escaped</span> <span class="o">:=</span> <span class="nc">EscapeSequence</span> <span class="nf">escape</span><span class="p">(</span><span class="s2">"This is\na 'String'"</span><span class="p">)</span>
+<span class="c">// now, `escaped` looks like this:</span>
+<span class="nv">escaped</span> <span class="o">==</span> <span class="s2">"This is \\n a \\'String\\'"</span></code></pre>
+
+<p>But that is only one half of the truth: You can additionally pass a
+string of all characters that should not be escaped as the
+second argument:</p>
+
+<pre><code class="language-ooc"><span class="nv">escaped</span> <span class="o">:=</span> <span class="nc">EscapeSequence</span> <span class="nf">escape</span><span class="p">(</span><span class="s2">"This is\na 'String'"</span><span class="p">,</span> <span class="s2">"'\n"</span><span class="p">)</span>
+<span class="c">// The method did not escape anything now.</span>
+<span class="nv">escaped</span> <span class="o">==</span> <span class="s2">"This is\na 'String'"</span></code></pre>
+
+<p><code>unescape</code> is useful if you have a string containing escape sequences
+and you need a string with these sequences converted to their real character
+counterparts. This method supports one-character escape sequences like
+“\n”, “\r” or “\t”, but also hexadecimal sequences like “\x34”.
+Usage is easy:</p>
+
+<pre><code class="language-ooc"><span class="s2">"\\x27\\163up\\t\\x62ro\\n\\x3f"</span> <span class="nf">println</span><span class="p">()</span></code></pre>
+
+<p>which will print</p>
+
+<pre><code class="language-bash"><span class="err">'</span>sup	bro
+?</code></pre>
+
+<h2 id="stringtokenizer">StringTokenizer</h2>
+
+<p>Sometimes, one needs to split a string at a special character and turn
+it into an array. In ooc, the <code>text/StringTokenizer</code> module adds
+every desirable variation of the good old <code>split</code> method to <code>Buffer</code> and <code>String</code>,
+each returning an <code>ArrayList</code>:</p>
+
+<pre><code class="language-ooc"><span class="k">import</span> <span class="nv">text</span><span class="o">/</span><span class="nc">StringTokenizer</span>
+<span class="k">import</span> <span class="nv">structs</span><span class="o">/</span><span class="nc">ArrayList</span>
+
+<span class="c">// split at a specific character</span>
+<span class="s2">"A|simple and stupid|example"</span> <span class="nf">split</span><span class="p">(</span><span class="sc">'|'</span><span class="p">)</span>
+<span class="c">// This creates an ArrayList:</span>
+<span class="c">//  ["A", "simple and stupid", "example"]</span>
+
+<span class="c">// split until a specific number of tokens is reached.</span>
+<span class="c">// This will produce an ArrayList like</span>
+<span class="c">//    ["A", "simple and stupid|example"]</span>
+<span class="s2">"A|simple and stupid|example"</span> <span class="nf">split</span><span class="p">(</span><span class="sc">'|'</span><span class="p">,</span> <span class="m-Decimal">2</span><span class="p">)</span>
+
+<span class="c">// There is also a function to split at delimiters longer</span>
+<span class="c">// than one char:</span>
+<span class="s2">":-)A case :-)of intimidating:-)smiley abuse :-)"</span> <span class="nf">split</span><span class="p">(</span><span class="s2">":-"</span><span class="p">)</span>
+<span class="c">// ... produces</span>
+<span class="c">//  ["", "A case ", "of intimidating", "smiley abuse ", ""]</span></code></pre>
+
+<h2 id="stringtemplate">StringTemplate</h2>
+
+<p>The <code>io/StringTemplate</code> module adds a lightweight <code>formatTemplate</code> string interpolation
+function to strings, which can be used in cases where <code>format</code> is not enough. This function
+uses a hashmap to access items by value:</p>
+
+<p></p>
+
+<pre><code class="language-ooc"><span class="k">import</span> <span class="nv">text</span><span class="o">/</span><span class="nc">StringTemplate</span>
+<span class="k">import</span> <span class="nv">structs</span><span class="o">/</span><span class="nc">HashMap</span>
+
+<span class="nv">values</span> <span class="o">:=</span> <span class="nc">HashMap</span><span class="o">&lt;</span><span class="nc">String</span><span class="p">,</span> <span class="nc">String</span><span class="o">&gt;</span> <span class="k">new</span><span class="p">()</span>
+<span class="nv">values</span> <span class="nf">put</span><span class="p">(</span><span class="s2">"day"</span><span class="p">,</span> <span class="s2">"Saturday"</span><span class="p">)</span> \
+      <span class="o">.</span><span class="nf">put</span><span class="p">(</span><span class="s2">"weather"</span><span class="p">,</span> <span class="s2">"cloudy"</span><span class="p">)</span>
+
+<span class="s2">"Hi! Today's {{day}}, and it is a pretty {{  weather   }} {{ day }}!"</span> <span class="nf">formatTemplate</span><span class="p">(</span><span class="nv">values</span><span class="p">)</span> <span class="nf">println</span><span class="p">()</span></code></pre>
+
+<p></p>
+
+<p>This will print:</p>
+
+<pre><code>Hi! Today's Saturday, and it is a pretty cloudy Saturday!
+</code></pre>
+
+<p>As you can see, you can access the values by their keys, order isn’t important
+and you can interpolate one value multiple times.<br>
+However, this is still pretty basic, since it does not support filters or control
+structures, but this is often enough.</p>
+
+<p>In case a key is referenced that does not exist in the hashmap, it will be
+replaced by an empty string.</p>
+
+<h2 id="shell-like-lexer">Shell-like Lexer</h2>
+
+<p>The <code>text/Shlex</code> module implements a basic lexer for strings containing
+quoted strings and backslash escape sequences. Basically, it splits an input
+string into an Array, using whitespace characters as delimiters. Single and double
+quotes can be used to include whitespace in the string items.</p>
+
+<p>The public API can be accessed like this:</p>
+
+<pre><code class="language-ooc"><span class="k">import</span> <span class="nv">text</span><span class="o">/</span><span class="nc">Shlex</span>
+<span class="k">import</span> <span class="nv">structs</span><span class="o">/</span><span class="nc">ArrayList</span>
+<span class="nc">Shlex</span> <span class="nf">split</span><span class="p">(</span><span class="s2">"'This is a \\'quoted\\' string'     and I \"like \\x69\\x74.\""</span><span class="p">)</span>
+<span class="c">// This produces the following ArrayList:</span>
+<span class="c">// ["This is a 'quoted' string", "and", "I", "like it."]</span></code></pre>
+
+<p>This can be useful to parse command-line arguments. However, be careful, since
+this module was not designed with security in mind.</p>
+
+<h2 id="regular-expressions">Regular Expressions</h2>
+
+<p>The SDK provides a simple cover for the <a href="http://www.pcre.org/">Perl Compatible Regular Expressions</a>
+library. Its use is pretty straightforward. First, you need to compile a regular
+expression pattern, passing some options as a bitmask if you want to:</p>
+
+<pre><code class="language-ooc"><span class="k">import</span> <span class="nv">text</span><span class="o">/</span><span class="nc">Regexp</span>
+
+<span class="nv">pattern</span> <span class="o">:=</span> <span class="nc">Regexp</span> <span class="nf">compile</span><span class="p">(</span><span class="s2">"on (?P&lt;year&gt;[0-9]{4})-?P&lt;month&gt;[0-9]{1,2})-(?P&lt;day&gt;[0-9]{1,2})"</span><span class="p">,</span> <span class="nc">RegexOptions</span> <span class="no">CASELESS</span><span class="p">)</span>
+<span class="nv">pattern</span> <span class="nf">matches</span><span class="p">(</span><span class="s2">"foo"</span><span class="p">)</span> <span class="c">// this will return null, since the pattern could not be matched</span>
+
+<span class="nv">someDate</span> <span class="o">:=</span> <span class="nv">pattern</span> <span class="nf">matches</span><span class="p">(</span><span class="s2">"On 2013-08-07"</span><span class="p">)</span>
+<span class="c">// `someDate` is now a `Match` object. You can access groups by index or by name:</span>
+<span class="nv">someDate</span> <span class="nf">group</span><span class="p">(</span><span class="m-Decimal">1</span><span class="p">)</span>
+<span class="nv">someDate</span> <span class="nf">group</span><span class="p">(</span><span class="s2">"year"</span><span class="p">)</span>
+<span class="c">// ... both return "2013".</span>
+<span class="c">// Group zero is the whole matched string:</span>
+<span class="nv">someDate</span> <span class="nf">group</span><span class="p">(</span><span class="m-Decimal">0</span><span class="p">)</span> <span class="c">// is "On 2013-08-07"</span>
+
+<span class="c">// You can also iterate over the matches. This will include</span>
+<span class="c">// group 0 (the whole string), though.</span>
+<span class="k">for</span><span class="p">(</span><span class="nv">group</span> <span class="k">in</span> <span class="nv">someDate</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c">// `group` is now a String.</span>
+<span class="p">}</span></code></pre>
+
+<p>For more information about the Perl regular expression syntax, take a look
+at the <a href="http://perldoc.perl.org/perlre.html">Perl documentation</a>.</p>
+
+<h2 id="json">JSON</h2>
+
+<h3 id="basic-reading-and-writing">Basic reading and writing</h3>
+
+<p>The <code>text/json/</code> package contains a JSON parser and generator, written in ooc
+without external dependencies, which is able to deal with basic JSON. However,
+if you care about speed or compliance (especially when dealing with numbers),
+you should check out <a href="https://github.com/fasterthanlime/ooc-yaml">ooc-yaml</a>.</p>
+
+<p>The JSON classes operate on nested <a href="/docs/sdk/structs/#bag-variants">HashBags and Bags</a>,
+so if you parse JSON, you get some (Hash)Bags, and if you want to generate JSON, you need
+to pass the data as (Hash)Bags.</p>
+
+<p>To parse or generate JSON, you can just use the convenience <code>text/json</code> module.
+Every function exists in two flavours: Normally, you need to pass the class
+of your expected base value. So, for example, if you want to parse JSON like that:</p>
+
+<pre><code class="language-json"><span class="p">[</span><span class="s2">"Hi"</span><span class="p">,</span> <span class="s2">"World"</span><span class="p">]</span></code></pre>
+
+<p>You need to pass <code>Bag</code> as the base value class. However, since most of the time
+you will parse JSON objects that will represented by a <code>HashBag</code>, <code>HashBag</code> is
+used by default if you do not pass a class explicitly.</p>
+
+<p>Here are some examples:</p>
+
+<pre><code class="language-ooc"><span class="k">import</span> <span class="nv">text</span><span class="o">/</span><span class="nv">json</span>
+<span class="k">import</span> <span class="nv">structs</span><span class="o">/</span><span class="nc">HashBag</span>
+
+<span class="c">// if you have a `Reader` (to read directly from a file, for example):</span>
+<span class="k">import</span> <span class="nv">io</span><span class="o">/</span><span class="nc">FileReader</span>
+<span class="nv">myObject</span> <span class="o">:=</span> <span class="no">JSON</span> <span class="nf">parse</span><span class="p">(</span><span class="nc">FileReader</span> <span class="k">new</span><span class="p">(</span><span class="s2">"package.json"</span><span class="p">))</span>
+
+<span class="c">// ... and if your base value is not a JSON object:</span>
+<span class="k">import</span> <span class="nv">structs</span><span class="o">/</span><span class="nc">Bag</span>
+<span class="nv">myArray</span> <span class="o">:=</span> <span class="no">JSON</span> <span class="nf">parse</span><span class="p">(</span><span class="nc">FileReader</span> <span class="k">new</span><span class="p">(</span><span class="s2">"myarray.json"</span><span class="p">),</span> <span class="nc">Bag</span><span class="p">)</span>
+
+<span class="c">// reading directly from strings is also supported:</span>
+<span class="no">JSON</span> <span class="nf">parse</span><span class="p">(</span><span class="s2">"{\"hello\": \"world\"}"</span><span class="p">)</span>
+<span class="no">JSON</span> <span class="nf">parse</span><span class="p">(</span><span class="s2">"\"just a string\""</span><span class="p">,</span> <span class="nc">String</span><span class="p">)</span>
+
+<span class="c">// and to generate JSON, there is:</span>
+<span class="nv">myBag</span> <span class="o">:=</span> <span class="nc">HashBag</span> <span class="k">new</span><span class="p">()</span>
+<span class="nv">myBag</span> <span class="nf">put</span><span class="p">(</span><span class="s2">"integer"</span><span class="p">,</span> <span class="m-Decimal">1234</span><span class="p">)</span> \
+     <span class="o">.</span><span class="nf">put</span><span class="p">(</span><span class="s2">"string"</span><span class="p">,</span> <span class="s2">"Yes"</span><span class="p">)</span>
+
+<span class="k">import</span> <span class="nv">io</span><span class="o">/</span><span class="nc">FileWriter</span>
+<span class="no">JSON</span> <span class="nf">generate</span><span class="p">(</span><span class="nc">FileWriter</span> <span class="k">new</span><span class="p">(</span><span class="s2">"output.json"</span><span class="p">),</span> <span class="nv">myBag</span><span class="p">)</span>
+
+<span class="nv">myJSONString</span> <span class="o">:=</span> <span class="no">JSON</span> <span class="nf">generateString</span><span class="p">(</span><span class="nv">myBag</span><span class="p">)</span></code></pre>
+
+<p>When dealing with the <code>HashBag</code> class, you should take a look at its
+<a href="/docs/sdk/structs/#hashbag">getPath</a> function, which will save you
+a lot of typing.</p>
+
+<h3 id="a-json-generation-dsl">A JSON generation DSL</h3>
+
+<p>If you find yourself generating a lot of JSON, you might find
+the <code>HashBag</code>/<code>Bag</code> objects create a lot of syntactic noise. For this
+reason, the SDK contains another convenience module implementing
+a small DSL for JSON generation.</p>
+
+<pre><code class="language-ooc"><span class="c">// Let's import the module into a namespace, since `make`</span>
+<span class="c">// is a bit ambiguous.</span>
+<span class="k">import</span> <span class="nv">text</span><span class="o">/</span><span class="nv">json</span><span class="o">/</span><span class="no">DSL</span> <span class="nv">into</span> <span class="no">JSON</span>
+
+<span class="nv">data</span> <span class="o">:=</span> <span class="no">JSON</span> <span class="nf">make</span><span class="p">(</span><span class="o">|</span><span class="nv">j</span><span class="o">|</span>
+    <span class="nv">j</span> <span class="nf">object</span><span class="p">(</span>
+        <span class="s2">"some-key"</span><span class="p">,</span>
+            <span class="s2">"some-value"</span><span class="p">,</span>
+        <span class="s2">"here comes a list"</span><span class="p">,</span>
+            <span class="nv">j</span> <span class="nf">array</span><span class="p">(</span>
+                <span class="m-Decimal">1</span><span class="p">,</span> <span class="m-Decimal">2</span><span class="p">,</span> <span class="s2">"three"</span><span class="p">,</span> <span class="m-Decimal">4</span>
+            <span class="p">),</span>
+        <span class="s2">"and a nested object"</span><span class="p">,</span>
+            <span class="nv">j</span> <span class="nf">object</span><span class="p">(</span>
+                <span class="s2">"true"</span><span class="p">,</span> <span class="k">true</span>
+            <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+<span class="nv">data</span> <span class="nf">println</span><span class="p">()</span></code></pre>
+
+<p><code>make</code> creates a helper object with <code>object</code> and <code>array</code> functions and passes
+it to the function you provide; using a closure is the most convenient way here.
+You can use <code>object</code> to create JSON objects, passing as many key-value pairs
+as you want, and <code>array</code> for JSON arrays.</p>
+
+<p>When it’s done, it returns the JSON data as a string.</p>
+    </div>
+  </article>
+</div>
+<footer>
+  <div class="footer-content">
+  <nav><section class="about"><h3>About</h3>
+    <ul>
+        <li><a href="/about/#history">History</a></li>
+        <li><a href="/about/#why-use-ooc">Why use ooc?</a></li>
+        <li><a href="/about/#similar-projects">Alternatives</a></li>
+    </ul></section><section class="install"><h3>Install</h3>
+    <ul>
+        <li><a href="/install/#quick-install">Quick install</a></li>
+        <li><a href="/install/#installing-from-git">Installing from Git</a></li>
+        <li><a href="/install/#post-install-instructions">Post-install instructions</a></li>
+        <li><a href="/install/#installing-sam">Installing sam</a></li>
+    </ul></section><section class="documentation"><h3>Documentation</h3>
+    <ul>
+        <li><a href="/docs/tutorial/">Tutorial</a></li>
+        <li><a href="/docs/lang/">Language</a></li>
+        <li><a href="/docs/sdk/">SDK</a></li>
+        <li><a href="/docs/tools/">Tools</a></li>
+        <li><a href="/docs/tools/rock/">Implementation</a></li>
+        <li><a href="/docs/kaputt/">Troubleshooting</a></li>
+        <li><a href="/docs/glossary/">Glossary</a></li>
+    </ul></section><section class="community"><h3>Community</h3>
+    <ul>
+        <li><a href="http://groups.google.com/group/ooc-lang">Discussion group</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/issues">Issue tracker</a></li>
+        <li><a href="irc://chat.freenode.net/#ooc-lang">IRC channel</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/wiki">Wiki</a></li>
+        <li><a href="/development/">Development</a></li>
+        <li><a href="http://pledgie.com/campaigns/21363">Donate</a></li>
+    </ul></section></nav>
+    <div class="fine-print">
+      <p>
+        ooc &copy; 2009-2015 <a href="http://amos.me/">Amos Wenger</a>. The content of this website is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0 License</a>.
+        rock is licensed under the MIT license. Design based on the <a href="http://nanoc.ws/">nanoc web site</a> by <a href="http://stoneship.org/">Denis Defreyne</a> and used with permission.
+        <a href="http://entypo.com/">Entypo</a>By Daniel Bruce.
+      </p>
+    </div>
+  </div>
+</footer>
+
+  </body>
+</html>

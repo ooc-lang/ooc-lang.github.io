@@ -1,0 +1,132 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ooc &raquo; ShellUtils</title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="stylesheet" href="/assets/pygments.css">
+    <link href="http://fonts.googleapis.com/css?family=Radley:regular&text=OC" rel="stylesheet" type="text/css" >
+    <link href="http://fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,400,400italic,700,700italic,900,900italic" rel="stylesheet" type="text/css" >
+
+    <!-- Cool stats stuff for nanoc :) -->
+    <meta name="generator" content="nanoc 3.6.5"> 
+  </head>
+  <body>
+
+<header>
+  <div class="header-content">
+    <nav class="main">
+      <ol>
+        <li class="home"><a href="/"><img src="/assets/images/logo-nav.png" alt="Home"></a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/install/">Install</a></li>
+        <li><a href="/docs/">Documentation</a></li>
+        <li><a href="/community/">Community</a></li>
+        <li><a href="/development/">Development</a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+<div class="intro">
+  <div class="intro-content">
+    <h1>ShellUtils</h1>
+  </div>
+</div>
+<div class="article">
+  <article>
+    <nav class="side">
+  <div class="side-title">
+    ShellUtils
+  </div>
+
+  <div class="side-content">
+    
+      <p>↑ <a href="/docs/sdk/os/">Back to The os package</a></p>
+    
+
+    <ol class="toc"><li><a href="#the-osshellutils-module">The os/ShellUtils module</a></li><ol><li><a href="#cross-platform">Cross-platform</a></li><li><a href="#crucial">Crucial</a></li></ol>
+  </div>
+</nav>
+
+    <div class="article-content">
+      <h2 id="the-osshellutils-module">The os/ShellUtils module</h2>
+
+<p>The entire purpose of the <code>ShellUtils</code> module is to find an
+executable in the PATH environment variable.</p>
+
+<p>It can be used to implement functionality usually found in the
+*nix <code>which</code> command-line utility.</p>
+
+<p>For example, to know where <code>autoconf</code> is hiding, one can do:</p>
+
+<pre><code class="language-ooc"><span class="k">import</span> <span class="nv">os</span><span class="o">/</span><span class="nc">ShellUtils</span>
+<span class="nv">file</span> <span class="o">:=</span> <span class="nc">ShellUtils</span> <span class="nf">findExecutable</span><span class="p">(</span><span class="s2">"autoconf"</span><span class="p">)</span></code></pre>
+
+<p>If the executable is not found, <code>file</code> here will be null. Otherwise,
+it’ll correspond to the executable first found in the path:</p>
+
+<pre><code class="language-ooc"><span class="nv">match</span> <span class="nv">file</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="k">null</span> <span class="o">=&gt;</span> <span class="s2">"autoconf not found"</span>
+    <span class="k">case</span> <span class="o">=&gt;</span> <span class="s2">"found: %s"</span> <span class="nf">format</span><span class="p">(</span><span class="nv">file</span> <span class="nv">path</span><span class="p">)</span>
+<span class="p">}</span> <span class="nf">println</span><span class="p">()</span></code></pre>
+
+<h3 id="cross-platform">Cross-platform</h3>
+
+<p>Adding the <code>.exe</code> suffix is not necessary on Windows - it’ll be
+added automatically on this platform when searching.</p>
+
+<h3 id="crucial">Crucial</h3>
+
+<p><code>findExecutable</code> can be made to throw an exception in case an
+executable is not found, instead of returning null. For this, pass
+<code>true</code> as its second argument:</p>
+
+<pre><code class="language-ooc"><span class="c">// if we can't find make, don't even bother</span>
+<span class="nv">make</span> <span class="o">:=</span> <span class="nc">ShellUtils</span> <span class="nf">findExecutable</span><span class="p">(</span><span class="s2">"make"</span><span class="p">,</span> <span class="k">true</span><span class="p">)</span></code></pre>
+    </div>
+  </article>
+</div>
+<footer>
+  <div class="footer-content">
+  <nav><section class="about"><h3>About</h3>
+    <ul>
+        <li><a href="/about/#history">History</a></li>
+        <li><a href="/about/#why-use-ooc">Why use ooc?</a></li>
+        <li><a href="/about/#similar-projects">Alternatives</a></li>
+    </ul></section><section class="install"><h3>Install</h3>
+    <ul>
+        <li><a href="/install/#quick-install">Quick install</a></li>
+        <li><a href="/install/#installing-from-git">Installing from Git</a></li>
+        <li><a href="/install/#post-install-instructions">Post-install instructions</a></li>
+        <li><a href="/install/#installing-sam">Installing sam</a></li>
+    </ul></section><section class="documentation"><h3>Documentation</h3>
+    <ul>
+        <li><a href="/docs/tutorial/">Tutorial</a></li>
+        <li><a href="/docs/lang/">Language</a></li>
+        <li><a href="/docs/sdk/">SDK</a></li>
+        <li><a href="/docs/tools/">Tools</a></li>
+        <li><a href="/docs/tools/rock/">Implementation</a></li>
+        <li><a href="/docs/kaputt/">Troubleshooting</a></li>
+        <li><a href="/docs/glossary/">Glossary</a></li>
+    </ul></section><section class="community"><h3>Community</h3>
+    <ul>
+        <li><a href="http://groups.google.com/group/ooc-lang">Discussion group</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/issues">Issue tracker</a></li>
+        <li><a href="irc://chat.freenode.net/#ooc-lang">IRC channel</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/wiki">Wiki</a></li>
+        <li><a href="/development/">Development</a></li>
+        <li><a href="http://pledgie.com/campaigns/21363">Donate</a></li>
+    </ul></section></nav>
+    <div class="fine-print">
+      <p>
+        ooc &copy; 2009-2015 <a href="http://amos.me/">Amos Wenger</a>. The content of this website is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0 License</a>.
+        rock is licensed under the MIT license. Design based on the <a href="http://nanoc.ws/">nanoc web site</a> by <a href="http://stoneship.org/">Denis Defreyne</a> and used with permission.
+        <a href="http://entypo.com/">Entypo</a>By Daniel Bruce.
+      </p>
+    </div>
+  </div>
+</footer>
+
+  </body>
+</html>

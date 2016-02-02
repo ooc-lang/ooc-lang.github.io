@@ -1,0 +1,225 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ooc &raquo; String</title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="stylesheet" href="/assets/pygments.css">
+    <link href="http://fonts.googleapis.com/css?family=Radley:regular&text=OC" rel="stylesheet" type="text/css" >
+    <link href="http://fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,400,400italic,700,700italic,900,900italic" rel="stylesheet" type="text/css" >
+
+    <!-- Cool stats stuff for nanoc :) -->
+    <meta name="generator" content="nanoc 3.6.5"> 
+  </head>
+  <body>
+
+<header>
+  <div class="header-content">
+    <nav class="main">
+      <ol>
+        <li class="home"><a href="/"><img src="/assets/images/logo-nav.png" alt="Home"></a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/install/">Install</a></li>
+        <li><a href="/docs/">Documentation</a></li>
+        <li><a href="/community/">Community</a></li>
+        <li><a href="/development/">Development</a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+<div class="intro">
+  <div class="intro-content">
+    <h1>String</h1>
+  </div>
+</div>
+<div class="article">
+  <article>
+    <nav class="side">
+  <div class="side-title">
+    String
+  </div>
+
+  <div class="side-content">
+    
+      <p>↑ <a href="/docs/sdk/lang/">Back to The lang package</a></p>
+    
+
+    <ol class="toc"><li><a href="#string">String</a></li><ol><li><a href="#basic-usage">Basic usage</a></li><li><a href="#tests">Tests</a></li><li><a href="#indexing">Indexing</a></li><li><a href="#formatting-and-printing">Formatting and printing</a></li><li><a href="#concatenation">Concatenation</a></li><li><a href="#finding-and-replacing">Finding and replacing</a></li><li><a href="#slicing">Slicing</a></li><li><a href="#trimming">Trimming</a></li></ol><li><a href="#cstring">CString</a></li></ol>
+  </div>
+</nav>
+
+    <div class="article-content">
+      <h2 id="string">String</h2>
+
+<p>A string in ooc is a chain of bytes with no particular property.
+In most cases, you’ll want to deal with UTF-8 encoded strings.</p>
+
+<p>The <code>String</code> type is the full-blown ooc String - it is a pascal
+string in the sense that the length is stored with it. It is
+backed by the <code>Buffer</code> type, which contains the actual bytes.</p>
+
+<p>Buffers are mutable, whereas Strings are immutable. Therefore,
+to build up a long String from several elements, using <code>Buffer</code>
+is preferable.</p>
+
+<h3 id="basic-usage">Basic usage</h3>
+
+<p>The size of a String can be retrieved through the <code>size</code> property.</p>
+
+<pre><code class="language-ooc"><span class="s2">"dumb luck"</span> <span class="nv">size</span> <span class="o">==</span> <span class="m-Decimal">9</span> <span class="c">// true</span></code></pre>
+
+<h3 id="tests">Tests</h3>
+
+<p><code>startsWith?</code> and <code>endsWith?</code> do exactly what they sound like.
+<code>equals?</code> tests for equality, and is aliased to the <code>==</code> operator
+and, for non-equality, the <code>!=</code> operator:</p>
+
+<pre><code class="language-ooc"><span class="s2">"moonlight"</span> <span class="nv">startsWith</span><span class="o">?</span><span class="p">(</span><span class="s2">"moon"</span><span class="p">)</span> <span class="c">// true</span>
+<span class="s2">"lightscape"</span> <span class="nv">endsWith</span><span class="o">?</span><span class="p">(</span><span class="s2">"scape"</span><span class="p">)</span> <span class="c">// true</span>
+
+<span class="s2">"moon"</span> <span class="o">==</span> <span class="s2">"moon"</span> <span class="c">// true</span>
+<span class="s2">"light"</span> <span class="o">!=</span> <span class="s2">"darkness"</span> <span class="c">// true</span></code></pre>
+
+<h3 id="indexing">Indexing</h3>
+
+<p>One can retrieve the n-th byte with the array indexing operator, <code>[]</code>
+and an integer value:</p>
+
+<pre><code class="language-ooc"><span class="s2">"abcdef"</span><span class="p">[</span><span class="m-Decimal">2</span><span class="p">]</span> <span class="c">// == 'c'</span></code></pre>
+
+<p>Note that the indexes are 0-based, like arrays.</p>
+
+<p>To iterate through each byte of a String, a foreach can be used:</p>
+
+<pre><code class="language-ooc"><span class="s2">"Let's spell!"</span> <span class="nf">println</span><span class="p">()</span>
+<span class="k">for</span> <span class="p">(</span><span class="nv">c</span> <span class="k">in</span> <span class="s2">"violin"</span><span class="p">)</span> <span class="p">{</span>
+  <span class="s2">"%c, "</span> <span class="nf">printfln</span><span class="p">(</span><span class="nv">c</span><span class="p">)</span>
+<span class="p">}</span></code></pre>
+
+<h3 id="formatting-and-printing">Formatting and printing</h3>
+
+<p>The <code>format</code> method can be used to format a string with various
+elements such as integers, floats, other strings, etc:</p>
+
+<pre><code class="language-ooc"><span class="s2">"%d"</span> <span class="nf">format</span><span class="p">(</span><span class="m-Decimal">42</span><span class="p">)</span> <span class="c">// == "42"</span>
+<span class="s2">"%.2f"</span> <span class="nf">format</span><span class="p">(</span><span class="mf">3.1567</span><span class="p">)</span> <span class="c">// == "3.16"</span>
+<span class="s2">"%s"</span> <span class="nf">format</span><span class="p">(</span><span class="s2">"Hi!"</span><span class="p">)</span> <span class="c">// == "Hi!"</span></code></pre>
+
+<p>The <code>print</code> method will print a string to the standard output.
+Since it is so convenient to print a string followed by a newline,
+<code>println</code> does exactly that. And since formatting is often used,
+<code>printfln</code> does formatting, then print the result followed by a newline.</p>
+
+<pre><code class="language-ooc"><span class="s2">"Hello world!\n"</span> <span class="nf">print</span><span class="p">()</span>
+<span class="c">// is equivalent to:</span>
+<span class="s2">"Hello world!"</span> <span class="nf">println</span><span class="p">()</span>
+<span class="c">// itself equivalent to:</span>
+<span class="s2">"Hello %s!"</span> <span class="nf">printfln</span><span class="p">(</span><span class="s2">"world"</span><span class="p">)</span></code></pre>
+
+<h3 id="concatenation">Concatenation</h3>
+
+<p>One can use the <code>append</code> and <code>prepend</code> methods:</p>
+
+<pre><code class="language-ooc"><span class="s2">"light"</span> <span class="nf">prepend</span><span class="p">(</span><span class="s2">"moon"</span><span class="p">)</span> <span class="c">// == "moonlight"</span>
+<span class="s2">"storm"</span> <span class="nf">append</span><span class="p">(</span><span class="s2">"born"</span><span class="p">)</span> <span class="c">// == "stormborn"</span></code></pre>
+
+<p>Or simply, the <code>+</code> operator:</p>
+
+<pre><code class="language-ooc"><span class="s2">"not"</span> <span class="o">+</span> <span class="s2">"with"</span> <span class="o">+</span> <span class="s2">"standing"</span> <span class="c">// == "notwithstanding"</span></code></pre>
+
+<h3 id="finding-and-replacing">Finding and replacing</h3>
+
+<p>The <code>indexOf</code> method returns the index of a character or string inside
+a string:</p>
+
+<pre><code class="language-ooc"><span class="s2">"abcdef"</span> <span class="nv">indexOf</span><span class="o">?</span><span class="p">(</span><span class="sc">'c'</span><span class="p">)</span> <span class="c">// 2</span></code></pre>
+
+<p>Using <code>replaceAll</code>, one can replace all instances of a String with
+another String:</p>
+
+<pre><code class="language-ooc"><span class="c">// yields "Brother | father | lover."</span>
+<span class="s2">"Brother, father, lover."</span> <span class="nf">replaceAll</span><span class="p">(</span><span class="s2">","</span><span class="p">,</span> <span class="s2">" |"</span><span class="p">)</span></code></pre>
+
+<h3 id="slicing">Slicing</h3>
+
+<p>The <code>substring</code> method allows one to get a slice of a String:</p>
+
+<pre><code class="language-ooc"><span class="s2">"observe"</span> <span class="nf">substring</span><span class="p">(</span><span class="m-Decimal">2</span><span class="p">)</span> <span class="c">// == "serve"</span>
+<span class="s2">"laminate"</span> <span class="nf">substring</span><span class="p">(</span><span class="m-Decimal">2</span><span class="p">,</span> <span class="m-Decimal">5</span><span class="p">)</span> <span class="c">// == "min"</span></code></pre>
+
+<p>Alternatively, the array indexing operator, <code>[]</code>, can be used
+with a range literal.</p>
+
+<pre><code class="language-ooc"><span class="s2">"observe"</span><span class="p">[</span><span class="m-Decimal">2</span><span class="o">..-</span><span class="m-Decimal">1</span><span class="p">]</span> <span class="c">// == "serve"</span>
+<span class="s2">"laminate"</span><span class="p">[</span><span class="m-Decimal">2</span><span class="o">..</span><span class="m-Decimal">5</span><span class="p">]</span> <span class="c">// == "min"</span></code></pre>
+
+<h3 id="trimming">Trimming</h3>
+
+<p>To get rid of extra whitespace, use the <code>trim</code> method, or its variants,
+<code>trimLeft</code> and <code>trimRight</code>.</p>
+
+<pre><code>"  Hi!  " trim() // = "Hi!"
+"  Hi!  " trimLeft() // = "Hi!  "
+"  Hi!  " trimRight() // = "  Hi!"
+</code></pre>
+
+<p>They also have versions that accept which characters to trim:</p>
+
+<pre><code>"[Hola.]" trim() // = "[Hola.]"
+"[Hola.]" trim("[]()") // = "Hola."
+</code></pre>
+
+<h2 id="cstring">CString</h2>
+
+<p>While a pure ooc program will want to deal mostyl with <code>String</code>s,
+when dealing with C functions, one will want to convert back and forth
+with <code>toCString()</code>, which gives a <code>CString</code>, a cover of <code>char*</code>.</p>
+
+<p>Conversely, converting a CString to a String can be done with <code>toString()</code>.</p>
+    </div>
+  </article>
+</div>
+<footer>
+  <div class="footer-content">
+  <nav><section class="about"><h3>About</h3>
+    <ul>
+        <li><a href="/about/#history">History</a></li>
+        <li><a href="/about/#why-use-ooc">Why use ooc?</a></li>
+        <li><a href="/about/#similar-projects">Alternatives</a></li>
+    </ul></section><section class="install"><h3>Install</h3>
+    <ul>
+        <li><a href="/install/#quick-install">Quick install</a></li>
+        <li><a href="/install/#installing-from-git">Installing from Git</a></li>
+        <li><a href="/install/#post-install-instructions">Post-install instructions</a></li>
+        <li><a href="/install/#installing-sam">Installing sam</a></li>
+    </ul></section><section class="documentation"><h3>Documentation</h3>
+    <ul>
+        <li><a href="/docs/tutorial/">Tutorial</a></li>
+        <li><a href="/docs/lang/">Language</a></li>
+        <li><a href="/docs/sdk/">SDK</a></li>
+        <li><a href="/docs/tools/">Tools</a></li>
+        <li><a href="/docs/tools/rock/">Implementation</a></li>
+        <li><a href="/docs/kaputt/">Troubleshooting</a></li>
+        <li><a href="/docs/glossary/">Glossary</a></li>
+    </ul></section><section class="community"><h3>Community</h3>
+    <ul>
+        <li><a href="http://groups.google.com/group/ooc-lang">Discussion group</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/issues">Issue tracker</a></li>
+        <li><a href="irc://chat.freenode.net/#ooc-lang">IRC channel</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/wiki">Wiki</a></li>
+        <li><a href="/development/">Development</a></li>
+        <li><a href="http://pledgie.com/campaigns/21363">Donate</a></li>
+    </ul></section></nav>
+    <div class="fine-print">
+      <p>
+        ooc &copy; 2009-2015 <a href="http://amos.me/">Amos Wenger</a>. The content of this website is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0 License</a>.
+        rock is licensed under the MIT license. Design based on the <a href="http://nanoc.ws/">nanoc web site</a> by <a href="http://stoneship.org/">Denis Defreyne</a> and used with permission.
+        <a href="http://entypo.com/">Entypo</a>By Daniel Bruce.
+      </p>
+    </div>
+  </div>
+</footer>
+
+  </body>
+</html>

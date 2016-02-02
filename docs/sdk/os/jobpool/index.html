@@ -1,0 +1,199 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ooc &raquo; JobPool</title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="stylesheet" href="/assets/pygments.css">
+    <link href="http://fonts.googleapis.com/css?family=Radley:regular&text=OC" rel="stylesheet" type="text/css" >
+    <link href="http://fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,400,400italic,700,700italic,900,900italic" rel="stylesheet" type="text/css" >
+
+    <!-- Cool stats stuff for nanoc :) -->
+    <meta name="generator" content="nanoc 3.6.5"> 
+  </head>
+  <body>
+
+<header>
+  <div class="header-content">
+    <nav class="main">
+      <ol>
+        <li class="home"><a href="/"><img src="/assets/images/logo-nav.png" alt="Home"></a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/install/">Install</a></li>
+        <li><a href="/docs/">Documentation</a></li>
+        <li><a href="/community/">Community</a></li>
+        <li><a href="/development/">Development</a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+<div class="intro">
+  <div class="intro-content">
+    <h1>JobPool</h1>
+  </div>
+</div>
+<div class="article">
+  <article>
+    <nav class="side">
+  <div class="side-title">
+    JobPool
+  </div>
+
+  <div class="side-content">
+    
+      <p>↑ <a href="/docs/sdk/os/">Back to The os package</a></p>
+    
+
+    <ol class="toc"><li><a href="#the-osjobpool-module">The os/JobPool module</a></li><li><a href="#basic-usage">Basic usage</a></li><ol><li><a href="#proof-of-concept">Proof of concept</a></li></ol><li><a href="#customization">Customization</a></li><ol><li><a href="#parallelism">Parallelism</a></li><li><a href="#custom-job">Custom job</a></li></ol>
+  </div>
+</nav>
+
+    <div class="article-content">
+      <h2 id="the-osjobpool-module">The os/JobPool module</h2>
+
+<p>JobPool is useful when several background tasks have to be launched in
+parallel. It allows to control how many tasks are run in parallel, and to wait
+until all tasks have ended.</p>
+
+<p>A good example of JobPool usage would be a build system, where multiple
+instances of a compiler have to be ran on different files, and the number of
+instances running in parallel should be limited.</p>
+
+<h2 id="basic-usage">Basic usage</h2>
+
+<p>Creating a job pool is trivial:</p>
+
+<pre><code class="language-ooc"><span class="k">import</span> <span class="nv">os</span><span class="o">/</span><span class="nc">JobPool</span>
+<span class="nv">pool</span> <span class="o">:=</span> <span class="nc">JobPool</span> <span class="k">new</span><span class="p">()</span></code></pre>
+
+<p>Then jobs should be added. Jobs are attached to processes, so the process
+must be launched beforehand.</p>
+
+<pre><code class="language-ooc"><span class="nv">p</span> <span class="o">:=</span> <span class="nc">Process</span> <span class="k">new</span><span class="p">([</span><span class="s2">"find"</span><span class="p">,</span> <span class="s2">"./"</span><span class="p">,</span> <span class="s2">"-name"</span><span class="p">,</span> <span class="s2">"*.log"</span><span class="p">])</span>
+<span class="nv">p</span> <span class="nf">executeNoWait</span><span class="p">()</span></code></pre>
+
+<p>Then an associated job can be created and added to the pool:</p>
+
+<pre><code class="language-ooc"><span class="nv">job</span> <span class="o">:=</span> <span class="nc">Job</span> <span class="k">new</span><span class="p">(</span><span class="nv">p</span><span class="p">)</span>
+<span class="nv">pool</span> <span class="nf">add</span><span class="p">(</span><span class="nv">job</span><span class="p">)</span></code></pre>
+
+<p>Note that the <code>pool add</code> call might block, if there already is too many
+jobs running in parallel, waiting for at least one job to complete.</p>
+
+<p>When all jobs have been added, one can wait for all jobs to finish.</p>
+
+<pre><code class="language-ooc"><span class="nv">exitCode</span> <span class="o">:=</span> <span class="nv">pool</span> <span class="nf">waitAll</span><span class="p">()</span></code></pre>
+
+<p>If at least one job failed (returned with a non-zero exit code),
+<code>waitAll</code> will return its exit code. If they all succeeded, <code>waitAll</code>
+will just return 0.</p>
+
+<h3 id="proof-of-concept">Proof of concept</h3>
+
+<p>To demonstrate how it works, we can launch several <code>sleep</code> commands
+in the background, and wait for them all to finish:</p>
+
+<pre><code class="language-ooc"><span class="nv">pool</span> <span class="o">:=</span> <span class="nc">JobPool</span> <span class="k">new</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="nv">i</span> <span class="k">in</span> <span class="m-Decimal">0</span><span class="o">..</span><span class="nv">pool</span> <span class="nv">parallelism</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">p</span> <span class="o">:=</span> <span class="nc">Process</span> <span class="k">new</span><span class="p">([</span><span class="s2">"sleep"</span><span class="p">,</span> <span class="s2">"1"</span><span class="p">])</span>
+    <span class="nv">p</span> <span class="nf">executeNoWait</span><span class="p">()</span>
+    <span class="nv">pool</span> <span class="nf">add</span><span class="p">(</span><span class="nc">Job</span> <span class="k">new</span><span class="p">(</span><span class="nv">p</span><span class="p">))</span>
+<span class="p">}</span>
+
+<span class="nv">pool</span> <span class="nf">waitAll</span><span class="p">()</span></code></pre>
+
+<p>This program wil take about 1 second to complete, no matter the level
+of parallelism. Instead of being executed sequentially (which would add
+up the time of execution), they’re being executed in parallel.</p>
+
+<p>Note that this is a contrived example. In a real example, one would not
+adjust the total number of jobs from the <code>pool parallelism</code> setting, but
+rather let the natural number of jobs be distributed by the job pool itself.</p>
+
+<h2 id="customization">Customization</h2>
+
+<h3 id="parallelism">Parallelism</h3>
+
+<p>By default, <code>JobPool</code> tries to have a level of parallelism (max jobs in
+parallel) equal to the number of cores on the machine it’s running on.</p>
+
+<p>It can be adjusted by hand:</p>
+
+<pre><code class="language-ooc"><span class="c">// never run more that 2 jobs in parallel</span>
+<span class="nv">pool</span> <span class="nv">parallelism</span> <span class="o">=</span> <span class="m-Decimal">2</span></code></pre>
+
+<h3 id="custom-job">Custom job</h3>
+
+<p>In our examples above we’ve always used the default <code>Job</code> class. But it can be
+extended as well. By making a subclass of it, we can override the <code>Job onExit</code>
+method, allowing us to take action after each job is finished.</p>
+
+<pre><code class="language-ooc"><span class="nc">CompilationJob</span><span class="p">:</span> <span class="k">class</span> <span class="k">extends</span> <span class="nc">Job</span> <span class="p">{</span>
+    <span class="nv">init</span><span class="p">:</span> <span class="k">func</span> <span class="p">{</span>
+        <span class="nv">p</span> <span class="o">:=</span> <span class="nc">Process</span> <span class="k">new</span><span class="p">([</span><span class="s2">"gcc"</span><span class="p">,</span> <span class="s2">"-v"</span><span class="p">])</span>
+        <span class="nv">p</span> <span class="nf">executeNoWait</span><span class="p">()</span>
+        <span class="k">super</span><span class="p">(</span><span class="nv">p</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="nv">onExit</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">code</span><span class="p">:</span> <span class="nc">Int</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">code</span> <span class="o">!=</span> <span class="m-Decimal">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nf">raise</span><span class="p">(</span><span class="s2">"Compilation failed!"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
+
+<p>Our new job type can then be used, like so:</p>
+
+<pre><code class="language-ooc"><span class="nv">pool</span> <span class="o">:=</span> <span class="nc">Pool</span> <span class="k">new</span><span class="p">()</span>
+<span class="k">for</span> <span class="p">(</span><span class="nv">i</span> <span class="k">in</span> <span class="m-Decimal">0</span><span class="o">..</span><span class="m-Decimal">10</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">pool</span> <span class="nf">add</span><span class="p">(</span><span class="nc">CompilationJob</span> <span class="k">new</span><span class="p">())</span>
+<span class="p">}</span>
+<span class="nv">pool</span> <span class="nf">waitAll</span><span class="p">()</span></code></pre>
+    </div>
+  </article>
+</div>
+<footer>
+  <div class="footer-content">
+  <nav><section class="about"><h3>About</h3>
+    <ul>
+        <li><a href="/about/#history">History</a></li>
+        <li><a href="/about/#why-use-ooc">Why use ooc?</a></li>
+        <li><a href="/about/#similar-projects">Alternatives</a></li>
+    </ul></section><section class="install"><h3>Install</h3>
+    <ul>
+        <li><a href="/install/#quick-install">Quick install</a></li>
+        <li><a href="/install/#installing-from-git">Installing from Git</a></li>
+        <li><a href="/install/#post-install-instructions">Post-install instructions</a></li>
+        <li><a href="/install/#installing-sam">Installing sam</a></li>
+    </ul></section><section class="documentation"><h3>Documentation</h3>
+    <ul>
+        <li><a href="/docs/tutorial/">Tutorial</a></li>
+        <li><a href="/docs/lang/">Language</a></li>
+        <li><a href="/docs/sdk/">SDK</a></li>
+        <li><a href="/docs/tools/">Tools</a></li>
+        <li><a href="/docs/tools/rock/">Implementation</a></li>
+        <li><a href="/docs/kaputt/">Troubleshooting</a></li>
+        <li><a href="/docs/glossary/">Glossary</a></li>
+    </ul></section><section class="community"><h3>Community</h3>
+    <ul>
+        <li><a href="http://groups.google.com/group/ooc-lang">Discussion group</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/issues">Issue tracker</a></li>
+        <li><a href="irc://chat.freenode.net/#ooc-lang">IRC channel</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/wiki">Wiki</a></li>
+        <li><a href="/development/">Development</a></li>
+        <li><a href="http://pledgie.com/campaigns/21363">Donate</a></li>
+    </ul></section></nav>
+    <div class="fine-print">
+      <p>
+        ooc &copy; 2009-2015 <a href="http://amos.me/">Amos Wenger</a>. The content of this website is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0 License</a>.
+        rock is licensed under the MIT license. Design based on the <a href="http://nanoc.ws/">nanoc web site</a> by <a href="http://stoneship.org/">Denis Defreyne</a> and used with permission.
+        <a href="http://entypo.com/">Entypo</a>By Daniel Bruce.
+      </p>
+    </div>
+  </div>
+</footer>
+
+  </body>
+</html>

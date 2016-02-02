@@ -1,0 +1,275 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ooc &raquo; The math package</title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="stylesheet" href="/assets/pygments.css">
+    <link href="http://fonts.googleapis.com/css?family=Radley:regular&text=OC" rel="stylesheet" type="text/css" >
+    <link href="http://fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,400,400italic,700,700italic,900,900italic" rel="stylesheet" type="text/css" >
+
+    <!-- Cool stats stuff for nanoc :) -->
+    <meta name="generator" content="nanoc 3.6.5"> 
+  </head>
+  <body>
+
+<header>
+  <div class="header-content">
+    <nav class="main">
+      <ol>
+        <li class="home"><a href="/"><img src="/assets/images/logo-nav.png" alt="Home"></a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/install/">Install</a></li>
+        <li><a href="/docs/">Documentation</a></li>
+        <li><a href="/community/">Community</a></li>
+        <li><a href="/development/">Development</a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+<div class="intro">
+  <div class="intro-content">
+    <h1>The math package</h1>
+  </div>
+</div>
+<div class="article">
+  <article>
+    <nav class="side">
+  <div class="side-title">
+    The math package
+  </div>
+
+  <div class="side-content">
+    
+      <p>↑ <a href="/docs/sdk/">Back to SDK</a></p>
+    
+
+    <ol class="toc"><li><a href="#the-math-package">The math package</a></li><li><a href="#math">math</a></li><ol><li><a href="#powers-and-roots">Powers and roots</a></li><li><a href="#trigonometry">Trigonometry</a></li><li><a href="#logarithms">Logarithms</a></li><li><a href="#rounding-and-truncation">Rounding and truncation</a></li><li><a href="#floating-point-remainder">Floating-point remainder</a></li><li><a href="#various">Various</a></li></ol><li><a href="#random">Random</a></li><ol><li><a href="#libc-generator">libc generator</a></li><li><a href="#fast-prng">fast prng</a></li></ol>
+  </div>
+</nav>
+
+    <div class="article-content">
+      <h2 id="the-math-package">The math package</h2>
+
+<p>The math package piggybacks on libc for basic mathematical operations with
+standard integer and floating point types.</p>
+
+<h2 id="math">math</h2>
+
+<p>By simply importing <code>math</code>, a most of the math functions from libc will get
+imported.</p>
+
+<p>Often, math operations are available both in function form and in method form.
+The function form would be similar to C, e.g.:</p>
+
+<pre><code class="language-ooc"><span class="nf">sin</span><span class="p">(</span><span class="m-Decimal">2</span> <span class="o">*</span> <span class="no">PI</span><span class="p">)</span></code></pre>
+
+<p>Whereas the method form would be more.. object-oriented-ish:</p>
+
+<pre><code class="language-ooc"><span class="m-Decimal">2</span> <span class="nf">pow</span><span class="p">(</span><span class="m-Decimal">16</span><span class="p">)</span></code></pre>
+
+<h3 id="powers-and-roots">Powers and roots</h3>
+
+<p><code>pow</code> elevates the first argument to the power of the second:</p>
+
+<pre><code class="language-ooc"><span class="m-Decimal">2</span> <span class="nf">pow</span><span class="p">(</span><span class="m-Decimal">8</span><span class="p">)</span> <span class="c">// 256</span></code></pre>
+
+<p><code>exp</code> returns the value of e (the base of natural logarithms) raised to the
+power of x:</p>
+
+<pre><code class="language-ooc"><span class="nf">exp</span><span class="p">(</span><span class="m-Decimal">2</span><span class="p">)</span> <span class="c">// approx. 7.389</span></code></pre>
+
+<p><code>sqrt</code> returns the square root of a number:</p>
+
+<pre><code class="language-ooc"><span class="m-Decimal">144</span> <span class="nf">sqrt</span><span class="p">()</span> <span class="c">// 12</span></code></pre>
+
+<p><code>cbrt</code> returns the cube root of a number:</p>
+
+<pre><code class="language-ooc"><span class="m-Decimal">8</span> <span class="nf">cbrt</span><span class="p">()</span> <span class="c">// 2</span></code></pre>
+
+<h3 id="trigonometry">Trigonometry</h3>
+
+<p><code>PI</code> is a constant defined in math as:</p>
+
+<pre><code class="language-ooc"><span class="no">PI</span> <span class="o">:=</span> <span class="mf">3.14159_26535_89793_23846_26433_83279</span></code></pre>
+
+<p><code>sin</code>, <code>cos</code>, and <code>tan</code>, are available, both in method and function form:</p>
+
+<pre><code class="language-ooc"><span class="nf">sin</span><span class="p">(</span><span class="m-Decimal">2</span> <span class="o">*</span> <span class="no">PI</span><span class="p">)</span> <span class="c">// 0</span>
+<span class="nf">cos</span><span class="p">(</span><span class="o">-</span> <span class="p">(</span><span class="m-Decimal">3</span> <span class="o">/</span> <span class="m-Decimal">4</span><span class="p">)</span> <span class="o">*</span> <span class="no">PI</span><span class="p">)</span> <span class="c">// -0.707, etc.</span>
+<span class="nf">tan</span><span class="p">(</span><span class="no">PI</span> <span class="o">/</span> <span class="m-Decimal">4</span><span class="p">)</span> <span class="c">// 1</span></code></pre>
+
+<p>As are their arc equivalents, <code>asin</code>, <code>acos</code>, <code>atan</code>, their hyperbolic
+variants, <code>sinh</code>, <code>cosh</code>, <code>tanh</code>, and their arc hyperbolic tandems,
+<code>asinh</code>, <code>acosh</code>, <code>atanh</code>.</p>
+
+<p>As for <code>atan2</code>, straight from Wikipedia:</p>
+
+<pre><code>In a variety of computer languages, the function atan2 is the arctangent
+function with two arguments. The purpose of using two arguments instead of
+one, is to gather information of the signs of the inputs in order to return
+the appropriate quadrant of the computed angle, which is not possible for
+the single-argument arctangent function.
+
+For any real number (e.g., floating point) arguments x and y not both equal
+to zero, atan2(y, x) is the angle in radians between the positive x-axis of
+a plane and the point given by the coordinates (x, y) on it. The angle is
+positive for counter-clockwise angles (upper half-plane, y &gt; 0), and
+negative for clockwise angles (lower half-plane, y &lt; 0).
+</code></pre>
+
+<p>Source: <a href="http://en.wikipedia.org/wiki/Atan2">http://en.wikipedia.org/wiki/Atan2</a></p>
+
+<h3 id="logarithms">Logarithms</h3>
+
+<p>The <code>log</code> function returns the natural logarithm of x:</p>
+
+<pre><code class="language-ooc"><span class="nf">log</span><span class="p">(</span><span class="m-Decimal">2</span><span class="p">)</span> <span class="c">// about 0.69</span></code></pre>
+
+<p>The <code>log10</code> function returns the base 10 logarithm of x:</p>
+
+<pre><code class="language-ooc"><span class="nf">log10</span><span class="p">(</span><span class="m-Decimal">4000</span><span class="p">)</span> <span class="c">// about 3.6</span></code></pre>
+
+<h3 id="rounding-and-truncation">Rounding and truncation</h3>
+
+<p>The <code>round</code>, <code>roundLong</code> and <code>roundLLong</code> are methods that will round to the
+nearest integer:</p>
+
+<pre><code>3.14 round() // 3.00
+4.78 roundLong() // 5
+0.92 roundLLong() // 1
+</code></pre>
+
+<p>The <code>ceil</code> and <code>floor</code> methods will round to the nearest upper and lower
+integer, respectively:</p>
+
+<pre><code>3.14 ceil() // 4.00
+8.92 floor() // 8.00
+</code></pre>
+
+<h3 id="floating-point-remainder">Floating-point remainder</h3>
+
+<p>The <code>mod</code> function computes the floating-point remainder of dividing x by y.
+The return value is x - n * y, where n is the quotient of x / y, rounded toward
+zero to an integer.</p>
+
+<pre><code>12 mod(5) // 2
+</code></pre>
+
+<h3 id="various">Various</h3>
+
+<p>To get the absolute value of a number, use <code>abs()</code>:</p>
+
+<pre><code class="language-ooc"><span class="p">(</span><span class="o">-</span><span class="m-Decimal">4</span><span class="p">)</span> <span class="nf">abs</span><span class="p">()</span> <span class="c">// 4</span></code></pre>
+
+<h2 id="random">Random</h2>
+
+<p>By importing <code>math/Random</code>, one can generate random numbers.</p>
+
+<p><strong>Disclaimer: neither the libc random number generator or the fast prng
+exposed by math/Random are suitable for cryptographic usage. Find a library
+that does it right, this was not planned for it.</strong></p>
+
+<p>When the module is loaded (probably at program start-up), the libc random
+number generator will be seeded with the current time in microseconds.</p>
+
+<p>Then, various functions can be used to get random numbers.</p>
+
+<h3 id="libc-generator">libc generator</h3>
+
+<p>To get any number between <code>INT_MIN</code> and <code>INT_MAX</code>, call:</p>
+
+<pre><code class="language-ooc"><span class="nv">number</span> <span class="o">:=</span> <span class="nc">Random</span> <span class="nf">random</span><span class="p">()</span></code></pre>
+
+<p>To get any number within a range, use either:</p>
+
+<pre><code class="language-ooc"><span class="c">// gives a number between 0 (included) and 10 (included)</span>
+<span class="nv">number</span> <span class="o">:=</span> <span class="nc">Random</span> <span class="nf">randInt</span><span class="p">(</span><span class="m-Decimal">0</span><span class="p">,</span> <span class="m-Decimal">10</span><span class="p">)</span>
+
+<span class="c">// gives a number between 0 (included) and 9 (included)</span>
+<span class="nv">number</span> <span class="o">=</span> <span class="nc">Random</span> <span class="nf">randRange</span><span class="p">(</span><span class="m-Decimal">0</span><span class="p">,</span> <span class="m-Decimal">10</span><span class="p">)</span></code></pre>
+
+<p>Those both have variants to get a number in a range, excluding any
+number already contained in a list:</p>
+
+<pre><code class="language-ooc"><span class="c">// get 10 unique numbers between 0 and 100</span>
+<span class="nv">list</span> <span class="o">:=</span> <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="nc">Int</span><span class="o">&gt;</span> <span class="k">new</span><span class="p">()</span>
+
+<span class="m-Decimal">10</span> <span class="nf">times</span><span class="p">(</span><span class="o">||</span>
+    <span class="nv">list</span> <span class="nf">add</span><span class="p">(</span><span class="nc">Random</span> <span class="nf">randInt</span><span class="p">(</span><span class="m-Decimal">0</span><span class="p">,</span> <span class="m-Decimal">100</span><span class="p">,</span> <span class="nv">list</span><span class="p">))</span>
+<span class="p">)</span></code></pre>
+
+<p>To pick out a random element ouf ot a list, use <code>choice</code>:</p>
+
+<pre><code class="language-ooc"><span class="c">// get one of those 10 unique numbers we just generated:</span>
+<span class="nv">num</span> <span class="o">:=</span> <span class="nc">Random</span> <span class="nf">choice</span><span class="p">(</span><span class="nv">list</span><span class="p">)</span></code></pre>
+
+<p>Note that <code>choice</code> is generic, so it will work with lists of any
+type of element.</p>
+
+<h3 id="fast-prng">fast prng</h3>
+
+<p>Most of the methods above have a <code>fast</code> variant, working from a PRNG (<a href="http://en.wikipedia.org/wiki/Pseudorandom_number_generator">pseudorandom
+number generator</a>) coded directly into the Random class.</p>
+
+<pre><code class="language-ooc"><span class="c">// all these are documented above, they work in a similar fashion</span>
+<span class="nc">Random</span> <span class="nf">fastRandom</span><span class="p">()</span>
+
+<span class="nc">Random</span> <span class="nf">fastRandInt</span><span class="p">(</span><span class="m-Decimal">0</span><span class="p">,</span> <span class="m-Decimal">10</span><span class="p">)</span>
+<span class="nc">Random</span> <span class="nf">fastRandRange</span><span class="p">(</span><span class="m-Decimal">0</span><span class="p">,</span> <span class="m-Decimal">10</span><span class="p">)</span>
+
+<span class="nc">Random</span> <span class="nf">fastRandInt</span><span class="p">(</span><span class="m-Decimal">0</span><span class="p">,</span> <span class="m-Decimal">10</span><span class="p">,</span> <span class="nv">list</span><span class="p">)</span>
+<span class="nc">Random</span> <span class="nf">fastRandRange</span><span class="p">(</span><span class="m-Decimal">0</span><span class="p">,</span> <span class="m-Decimal">10</span><span class="p">,</span> <span class="nv">list</span><span class="p">)</span>
+
+<span class="nc">Random</span> <span class="nf">fastChoice</span><span class="p">(</span><span class="nv">list</span><span class="p">)</span></code></pre>
+
+<p>The <code>fast</code> variants are meant to be faster, as the name implies, but they’re even
+less guaranteed to have good random qualities - the numbers it generates might be
+less even / repeat more easily.</p>
+    </div>
+  </article>
+</div>
+<footer>
+  <div class="footer-content">
+  <nav><section class="about"><h3>About</h3>
+    <ul>
+        <li><a href="/about/#history">History</a></li>
+        <li><a href="/about/#why-use-ooc">Why use ooc?</a></li>
+        <li><a href="/about/#similar-projects">Alternatives</a></li>
+    </ul></section><section class="install"><h3>Install</h3>
+    <ul>
+        <li><a href="/install/#quick-install">Quick install</a></li>
+        <li><a href="/install/#installing-from-git">Installing from Git</a></li>
+        <li><a href="/install/#post-install-instructions">Post-install instructions</a></li>
+        <li><a href="/install/#installing-sam">Installing sam</a></li>
+    </ul></section><section class="documentation"><h3>Documentation</h3>
+    <ul>
+        <li><a href="/docs/tutorial/">Tutorial</a></li>
+        <li><a href="/docs/lang/">Language</a></li>
+        <li><a href="/docs/sdk/">SDK</a></li>
+        <li><a href="/docs/tools/">Tools</a></li>
+        <li><a href="/docs/tools/rock/">Implementation</a></li>
+        <li><a href="/docs/kaputt/">Troubleshooting</a></li>
+        <li><a href="/docs/glossary/">Glossary</a></li>
+    </ul></section><section class="community"><h3>Community</h3>
+    <ul>
+        <li><a href="http://groups.google.com/group/ooc-lang">Discussion group</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/issues">Issue tracker</a></li>
+        <li><a href="irc://chat.freenode.net/#ooc-lang">IRC channel</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/wiki">Wiki</a></li>
+        <li><a href="/development/">Development</a></li>
+        <li><a href="http://pledgie.com/campaigns/21363">Donate</a></li>
+    </ul></section></nav>
+    <div class="fine-print">
+      <p>
+        ooc &copy; 2009-2015 <a href="http://amos.me/">Amos Wenger</a>. The content of this website is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0 License</a>.
+        rock is licensed under the MIT license. Design based on the <a href="http://nanoc.ws/">nanoc web site</a> by <a href="http://stoneship.org/">Denis Defreyne</a> and used with permission.
+        <a href="http://entypo.com/">Entypo</a>By Daniel Bruce.
+      </p>
+    </div>
+  </div>
+</footer>
+
+  </body>
+</html>

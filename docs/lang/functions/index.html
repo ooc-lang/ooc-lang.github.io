@@ -1,0 +1,327 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ooc &raquo; Functions</title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="stylesheet" href="/assets/pygments.css">
+    <link href="http://fonts.googleapis.com/css?family=Radley:regular&text=OC" rel="stylesheet" type="text/css" >
+    <link href="http://fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,400,400italic,700,700italic,900,900italic" rel="stylesheet" type="text/css" >
+
+    <!-- Cool stats stuff for nanoc :) -->
+    <meta name="generator" content="nanoc 3.6.5"> 
+  </head>
+  <body>
+
+<header>
+  <div class="header-content">
+    <nav class="main">
+      <ol>
+        <li class="home"><a href="/"><img src="/assets/images/logo-nav.png" alt="Home"></a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/install/">Install</a></li>
+        <li><a href="/docs/">Documentation</a></li>
+        <li><a href="/community/">Community</a></li>
+        <li><a href="/development/">Development</a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+<div class="intro">
+  <div class="intro-content">
+    <h1>Functions</h1>
+  </div>
+</div>
+<div class="article">
+  <article>
+    <nav class="side">
+  <div class="side-title">
+    Functions
+  </div>
+
+  <div class="side-content">
+    
+      <p>↑ <a href="/docs/lang/">Back to Language</a></p>
+    
+
+    <ol class="toc"><li><a href="#functions">Functions</a></li><li><a href="#main">Main</a></li><li><a href="#suffixes--overloading">Suffixes / overloading</a></li><li><a href="#variable-arguments">Variable arguments</a></li><ol><li><a href="#ooc-varargs">ooc varargs</a></li><li><a href="#c-varargs">C varargs</a></li></ol><li><a href="#extern-functions">Extern functions</a></li><li><a href="#by-ref-parameters">By-ref parameters</a></li><li><a href="#default-parameters">Default parameters</a></li><li><a href="#closures">Closures</a></li></ol>
+  </div>
+</nav>
+
+    <div class="article-content">
+      <h2 id="functions">Functions</h2>
+
+<p>A parameterized piece of code is often packaged into a function.</p>
+
+<p>Here’s an example function that adds two numbers:</p>
+
+<pre><code class="language-ooc"><span class="nv">add</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">a</span><span class="p">:</span> <span class="nc">Int</span><span class="p">,</span> <span class="nv">b</span><span class="p">:</span> <span class="nc">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nc">Int</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nv">a</span> <span class="o">+</span> <span class="nv">b</span>
+<span class="p">}</span>
+
+<span class="nf">add</span><span class="p">(</span><span class="m-Decimal">1</span><span class="p">,</span> <span class="m-Decimal">2</span><span class="p">)</span></code></pre>
+
+<p>The syntax for function signatures is <code>NAME: func (ARG1, ARG2, ...) -&gt; RETURNTYPE</code>.
+Both the argument definition list and the arrow return type parts are optional, in case
+a function takes no argument, or returns nothing. Hence, the following definitions are
+all perfectly equivalent:</p>
+
+<pre><code class="language-ooc"><span class="nv">f</span><span class="p">:</span> <span class="k">func</span> <span class="p">()</span> <span class="o">-&gt;</span> <span class="nc">Void</span> <span class="p">{}</span>
+<span class="nv">f</span><span class="p">:</span> <span class="k">func</span> <span class="o">-&gt;</span> <span class="nc">Void</span> <span class="p">{}</span>
+<span class="nv">f</span><span class="p">:</span> <span class="k">func</span> <span class="p">()</span> <span class="p">{}</span>
+<span class="nv">f</span><span class="p">:</span> <span class="k">func</span> <span class="p">{}</span></code></pre>
+
+<p>Arguments of the same type may be listed in short form: <code>name1, name2, name3: Type</code>.
+Also, the <code>return</code> keyword is optional - it is only required to exit of the normal
+function flow early. Hence, the first example can be rewritten like so:</p>
+
+<pre><code class="language-ooc"><span class="nv">add</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">a</span><span class="p">,</span> <span class="nv">b</span><span class="p">:</span> <span class="nc">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nc">Int</span> <span class="p">{</span>
+  <span class="nv">a</span> <span class="o">+</span> <span class="nv">b</span>
+<span class="p">}</span></code></pre>
+
+<p>In the absence of a <code>return</code> keyword in the body of a non-void function, the last
+expression will be returned. This works with ifs, matches, etc.</p>
+
+<h2 id="main">Main</h2>
+
+<p>Perhaps the most interesting function at first is the <code>main</code> function, aka the
+entry point of a program. If not defined, one will be implicitly created. For
+example, the following is a valid ooc program:</p>
+
+<pre><code class="language-ooc"><span class="s2">"Hi, world!"</span> <span class="nf">println</span><span class="p">()</span></code></pre>
+
+<p>If we don’t need to process command-line arguments, we can define the main function
+simply like this:</p>
+
+<pre><code class="language-ooc"><span class="nv">main</span><span class="p">:</span> <span class="k">func</span> <span class="p">{</span>
+  <span class="s2">"Hi, world!"</span> <span class="nf">println</span><span class="p">()</span>
+<span class="p">}</span></code></pre>
+
+<p>Note that any could outside the main function (and outside class definitions, etc.)
+will get executed before the code in the main function is. This gives a chance for
+module to run initialization code (e.g. C libraries that need some routine to be called
+before anything else, to set up stuff).</p>
+
+<p>If we do want command-line arguments, we can do it the C way:</p>
+
+<pre><code class="language-ooc"><span class="nv">main</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">argv</span><span class="p">:</span> <span class="nc">Int</span><span class="p">,</span> <span class="nv">argc</span><span class="p">:</span> <span class="no">CS</span><span class="nv">tring</span><span class="o">*</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">for</span> <span class="p">(</span><span class="nv">i</span> <span class="k">in</span> <span class="m-Decimal">0</span><span class="o">..</span><span class="nv">argv</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">arg</span> <span class="o">=</span> <span class="nv">argc</span><span class="p">[</span><span class="nv">i</span><span class="p">]</span>
+    <span class="s2">"Got argument: #{arg toString()}"</span> <span class="nf">println</span><span class="p">()</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre>
+
+<p>Or, we can use an array of strings:</p>
+
+<pre><code class="language-ooc"><span class="nv">main</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">args</span><span class="p">:</span> <span class="nc">String[]</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c">// and so on..</span>
+<span class="p">}</span></code></pre>
+
+<p>Or, we can use an ArrayList of Strings, if more convenient:</p>
+
+<pre><code class="language-ooc"><span class="k">import</span> <span class="nv">structs</span><span class="o">/</span><span class="nc">ArrayList</span>
+<span class="nv">main</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">args</span><span class="p">:</span> <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c">// etc.</span>
+<span class="p">}</span></code></pre>
+
+<p>Note that command line arguments might not be relevant for all ooc implementations.
+One could imagine an ooc implementation that compiles down to JavaScript - in which
+case, running in a browser, the command line arguments would always be empty.</p>
+
+<h2 id="suffixes--overloading">Suffixes / overloading</h2>
+
+<p>Functions can have the same name, but different signatures (argument lists and
+return type), as long as they have different suffixes. They can be called without
+suffix, in which case the compiler will infer the right function to call, or
+explicitly by specifying the suffix by hand:</p>
+
+<pre><code class="language-ooc"><span class="nv">add</span><span class="p">:</span> <span class="k">func</span> <span class="nf">~ints</span> <span class="p">(</span><span class="nv">a</span><span class="p">,</span> <span class="nv">b</span><span class="p">:</span> <span class="nc">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nc">Int</span> <span class="p">{</span> <span class="nv">a</span> <span class="o">+</span> <span class="nv">b</span> <span class="p">}</span>
+<span class="nv">add</span><span class="p">:</span> <span class="k">func</span> <span class="nf">~floats</span> <span class="p">(</span><span class="nv">a</span><span class="p">,</span> <span class="nv">b</span><span class="p">:</span> <span class="nc">Float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nc">Float</span> <span class="p">{</span> <span class="nv">a</span> <span class="o">+</span> <span class="nv">b</span> <span class="p">}</span>
+
+<span class="nf">add</span><span class="p">(</span><span class="m-Decimal">1</span><span class="p">,</span> <span class="m-Decimal">2</span><span class="p">)</span> <span class="c">// calls ~ints variant</span>
+<span class="nf">add</span><span class="p">(</span><span class="mf">3.14</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)</span> <span class="c">// calls ~floats variant</span>
+<span class="nf">add~floats</span><span class="p">(</span><span class="m-Decimal">3</span><span class="p">,</span> <span class="m-Decimal">5</span><span class="p">)</span> <span class="c">// explicit call</span></code></pre>
+
+<h2 id="variable-arguments">Variable arguments</h2>
+
+<p>Special slot in the argument list, can only be at the end, purpose is to accept
+any number of arguments.</p>
+
+<h3 id="ooc-varargs">ooc varargs</h3>
+
+<p>Store the number of arguments, and the types of each argument. Syntax is as follows:</p>
+
+<pre><code class="language-ooc"><span class="nv">f</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">args</span><span class="p">:</span> <span class="o">..</span><span class="p">.)</span> <span class="p">{</span>
+  <span class="c">// body</span>
+<span class="p">}</span></code></pre>
+
+<p>Access <code>args count</code> to know how many arguments were passed.
+Use <code>args iterator()</code> to be able to iterate through the arguments:</p>
+
+<pre><code class="language-ooc"><span class="nv">printAll</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">things</span><span class="p">:</span> <span class="o">..</span><span class="p">.)</span> <span class="p">{</span>
+  <span class="s2">"Printing #{things count} things"</span> <span class="nf">println</span><span class="p">()</span>
+  <span class="nv">iter</span> <span class="o">:=</span> <span class="nv">things</span> <span class="nf">iterator</span><span class="p">()</span>
+
+  <span class="k">while</span> <span class="p">(</span><span class="nv">iter</span> <span class="nv">hasNext</span><span class="o">?</span><span class="p">())</span> <span class="p">{</span>
+    <span class="nc">T</span> <span class="o">:=</span> <span class="nv">iter</span> <span class="nf">getNextType</span><span class="p">()</span>
+    <span class="s2">"The next argument is a #{T name}"</span> <span class="nf">println</span><span class="p">()</span>
+
+    <span class="nv">match</span> <span class="nc">T</span> <span class="p">{</span>
+      <span class="k">case</span> <span class="nc">Int</span>   <span class="o">=&gt;</span> <span class="s2">"%d"</span>   <span class="nf">printfln</span><span class="p">(</span><span class="nv">iter</span> <span class="nf">next</span><span class="p">(</span><span class="nc">Int</span><span class="p">))</span>
+      <span class="k">case</span> <span class="nc">Float</span> <span class="o">=&gt;</span> <span class="s2">"%.2f"</span> <span class="nf">printfln</span><span class="p">(</span><span class="nv">iter</span> <span class="nf">next</span><span class="p">(</span><span class="nc">Float</span><span class="p">))</span>
+      <span class="k">case</span> <span class="o">=&gt;</span> <span class="s2">"Unsupported type"</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre>
+
+<p>More simply, <code>each</code> can be used on a <code>VarArgs</code>:</p>
+
+<pre><code class="language-ooc"><span class="nv">printAll</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">things</span><span class="p">:</span> <span class="o">..</span><span class="p">.)</span> <span class="p">{</span>
+  <span class="nv">things</span> <span class="nf">each</span><span class="p">(</span><span class="o">|</span><span class="nv">thing</span><span class="o">|</span>
+    <span class="nv">match</span> <span class="nv">thing</span> <span class="p">{</span>
+      <span class="k">case</span> <span class="nv">i</span><span class="p">:</span> <span class="nc">Int</span>   <span class="o">=&gt;</span> <span class="s2">"%d"</span>   <span class="nf">printfln</span><span class="p">(</span><span class="nv">i</span><span class="p">)</span>
+      <span class="k">case</span> <span class="nv">f</span><span class="p">:</span> <span class="nc">Float</span> <span class="o">=&gt;</span> <span class="s2">"%.2f"</span> <span class="nf">printfln</span><span class="p">(</span><span class="nv">f</span><span class="p">)</span>
+      <span class="k">case</span> <span class="o">=&gt;</span> <span class="s2">"&lt;unknown&gt;"</span>
+    <span class="p">}</span>
+  <span class="p">)</span>
+<span class="p">}</span></code></pre>
+
+<h3 id="c-varargs">C varargs</h3>
+
+<p>Used by writing simply <code>...</code> in the argument list, not <code>args: ...</code>:</p>
+
+<pre><code class="language-ooc"><span class="nv">f</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">firstArg</span><span class="p">:</span> <span class="nc">Type</span><span class="p">,</span> <span class="o">..</span><span class="p">.)</span> <span class="p">{</span>
+  <span class="c">// body</span>
+<span class="p">}</span></code></pre>
+
+<p>Only accessible through <code>va_start</code>, <code>va_next</code>, <code>va_end</code>. See <a href="http://en.wikipedia.org/wiki/Variadic_function">Variadic
+function</a> on Wikipedia.</p>
+
+<p>Useful only to relay a variable number of arguments to an extern C function,
+since <code>va_arg</code> couldn’t work (can’t quote raw C types in ooc).</p>
+
+<p>Example:</p>
+
+<pre><code class="language-ooc"><span class="nv">vprintf</span><span class="p">:</span> <span class="k">extern</span> <span class="p">(</span><span class="nv">s</span><span class="p">:</span> <span class="no">CS</span><span class="nv">tring</span><span class="p">,</span> <span class="o">..</span><span class="p">.)</span>
+
+<span class="nv">printf</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">s</span><span class="p">:</span> <span class="nc">String</span><span class="p">,</span> <span class="o">..</span><span class="p">.)</span> <span class="o">-&gt;</span> <span class="nc">This</span> <span class="p">{</span>
+  <span class="nv">list</span><span class="p">:</span> <span class="nc">VaList</span>
+  <span class="nf">va_start</span><span class="p">(</span><span class="nv">list</span><span class="p">,</span> <span class="k">this</span><span class="p">)</span>
+  <span class="nf">vprintf</span><span class="p">(</span><span class="nv">s</span> <span class="nf">toCString</span><span class="p">(),</span> <span class="nv">list</span><span class="p">)</span>
+  <span class="nf">va_end</span><span class="p">(</span><span class="nv">list</span><span class="p">)</span>
+<span class="p">}</span></code></pre>
+
+<h2 id="extern-functions">Extern functions</h2>
+
+<p>To call a function defined elsewhere, for example in a C library, its prototype
+needs to be defined</p>
+
+<pre><code class="language-ooc"><span class="nv">exit</span><span class="p">:</span> <span class="k">extern</span> <span class="k">func</span> <span class="p">(</span><span class="nc">Int</span><span class="p">)</span></code></pre>
+
+<p>Lazy way: type-only args, thorough way: variable-decl-args.</p>
+
+<pre><code class="language-ooc"><span class="nv">exit</span><span class="p">:</span> <span class="k">extern</span> <span class="k">func</span> <span class="p">(</span><span class="nv">exitCode</span><span class="p">:</span> <span class="nc">Int</span><span class="p">)</span></code></pre>
+
+<h2 id="by-ref-parameters">By-ref parameters</h2>
+
+<p>Instead of having to dereference each time the parameter is accessed, just declare
+it as a reference type:</p>
+
+<pre><code class="language-ooc"><span class="nv">increment</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">a</span><span class="p">:</span> <span class="nc">Int*</span><span class="p">)</span> <span class="p">{</span> <span class="nv">a</span><span class="p">@</span> <span class="o">+=</span> <span class="m-Decimal">1</span> <span class="p">}</span>
+<span class="c">// vs</span>
+<span class="nv">increment</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">a</span><span class="p">:</span> <span class="nc">Int@</span><span class="p">)</span> <span class="p">{</span> <span class="nv">a</span> <span class="o">+=</span> <span class="m-Decimal">1</span> <span class="p">}</span></code></pre>
+
+<p>Saves typing, saves error, clearer code. Can still access the address via <code>argument&amp;</code>.</p>
+
+<h2 id="default-parameters">Default parameters</h2>
+
+<p>Default values for parameters can be specified using <code>:=</code></p>
+
+<pre><code class="language-ooc"><span class="nv">greet</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">name</span> <span class="o">:=</span> <span class="s2">"John Doe"</span><span class="p">)</span> <span class="p">{</span>
+  <span class="s2">"Hello, #{name}!"</span> <span class="nf">println</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="nf">greet</span><span class="p">()</span> <span class="c">// prints: "Hello, John Doe!"</span>
+<span class="nf">greet</span><span class="p">(</span><span class="s2">"Rita"</span><span class="p">)</span> <span class="c">// prints: "Hello, Rita!"</span></code></pre>
+
+<p>A function can have any number of default parameters, but they should
+all be at the end of the parameter list, never interleaved with non-default
+parameters.</p>
+
+<h2 id="closures">Closures</h2>
+
+<p>A very concise way to pass a function as an argument. <code>each</code> is a typical
+example:</p>
+
+<pre><code class="language-ooc"><span class="c">// definition</span>
+<span class="nc">List</span><span class="p">:</span> <span class="k">class</span> <span class="o">&lt;</span><span class="nc">T</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="nv">each</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">f</span><span class="p">:</span> <span class="nc">Func</span> <span class="p">(</span><span class="nc">T</span><span class="p">))</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c">// usage</span>
+<span class="nv">list</span> <span class="o">:=</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Int</span><span class="o">&gt;</span> <span class="k">new</span><span class="p">()</span>
+<span class="nv">list</span> <span class="nf">each</span><span class="p">(</span><span class="o">|</span><span class="nv">elem</span><span class="o">|</span>
+  <span class="c">// do something with elem, of type Int</span>
+<span class="p">)</span></code></pre>
+
+<p>Also works with several parameters:</p>
+
+<pre><code class="language-ooc"><span class="c">// definition</span>
+<span class="nc">Map</span><span class="p">:</span> <span class="k">class</span> <span class="o">&lt;</span><span class="nc">K</span><span class="p">,</span> <span class="nc">V</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="nv">each</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">f</span><span class="p">:</span> <span class="nc">Func</span> <span class="p">(</span><span class="nc">K</span><span class="p">,</span> <span class="nc">V</span><span class="p">))</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c">// usage</span>
+<span class="nv">map</span> <span class="o">:=</span> <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="p">,</span> <span class="nc">Horse</span><span class="o">&gt;</span> <span class="k">new</span><span class="p">()</span>
+<span class="nv">map</span> <span class="nf">each</span><span class="p">(</span><span class="o">|</span><span class="nv">key</span><span class="p">,</span> <span class="nv">value</span><span class="o">|</span>
+  <span class="c">// key is of type String, value is of type Horse</span>
+<span class="p">)</span></code></pre>
+
+<p>Argument types are inferred, hence, the code is very short.</p>
+    </div>
+  </article>
+</div>
+<footer>
+  <div class="footer-content">
+  <nav><section class="about"><h3>About</h3>
+    <ul>
+        <li><a href="/about/#history">History</a></li>
+        <li><a href="/about/#why-use-ooc">Why use ooc?</a></li>
+        <li><a href="/about/#similar-projects">Alternatives</a></li>
+    </ul></section><section class="install"><h3>Install</h3>
+    <ul>
+        <li><a href="/install/#quick-install">Quick install</a></li>
+        <li><a href="/install/#installing-from-git">Installing from Git</a></li>
+        <li><a href="/install/#post-install-instructions">Post-install instructions</a></li>
+        <li><a href="/install/#installing-sam">Installing sam</a></li>
+    </ul></section><section class="documentation"><h3>Documentation</h3>
+    <ul>
+        <li><a href="/docs/tutorial/">Tutorial</a></li>
+        <li><a href="/docs/lang/">Language</a></li>
+        <li><a href="/docs/sdk/">SDK</a></li>
+        <li><a href="/docs/tools/">Tools</a></li>
+        <li><a href="/docs/tools/rock/">Implementation</a></li>
+        <li><a href="/docs/kaputt/">Troubleshooting</a></li>
+        <li><a href="/docs/glossary/">Glossary</a></li>
+    </ul></section><section class="community"><h3>Community</h3>
+    <ul>
+        <li><a href="http://groups.google.com/group/ooc-lang">Discussion group</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/issues">Issue tracker</a></li>
+        <li><a href="irc://chat.freenode.net/#ooc-lang">IRC channel</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/wiki">Wiki</a></li>
+        <li><a href="/development/">Development</a></li>
+        <li><a href="http://pledgie.com/campaigns/21363">Donate</a></li>
+    </ul></section></nav>
+    <div class="fine-print">
+      <p>
+        ooc &copy; 2009-2015 <a href="http://amos.me/">Amos Wenger</a>. The content of this website is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0 License</a>.
+        rock is licensed under the MIT license. Design based on the <a href="http://nanoc.ws/">nanoc web site</a> by <a href="http://stoneship.org/">Denis Defreyne</a> and used with permission.
+        <a href="http://entypo.com/">Entypo</a>By Daniel Bruce.
+      </p>
+    </div>
+  </div>
+</footer>
+
+  </body>
+</html>

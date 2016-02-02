@@ -1,0 +1,278 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ooc &raquo; Troubleshooting</title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="stylesheet" href="/assets/pygments.css">
+    <link href="http://fonts.googleapis.com/css?family=Radley:regular&text=OC" rel="stylesheet" type="text/css" >
+    <link href="http://fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,400,400italic,700,700italic,900,900italic" rel="stylesheet" type="text/css" >
+
+    <!-- Cool stats stuff for nanoc :) -->
+    <meta name="generator" content="nanoc 3.6.5"> 
+  </head>
+  <body>
+
+<header>
+  <div class="header-content">
+    <nav class="main">
+      <ol>
+        <li class="home"><a href="/"><img src="/assets/images/logo-nav.png" alt="Home"></a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/install/">Install</a></li>
+        <li><a href="/docs/">Documentation</a></li>
+        <li><a href="/community/">Community</a></li>
+        <li><a href="/development/">Development</a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+<div class="intro">
+  <div class="intro-content">
+    <h1>Troubleshooting</h1>
+  </div>
+</div>
+<div class="article">
+  <article>
+    <nav class="side">
+  <div class="side-title">
+    Troubleshooting
+  </div>
+
+  <div class="side-content">
+    
+      <p>↑ <a href="/docs/">Back to Documentation</a></p>
+    
+
+    <ol class="toc"><li><a href="#stuck-stranded-on-a-desert-island">Stuck? Stranded on a desert island?</a></li><li><a href="#rock-fails-at-ooc-compilation-stage">rock fails at ooc compilation stage</a></li><li><a href="#use-not-found-in-the-ooc-library-path">Use not found in the ooc library path</a></li><li><a href="#error-expected-include-import-statement-or-declaration">ERROR Expected include, import, statement or declaration</a></li><li><a href="#rock-fails-at-c-compilation-stage">rock fails at C compilation stage</a></li><li><a href="#gcc-error-dereferencing-pointer-to-incomplete-type">gcc error: dereferencing pointer to incomplete type</a></li></ol>
+  </div>
+</nav>
+
+    <div class="article-content">
+      <h2 id="stuck-stranded-on-a-desert-island">Stuck? Stranded on a desert island?</h2>
+
+<p>Chances are, this page might help. If you’re actually on a desert island right now
+you probably have better things to read though. However, if your problems are
+ooc-related, read on - who knows, maybe it’s a common problem.</p>
+
+<h2 id="rock-fails-at-ooc-compilation-stage">rock fails at ooc compilation stage</h2>
+
+<p>In most cases, rock gives a helpful error message, along with the exact location
+of the problem (file name, line and column). When possible, the troublesome part
+of your code is underlined.</p>
+
+<p>Here’s an example:</p>
+
+<pre><code class="language-text">tests/trouble1.ooc:5:1 ERROR No such function display(String)
+display("Huhu")
+~~~~~~~</code></pre>
+
+<p>In this case, the <code>display</code> function either:</p>
+
+<ul>
+<li>Isn’t defined anywhere</li>
+  <li>Is defined, but in another module that has not been imported
+in the current scope.</li>
+  <li>Is defined and in scope, but we are passing arguments of incompatible
+types, or too many or too few arguments.</li>
+</ul><p>Some errors are more cryptic. However, if it fails at the ooc stage, you’re
+still in a good place - those are usually easy to fix.</p>
+
+<p>A few typical “ooc compilation stage” errors are listed below.</p>
+
+<h2 id="use-not-found-in-the-ooc-library-path">Use not found in the ooc library path</h2>
+
+<p>An ooc library is missing, or can’t be found by rock. Explanation: ooc libraries are
+just folders with a .use file of a given name, and most often, a set of <code>.ooc</code> 
+source files.</p>
+
+<p>The recommended way to install ooc libraries is to set your <code>$OOC_LIBS</code> environment
+variable to a folder of your choice, and clone/extract/copy the libraries you need
+in there.</p>
+
+<p>Tools like <a href="/tools/sam">sam</a> can do that for you. Installing a library is as easy
+as <code>sam clone curl</code>, but most of the time, you’ll just want to run <code>sam get</code> to get
+all the dependencies of the current project.</p>
+
+<h2 id="error-expected-include-import-statement-or-declaration">ERROR Expected include, import, statement or declaration</h2>
+
+<p>This happens during the parsing stage. It is one of the most opaque errors you can
+come across from rock - it usually means something is wrong with your syntax. Let us
+take a look at one practical example:</p>
+
+<pre><code>tests/syntax.ooc:2:2 ERROR Expected include, import, statement or declaration
+
+a: (b, c: Int) -&gt; Int {
+~
+[FAIL]
+</code></pre>
+
+<p>In this case, the code seems to be trying to define a function - however, the
+<code>func</code> keyword is missing. As a result, rock’s parser gets confused, and said it
+encountered something it wasn’t expecting.</p>
+
+<p>While it is not smart enough to guess that you meant to declare a function, it
+is still kind enough to indicate the place that needs fixing. In this case, simply
+turning it into <code>a: func (b, c: Int) -&gt; Int {</code> is enough.</p>
+
+<p>Similar messages can be caused by syntax errors in other contexts. In this piece of
+code:</p>
+
+<pre><code class="language-ooc"><span class="nv">match</span> <span class="nv">input</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="o">%</span> <span class="m-Decimal">2</span> <span class="o">==</span> <span class="m-Decimal">0</span> <span class="o">=&gt;</span> <span class="s2">"even"</span>
+    <span class="k">case</span> <span class="o">=&gt;</span> <span class="s2">"odd"</span>
+<span class="p">}</span></code></pre>
+
+<p>…the case statement on the second line is incorrect. As is, it will prompt an error
+that looks like:</p>
+
+<pre><code>tests/syntax.ooc:4:9 ERROR Expected case in match
+        case % 2 == 0 =&gt; even
+        ~
+[FAIL]
+</code></pre>
+
+<p>A correct way to write it would be:</p>
+
+<pre><code class="language-ooc"><span class="nf">match</span> <span class="p">(</span><span class="nv">input</span> <span class="o">%</span> <span class="m-Decimal">2</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">case</span> <span class="m-Decimal">0</span> <span class="o">=&gt;</span> <span class="s2">"even"</span>
+  <span class="k">case</span> <span class="o">=&gt;</span> <span class="s2">"odd"</span>
+<span class="p">}</span></code></pre>
+
+<p>Or even:</p>
+
+<pre><code class="language-ooc"><span class="nv">match</span> <span class="p">{</span>
+  <span class="k">case</span> <span class="p">(</span><span class="nv">input</span> <span class="o">%</span> <span class="m-Decimal">2</span> <span class="o">==</span> <span class="m-Decimal">0</span><span class="p">)</span> <span class="o">=&gt;</span>
+    <span class="s2">"even"</span>
+  <span class="k">case</span> <span class="o">=&gt;</span>
+    <span class="s2">"odd"</span>
+<span class="p">}</span></code></pre>
+
+<p>Although in that particular case, an if-else would probably do the job better.</p>
+
+<h2 id="rock-fails-at-c-compilation-stage">rock fails at C compilation stage</h2>
+
+<p>These are more delicate. To investigate the causes of a failure during the C
+compilation phase (to be clear: that’s when gcc, clang, or whatever C compiler
+you are using is being launched on each ooc module), you should try to run
+<code>rock -g -v -j0</code> (enable debug, verbose, compiles using only 1 thread).</p>
+
+<p>When using <code>-g</code>, the source of the error indicated by the C compiler should
+refer to the ooc file, like in this example:</p>
+
+<pre><code>gcc -std=gnu99 -Wall -g -I.libs -D__OOC_USE_GC__ -DGC_NO_THREAD_REDIRECTS -I/Users/amos/Dev/rock/libs/headers/ -c rock_tmp/ooc/a/b.c -o .libs/ooc/a/b.o
+/Users/amos/Dev/tests/membe/a.ooc: In function ‘a_load’:
+/Users/amos/Dev/tests/membe/a.ooc:3: error: dereferencing pointer to incomplete type
+C compiler failed (got code 1), aborting compilation process
+[FAIL]
+</code></pre>
+
+<p>If working out the problem from the location in the .ooc file is not helpful
+enough, you can use rock’s <code>--nolines</code> command line option to get the location
+of the error in the generated C file instead, for example:</p>
+
+<pre><code>gcc -std=gnu99 -Wall -g -I.libs -D__OOC_USE_GC__ -DGC_NO_THREAD_REDIRECTS -I/Users/amos/Dev/rock/libs/headers/ -c rock_tmp/ooc/a/b.c -o .libs/ooc/a/b.o
+rock_tmp/ooc/a/a.c: In function ‘a_load’:
+rock_tmp/ooc/a/a.c:39: error: dereferencing pointer to incomplete type
+C compiler failed (got code 1), aborting compilation process
+[FAIL]
+</code></pre>
+
+<p>In this case, the offending line is:</p>
+
+<pre><code class="language-c"><span class="n">lang_String__String_println</span><span class="p">(</span><span class="n">b__getC</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">);</span></code></pre>
+
+<p>Still, gcc errors are seldom self-explanatory. Using another compiler, such as clang,
+could help. Adding the <code>--cc=clang</code> flag gives us (provided that we have clang installed
+on the system, obviously):</p>
+
+<pre><code>clang -std=gnu99 -Wall -g -I.libs -D__OOC_USE_GC__ -DGC_NO_THREAD_REDIRECTS -I/Users/amos/Dev/rock/libs/headers/ -c rock_tmp/ooc/a/b.c -o .libs/ooc/a/b.o
+rock_tmp/ooc/a/a.c:39:46: error: incomplete definition of type 'struct _c__C'
+        lang_String__String_println(b__getC()-&gt;name);
+                                    ~~~~~~~~~^
+.libs/ooc/a/c-fwd.h:7:8: note: forward declaration of 'struct _c__C'
+struct _c__C;
+      ^
+1 error generated.
+C compiler failed (got code 1), aborting compilation process
+[FAIL]
+</code></pre>
+
+<p>Which is a little more helpful. Still, to learn more about that kind of errors and other
+(hopefully not too) frequently encountered errors in the C compilation stage, read
+the others section below</p>
+
+<h2 id="gcc-error-dereferencing-pointer-to-incomplete-type">gcc error: dereferencing pointer to incomplete type</h2>
+
+<p>The corresponding clang error is <code>error: incomplete definition of type 'struct something'</code></p>
+
+<p>This happens in the following scenario. You have a module, <code>a.ooc</code>, that accesses
+some member of an object, like this:</p>
+
+<pre><code class="language-ooc"><span class="k">import</span> <span class="nv">b</span>
+
+<span class="nf">getC</span><span class="p">()</span> <span class="nv">name</span> <span class="nf">println</span><span class="p">()</span></code></pre>
+
+<p>In module <code>b.ooc</code>, you have some way to access an object of type <code>C</code>:</p>
+
+<pre><code class="language-ooc"><span class="k">import</span> <span class="nv">c</span>
+
+<span class="nv">getC</span><span class="p">:</span> <span class="k">func</span> <span class="o">-&gt;</span> <span class="nc">C</span> <span class="p">{</span> <span class="nc">C</span> <span class="k">new</span><span class="p">(</span><span class="s2">"ohum"</span><span class="p">)</span> <span class="p">}</span></code></pre>
+
+<p>And in module <code>c.ooc</code>, you have the actual definition of type <code>C</code>:</p>
+
+<pre><code class="language-ooc"><span class="nc">C</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+  <span class="nv">name</span><span class="p">:</span> <span class="nc">String</span>
+  <span class="nv">init</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="o">=</span><span class="nv">name</span><span class="p">)</span>
+<span class="p">}</span></code></pre>
+
+<p>In that particular case, due to implementation details, and for the time being,
+it will result in a compilation error during the C phase. The fix is simply to
+include module c from module a.</p>
+    </div>
+  </article>
+</div>
+<footer>
+  <div class="footer-content">
+  <nav><section class="about"><h3>About</h3>
+    <ul>
+        <li><a href="/about/#history">History</a></li>
+        <li><a href="/about/#why-use-ooc">Why use ooc?</a></li>
+        <li><a href="/about/#similar-projects">Alternatives</a></li>
+    </ul></section><section class="install"><h3>Install</h3>
+    <ul>
+        <li><a href="/install/#quick-install">Quick install</a></li>
+        <li><a href="/install/#installing-from-git">Installing from Git</a></li>
+        <li><a href="/install/#post-install-instructions">Post-install instructions</a></li>
+        <li><a href="/install/#installing-sam">Installing sam</a></li>
+    </ul></section><section class="documentation"><h3>Documentation</h3>
+    <ul>
+        <li><a href="/docs/tutorial/">Tutorial</a></li>
+        <li><a href="/docs/lang/">Language</a></li>
+        <li><a href="/docs/sdk/">SDK</a></li>
+        <li><a href="/docs/tools/">Tools</a></li>
+        <li><a href="/docs/tools/rock/">Implementation</a></li>
+        <li><a href="/docs/kaputt/">Troubleshooting</a></li>
+        <li><a href="/docs/glossary/">Glossary</a></li>
+    </ul></section><section class="community"><h3>Community</h3>
+    <ul>
+        <li><a href="http://groups.google.com/group/ooc-lang">Discussion group</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/issues">Issue tracker</a></li>
+        <li><a href="irc://chat.freenode.net/#ooc-lang">IRC channel</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/wiki">Wiki</a></li>
+        <li><a href="/development/">Development</a></li>
+        <li><a href="http://pledgie.com/campaigns/21363">Donate</a></li>
+    </ul></section></nav>
+    <div class="fine-print">
+      <p>
+        ooc &copy; 2009-2015 <a href="http://amos.me/">Amos Wenger</a>. The content of this website is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0 License</a>.
+        rock is licensed under the MIT license. Design based on the <a href="http://nanoc.ws/">nanoc web site</a> by <a href="http://stoneship.org/">Denis Defreyne</a> and used with permission.
+        <a href="http://entypo.com/">Entypo</a>By Daniel Bruce.
+      </p>
+    </div>
+  </div>
+</footer>
+
+  </body>
+</html>

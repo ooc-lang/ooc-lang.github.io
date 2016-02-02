@@ -1,0 +1,146 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ooc &raquo; Introduction</title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="stylesheet" href="/assets/pygments.css">
+    <link href="http://fonts.googleapis.com/css?family=Radley:regular&text=OC" rel="stylesheet" type="text/css" >
+    <link href="http://fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,400,400italic,700,700italic,900,900italic" rel="stylesheet" type="text/css" >
+
+    <!-- Cool stats stuff for nanoc :) -->
+    <meta name="generator" content="nanoc 3.6.5"> 
+  </head>
+  <body>
+
+<header>
+  <div class="header-content">
+    <nav class="main">
+      <ol>
+        <li class="home"><a href="/"><img src="/assets/images/logo-nav.png" alt="Home"></a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/install/">Install</a></li>
+        <li><a href="/docs/">Documentation</a></li>
+        <li><a href="/community/">Community</a></li>
+        <li><a href="/development/">Development</a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+<div class="intro">
+  <div class="intro-content">
+    <h1>Introduction</h1>
+  </div>
+</div>
+<div class="article">
+  <article>
+    <nav class="side">
+  <div class="side-title">
+    Introduction
+  </div>
+
+  <div class="side-content">
+    
+      <p>↑ <a href="/docs/tools/sam/">Back to sam</a></p>
+    
+
+    <ol class="toc"><li><a href="#installing-sam">Installing sam</a></li><li><a href="#updating-sam">Updating sam</a></li></ol>
+  </div>
+</nav>
+
+    <div class="article-content">
+      <h2 id="installing-sam">Installing sam</h2>
+
+<p>To use sam, apart from a working <a href="/docs/tools/rock/">rock</a>, you need <a href="http://git-scm.com/">git</a>.
+Also, you have to create a special directory that is writable for you, which will
+later contain all ooc packages cloned from their git repositories. This directory
+is called the ooc library path – you also have to specify its location in the special
+<code>OOC_LIBS</code> environment variable. On most unixes, you can do that like this:</p>
+
+<pre><code class="language-bash">mkdir ~/development/ooc
+<span class="nb">export </span><span class="nv">OOC_LIBS</span><span class="o">=</span>~/development/ooc</code></pre>
+
+<p>As a first step, you can use git to clone sam itself. You should clone sam into
+a subdirectory of the newly created directory. Since sam does not have any dependencies
+apart from rock, you can just go ahead and compile it <a href="/docs/tools/rock/usefiles/">from the usefile</a>:</p>
+
+<pre><code class="language-bash"><span class="nb">cd</span> <span class="nv">$OOC_LIBS</span>
+git clone https://github.com/ooc-lang/sam.git
+<span class="nb">cd </span>sam/
+rock -v sam.use</code></pre>
+
+<p>This should produce a <code>sam</code> executable. Just add it to the path:</p>
+
+<pre><code class="language-bash"><span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:<span class="nv">$OOC_LIBS</span>/sam</code></pre>
+
+<p>You should now be able to invoke sam just by typing</p>
+
+<pre><code class="language-bash">sam</code></pre>
+
+<p>When invoked without arguments, sam displays its version and a short usage
+guide.</p>
+
+<h2 id="updating-sam">Updating sam</h2>
+
+<p>sam has a very simple update mechanism for both itself and its grimoire.</p>
+
+<p>When running:</p>
+
+<pre><code class="language-bash">sam update</code></pre>
+
+<p>sam will attempt to find its repository, pull it, and recompile itself.
+Should anything go wrong and you end up with a broken build of sam, you
+can always go into the directory yourself, clean with <code>rock -x</code>, switch
+to whichever commit last worked for you and run <code>rock -v sam.use</code> again.</p>
+
+<p>Since formulas (ooc libraries you can install with sam) are just YAML files
+in a folder of sam’s repo, pulling the repo from git updates all formula
+definitions at the same time. However, it doesn’t fetch them until <code>sam get</code>
+is ran in a project that depends on them.</p>
+    </div>
+  </article>
+</div>
+<footer>
+  <div class="footer-content">
+  <nav><section class="about"><h3>About</h3>
+    <ul>
+        <li><a href="/about/#history">History</a></li>
+        <li><a href="/about/#why-use-ooc">Why use ooc?</a></li>
+        <li><a href="/about/#similar-projects">Alternatives</a></li>
+    </ul></section><section class="install"><h3>Install</h3>
+    <ul>
+        <li><a href="/install/#quick-install">Quick install</a></li>
+        <li><a href="/install/#installing-from-git">Installing from Git</a></li>
+        <li><a href="/install/#post-install-instructions">Post-install instructions</a></li>
+        <li><a href="/install/#installing-sam">Installing sam</a></li>
+    </ul></section><section class="documentation"><h3>Documentation</h3>
+    <ul>
+        <li><a href="/docs/tutorial/">Tutorial</a></li>
+        <li><a href="/docs/lang/">Language</a></li>
+        <li><a href="/docs/sdk/">SDK</a></li>
+        <li><a href="/docs/tools/">Tools</a></li>
+        <li><a href="/docs/tools/rock/">Implementation</a></li>
+        <li><a href="/docs/kaputt/">Troubleshooting</a></li>
+        <li><a href="/docs/glossary/">Glossary</a></li>
+    </ul></section><section class="community"><h3>Community</h3>
+    <ul>
+        <li><a href="http://groups.google.com/group/ooc-lang">Discussion group</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/issues">Issue tracker</a></li>
+        <li><a href="irc://chat.freenode.net/#ooc-lang">IRC channel</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/wiki">Wiki</a></li>
+        <li><a href="/development/">Development</a></li>
+        <li><a href="http://pledgie.com/campaigns/21363">Donate</a></li>
+    </ul></section></nav>
+    <div class="fine-print">
+      <p>
+        ooc &copy; 2009-2015 <a href="http://amos.me/">Amos Wenger</a>. The content of this website is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0 License</a>.
+        rock is licensed under the MIT license. Design based on the <a href="http://nanoc.ws/">nanoc web site</a> by <a href="http://stoneship.org/">Denis Defreyne</a> and used with permission.
+        <a href="http://entypo.com/">Entypo</a>By Daniel Bruce.
+      </p>
+    </div>
+  </div>
+</footer>
+
+  </body>
+</html>

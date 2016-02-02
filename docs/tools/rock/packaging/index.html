@@ -1,0 +1,473 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ooc &raquo; Packaging</title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="stylesheet" href="/assets/pygments.css">
+    <link href="http://fonts.googleapis.com/css?family=Radley:regular&text=OC" rel="stylesheet" type="text/css" >
+    <link href="http://fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,400,400italic,700,700italic,900,900italic" rel="stylesheet" type="text/css" >
+
+    <!-- Cool stats stuff for nanoc :) -->
+    <meta name="generator" content="nanoc 3.6.5"> 
+  </head>
+  <body>
+
+<header>
+  <div class="header-content">
+    <nav class="main">
+      <ol>
+        <li class="home"><a href="/"><img src="/assets/images/logo-nav.png" alt="Home"></a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/install/">Install</a></li>
+        <li><a href="/docs/">Documentation</a></li>
+        <li><a href="/community/">Community</a></li>
+        <li><a href="/development/">Development</a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+<div class="intro">
+  <div class="intro-content">
+    <h1>Packaging</h1>
+  </div>
+</div>
+<div class="article">
+  <article>
+    <nav class="side">
+  <div class="side-title">
+    Packaging
+  </div>
+
+  <div class="side-content">
+    
+      <p>↑ <a href="/docs/tools/rock/">Back to rock</a></p>
+    
+
+    <ol class="toc"><li><a href="#intro">Intro</a></li><li><a href="#windows">Windows</a></li><ol><li><a href="#dynamic-gc">Dynamic GC</a></li><li><a href="#resource-file">Resource file</a></li><li><a href="#dll-dependencies">DLL dependencies</a></li><li><a href="#final-notes">Final notes</a></li></ol><li><a href="#osx">OSX</a></li><ol><li><a href="#dylibbundler">dylibbundler</a></li><li><a href="#infoplist">Info.pList</a></li><li><a href="#launcher-script">Launcher script</a></li><li><a href="#troubleshooting">Troubleshooting</a></li><li><a href="#final-notes-1">Final notes</a></li></ol><li><a href="#linux">Linux</a></li><ol><li><a href="#multiarch">Multiarch</a></li><li><a href="#chroot">Chroot</a></li><li><a href="#copying-libs">Copying libs</a></li><li><a href="#launcher-script-1">Launcher script</a></li><li><a href="#final-notes-2">Final notes</a></li></ol>
+  </div>
+</nav>
+
+    <div class="article-content">
+      <h2 id="intro">Intro</h2>
+
+<p>While ooc provides facilities to write highly cross-platform applications, and
+makes it rather easy to develop on all these platforms, distributing standalone
+applications is another matter entirely.</p>
+
+<p>Until a tool comes along and in the darkness binds them, this chapter documents
+the manual process that goes into releasing neatly packaged software for
+Windows, OSX and Linux.</p>
+
+<h2 id="windows">Windows</h2>
+
+<p>Windows is surprisingly easy to package for — a 32-bit executable will happily
+run on both 32-bit and 64-bit systems, there is no library path headache if you
+include all the required DLLs in the same directory as the .exe, and the
+current working directory is always the one with the .exe file.</p>
+
+<h3 id="dynamic-gc">Dynamic GC</h3>
+
+<p>If your application is multi-threaded, make sure to link with the GC
+dynamically as explained in <a href="/docs/tools/rock/gc/#threads">the Garbage Collection chapter</a>.</p>
+
+<p>If you link statically with the GC and use multiple threads, chances are you
+will run into very ugly memory corruption bugs that seemingly make no sense.
+So, make sure to double-check that first.</p>
+
+<p>Since you’ll link dynamically with it, you’ll need to include <code>libgc-1.dll</code>,
+and you might also need <code>pthreadGC2.dll</code>, which lives in <code>/mingw/bin/</code> under
+MinGW.</p>
+
+<h3 id="resource-file">Resource file</h3>
+
+<p>To bundle an icon with your executable, and add the full program name, author,
+etc, create a .rc file containing something like that:</p>
+
+<pre><code>id ICON "art/foo.ico"
+1 VERSIONINFO
+FILEVERSION     1,0,0,0
+PRODUCTVERSION  1,0,0,0
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904E4"
+    BEGIN
+      VALUE "CompanyName", "Company Name"
+      VALUE "FileDescription", "Application Name"
+      VALUE "FileVersion", "1.0"
+      VALUE "InternalName", "applicationname"
+      VALUE "LegalCopyright", "Author Name"
+      VALUE "OriginalFilename", "foo.exe"
+      VALUE "ProductName", "Application Name"
+      VALUE "ProductVersion", "1.0"
+    END
+  END
+
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x409, 1252
+  END
+END
+</code></pre>
+
+<p>Adjust these values as needed. To create a high-quality <code>.ico</code> file from a
+PNG image, the usage of a tool such as <a href="http://icofx.ro/">IcoFX</a> might be needed.</p>
+
+<p>Then, compile this <code>.rc</code> file with the <code>windres</code> command-line utility - if
+you have a Makefile you might want to add a target for this.</p>
+
+<pre><code>windres -i foo.rc -o foo.res -O coff
+</code></pre>
+
+<p>The final step to include these resources is to link them with your executable.
+This can be done easily if you already have a .use file, by adding a section in
+a <code>version(windows)</code> block. For example, in foo.use:</p>
+
+<pre><code>Name: foo
+Version: 1.0
+Description: Foo builds upon bar baz and does wonderful stuff
+SourcePath: source
+Requires: bar, baz
+Main: foo/foo
+
+# Add resources on Windows
+version (windows) {
+  Libs: ./foo.res
+}
+</code></pre>
+
+<p>Make sure to <code>use foo</code> in the main file of your application so that rock takes
+these into account. The resulting executable should have the icon built-in,
+along with the author and product information you have specified in the
+<code>foo.rc</code> file.</p>
+
+<p>Note that every time <code>foo.rc</code> changes, it needs to be recompiled to <code>foo.res</code>.
+You don’t need to distribute either the <code>.rc</code> or the <code>.res</code> file with the
+executable, it’s all baked in!</p>
+
+<h3 id="dll-dependencies">DLL dependencies</h3>
+
+<p>To figure out which libraries someone will need to run your application, you can use
+<a href="http://www.dependencywalker.com/">Dependency Walker</a>, also known as <code>depends.exe</code>.</p>
+
+<p>Loading your .exe in it, with the right working directory, will allow you to
+see which DLLs it loads and from where. Then, all you need is to copy those
+DLLs to the directory of your application and distribute them along.</p>
+
+<p>Be warned: there may be several versions of a given library on your system.
+Make sure to pick the right one.</p>
+
+<p>If your program can be launched by double-clicking on it in the Windows GUI
+(instead of running it from the command-line), it’s a good sign - but it might
+not be enough. Some open-source programs install libraries to system paths, and
+your application may be relying on that.</p>
+
+<p>To make sure the application runs everywhere, testing it on a “virgin” install
+of Windows is recommended. If there was a time to use a virtual machine, that
+would be it.</p>
+
+<h3 id="final-notes">Final notes</h3>
+
+<p>You can choose to generate an installer of course, but a .zip file is fine as
+well.  Windows systems usually have facilities to extract .zip files without
+the need for an external program.</p>
+
+<p>Creating a zip file can be done with the command line GNU zip utility:</p>
+
+<pre><code>zip -r Foo-1.0-Windows.zip Foo-1.0-Windows
+</code></pre>
+
+<p>..or by using a graphical tool, for example, <a href="http://www.7-zip.org/">7-Zip</a></p>
+
+<h2 id="osx">OSX</h2>
+
+<p>Releasing an app on OSX is relatively easy, as tools exist to make it easier.
+64-bit executables are the norm for recent versions of Mac OS X, so there is no
+pain there either.</p>
+
+<p>The only part where it needs a little hand holding is when creating the app
+bundle.</p>
+
+<h3 id="dylibbundler">dylibbundler</h3>
+
+<p>We need to distribute libraries inside the app bundle - however, so that the
+paths are resolve correctly, we’ll need to use <a href="http://macdylibbundler.sourceforge.net/">dylibbundler</a> to modify
+the executable and ‘fix’ the paths to these libraries.</p>
+
+<p>With <a href="http://brew.sh/">Homebrew</a>, installing dylibbundler is as simple as doing:</p>
+
+<pre><code>brew install dylibbundler
+</code></pre>
+
+<p>The first step is to tell the C compiler to reserve enough room to modify the
+library paths later:</p>
+
+<pre><code>rock +-headerpad_max_install_names
+</code></pre>
+
+<p>Then, we’ll have to create a folder that will be our app bundle, such as
+<code>Foo.app</code>, with the following directory structure:</p>
+
+<pre><code>Foo.app/
+  Contents/
+    Info.pList
+    MacOS/
+      foo
+      wrapper
+    Resources/
+      foo.icns
+    libs/
+</code></pre>
+
+<p><code>Contents/MacOS/foo</code> is our executable that we have copied from before, and
+<code>Contents/MacOS/wrapper</code> will be our launcher script (described in a further
+section).</p>
+
+<p>The <code>Contents/MacOS</code> directory should also contain any files the executable
+expects to find in the current working directory when launched (e.g. for game
+that would be the graphics, sounds, etc.)</p>
+
+<p>The next step is to dylibbundler on the executable so that libs are copied and
+the paths are fixed:</p>
+
+<pre><code>dylibbundler -od -b -x ./Foo.app/Contents/MacOS/helloworld -d ./Foo.app/Contents/libs/
+</code></pre>
+
+<h3 id="infoplist">Info.pList</h3>
+
+<p>The <code>Info.pList</code> file is similar to the <code>foo.rc</code> file we discussed in the
+Windows section. A stock plist file looks something like:</p>
+
+<pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"&gt;
+&lt;plist version="1.0"&gt;
+&lt;dict&gt;
+  &lt;key&gt;CFBundleGetInfoString&lt;/key&gt;
+  &lt;string&gt;Application Name&lt;/string&gt;
+  &lt;key&gt;CFBundleExecutable&lt;/key&gt;
+  &lt;string&gt;wrapper&lt;/string&gt;
+  &lt;key&gt;CFBundleIdentifier&lt;/key&gt;
+  &lt;string&gt;com.yourdomain.www&lt;/string&gt;
+  &lt;key&gt;CFBundleName&lt;/key&gt;
+  &lt;string&gt;applicationname&lt;/string&gt;
+  &lt;key&gt;CFBundleIconFile&lt;/key&gt;
+  &lt;string&gt;foo.icns&lt;/string&gt;
+  &lt;!-- Don't modify those! --&gt;
+  &lt;key&gt;CFBundleShortVersionString&lt;/key&gt;
+  &lt;string&gt;1.0&lt;/string&gt;
+  &lt;key&gt;CFBundleInfoDictionaryVersion&lt;/key&gt;
+  &lt;string&gt;6.0&lt;/string&gt;
+  &lt;key&gt;CFBundlePackageType&lt;/key&gt;
+  &lt;string&gt;APPL&lt;/string&gt;
+  &lt;key&gt;IFMajorVersion&lt;/key&gt;
+  &lt;integer&gt;0&lt;/integer&gt;
+  &lt;key&gt;IFMinorVersion&lt;/key&gt;
+  &lt;integer&gt;1&lt;/integer&gt;
+&lt;/dict&gt;
+&lt;/plist&gt;
+</code></pre>
+
+<p>It should live in <code>Foo.app/Contents/Info.pList</code>. Just like a Windows RC file,
+it references a <code>foo.icns</code> file. A tool like <a href="http://www.img2icnsapp.com/">img2icns</a> can be used 
+to convert a high-resolution PNG image to a Mac OSX icon.</p>
+
+<h3 id="launcher-script">Launcher script</h3>
+
+<p>Finally, we have to use a launcher script so that the current working
+directory of the app will be correct.</p>
+
+<pre><code class="language-bash"><span class="c">#!/bin/bash</span>
+<span class="nb">cd</span> <span class="s2">"${0%/*}"</span>
+./foo</code></pre>
+
+<h3 id="troubleshooting">Troubleshooting</h3>
+
+<p>It’s not uncommon to encounter an error if an app Bundle is malformed or
+otherwise problematic. Instead of double-clicking on the .app bundle to
+launch it, one can open it from the command line:</p>
+
+<pre><code>open Foo.app
+</code></pre>
+
+<p>If you get an “error -10180”, it means something went wrong while launching
+the app. Make sure the files inside <code>Contents/MacOS/</code> are executable, and
+that the wrapper is trying to launch the correct executable.</p>
+
+<p>In doubt, running <code>plutil</code> can help proofread the <code>pList</code> file:</p>
+
+<pre><code>plutil Foo.app/Contents/Info.pList
+</code></pre>
+
+<h3 id="final-notes-1">Final notes</h3>
+
+<p>OSX apps are sometimes encountered as <code>.dmg</code> files in the wild, which are
+image files that contain partitions, which can be mounted and read from.
+This allows a nice “drag and drop” window to be displayed.</p>
+
+<p>However, distributing an OSX application by just zipping up the <code>.app</code>
+bundle is acceptable. It can be done either on the command line:</p>
+
+<pre><code>zip -r Foo.OSX.zip Foo.app
+</code></pre>
+
+<p>…or in the graphical interface (Right Click -&gt; Compress Foo.app).</p>
+
+<h2 id="linux">Linux</h2>
+
+<p>Linux may be one of the comfiest platform for ooc development, but ironically,
+it is one of the most painful to package standalone applications for. As a rule
+of thumb, do not assume that your users will want to install libraries
+themselves — always package them with the software.</p>
+
+<h3 id="multiarch">Multiarch</h3>
+
+<p>64-bit installs of Linux that aren’t multi-arch will complaing about missing
+32-bit libraries, and conversely, 32-bit installs won’t be able to run a 64-bit
+application at all. Which leaves us with the only option of providing both a
+32-bit and a 64-bit executable.</p>
+
+<p>An example folder hierarchy is:</p>
+
+<pre><code>foo-1.0-linux/
+  bin/
+    foo32
+    foo64
+    libs32/
+    libs64/
+  foo.sh
+</code></pre>
+
+<p>Since we are going to ship dynamic libraries with the app, we should specify
+the path where they are with the <code>-rpath</code> linker option. The rock command looks
+a little bit like this:</p>
+
+<pre><code>rock +-Wl,-rpath=bin/libs32 -o=foo32
+</code></pre>
+
+<p>…for the 32-bit version, and similarly for the 64-bit version.</p>
+
+<h3 id="chroot">Chroot</h3>
+
+<p>One of the easiest ways to build both a 32-bit and a 64-bit executable is to
+have a 64-bit VM of Ubuntu, and set up a 32-bit chroot inside of it, then copy
+files out of the chroot to retrieve the binaries and associated libraries.</p>
+
+<p>Setting up a chroot with debootstrap is <a href="https://wiki.ubuntu.com/DebootstrapChroot">documented on the Ubuntu website</a>.</p>
+
+<h3 id="copying-libs">Copying libs</h3>
+
+<p>To figure out the libraries you need to copy to <code>libs32</code> or <code>libs64</code>, the <code>ldd</code>
+command line utility can be used. Filtering its output to remove a few
+libraries always present on Linux systems can help:</p>
+
+<pre><code class="language-bash">ldd foo64 | egrep <span class="s2">"(/usr/lib/)|(prefix64)"</span> | cut -d <span class="s1">' '</span> -f 3 | egrep -v <span class="s2">"lib(X|x|GL|gl|drm)"</span></code></pre>
+
+<p>The example above works for an OpenGL-based application. Copying these files
+automatically can be done with a shell script such as:</p>
+
+<pre><code class="language-bash"><span class="k">for </span>l in <span class="k">$(</span>ldd foo64 | egrep <span class="s2">"(/usr/lib/)|(prefix64)"</span> | cut -d <span class="s1">' '</span> -f 3 | egrep -v <span class="s2">"lib(X|x|GL|gl|drm)"</span> | tr <span class="s1">'\n'</span> <span class="s1">' '</span><span class="k">)</span>; <span class="k">do</span>
+<span class="k">  </span>cp <span class="nv">$l</span> libs64/
+<span class="k">done</span></code></pre>
+
+<p>Checking that it well can be done by running <code>ldd bin/foo64</code> in the release
+directory.  Here’s some example output that shows the libs are resolved to
+their relative paths:</p>
+
+<pre><code>$ ldd bin/foo64
+libSDL2-2.0.so.0 =&gt; bin/libs64/libSDL2-2.0.so.0 (0x00007fc6fa615000)
+libSDL2_mixer-2.0.so.0 =&gt; bin/libs64/libSDL2_mixer-2.0.so.0 (0x00007fc6f9ee0000)
+libmxml.so.1 =&gt; bin/libs64/libmxml.so.1 (0x00007fc6f9cd3000)
+libfreetype.so.6 =&gt; bin/libs64/libfreetype.so.6 (0x00007fc6f9a37000)
+libyaml-0.so.2 =&gt; bin/libs64/libyaml-0.so.2 (0x00007fc6f9815000)
+</code></pre>
+
+<h3 id="launcher-script-1">Launcher script</h3>
+
+<p>Courtesy of <a href="https://twitter.com/flibitijibibo">Ethan Lee</a>, such a launcher script will detect the architecture
+of the machine it’s running on and launch the right executable:</p>
+
+<pre><code class="language-bash"><span class="c">#!/bin/bash</span>
+<span class="c"># Move to the script's directory</span>
+<span class="nb">cd</span> <span class="s2">"`dirname "</span><span class="nv">$0</span><span class="s2">"`"</span>
+
+<span class="c"># Get the kernel/architecture information</span>
+<span class="nv">UNAME</span><span class="o">=</span><span class="sb">`</span>uname<span class="sb">`</span>
+<span class="nv">ARCH</span><span class="o">=</span><span class="sb">`</span>uname -m<span class="sb">`</span>
+
+<span class="c"># Pick the proper executable</span>
+<span class="k">if</span> <span class="o">[</span> <span class="s2">"$ARCH"</span> <span class="o">==</span> <span class="s2">"x86_64"</span> <span class="o">]</span>; <span class="k">then</span>
+  ./bin/foo64
+<span class="k">else</span>
+  ./bin/foo32
+<span class="k">fi</span></code></pre>
+
+<h3 id="final-notes-2">Final notes</h3>
+
+<p>The <code>.tar.gz</code> or <code>.tar.bz2</code> archive formats is well-suited to distribute
+applications for Linux, but <code>.zip</code> works just as well, and <code>.tar.xz</code> is usually
+a little smaller.</p>
+
+<p>To create a <code>.tar.gz</code>, do:</p>
+
+<pre><code>tar czvf foo-1.0-linux.tar.gz foo-1.0-linux
+</code></pre>
+
+<p>To create a <code>.tar.bz2</code>, use <code>cjvf</code> instead.</p>
+
+<p>To create a <code>.tar.xz</code>:</p>
+
+<pre><code>tar cf --xz foo-1.0-linux.tar.xz foo-1.0-linux
+</code></pre>
+
+<p>To create a <code>.zip</code>, do:</p>
+
+<pre><code>zip -r foo-1.0-linux.tar.zip foo-1.0-linux
+</code></pre>
+    </div>
+  </article>
+</div>
+<footer>
+  <div class="footer-content">
+  <nav><section class="about"><h3>About</h3>
+    <ul>
+        <li><a href="/about/#history">History</a></li>
+        <li><a href="/about/#why-use-ooc">Why use ooc?</a></li>
+        <li><a href="/about/#similar-projects">Alternatives</a></li>
+    </ul></section><section class="install"><h3>Install</h3>
+    <ul>
+        <li><a href="/install/#quick-install">Quick install</a></li>
+        <li><a href="/install/#installing-from-git">Installing from Git</a></li>
+        <li><a href="/install/#post-install-instructions">Post-install instructions</a></li>
+        <li><a href="/install/#installing-sam">Installing sam</a></li>
+    </ul></section><section class="documentation"><h3>Documentation</h3>
+    <ul>
+        <li><a href="/docs/tutorial/">Tutorial</a></li>
+        <li><a href="/docs/lang/">Language</a></li>
+        <li><a href="/docs/sdk/">SDK</a></li>
+        <li><a href="/docs/tools/">Tools</a></li>
+        <li><a href="/docs/tools/rock/">Implementation</a></li>
+        <li><a href="/docs/kaputt/">Troubleshooting</a></li>
+        <li><a href="/docs/glossary/">Glossary</a></li>
+    </ul></section><section class="community"><h3>Community</h3>
+    <ul>
+        <li><a href="http://groups.google.com/group/ooc-lang">Discussion group</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/issues">Issue tracker</a></li>
+        <li><a href="irc://chat.freenode.net/#ooc-lang">IRC channel</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/wiki">Wiki</a></li>
+        <li><a href="/development/">Development</a></li>
+        <li><a href="http://pledgie.com/campaigns/21363">Donate</a></li>
+    </ul></section></nav>
+    <div class="fine-print">
+      <p>
+        ooc &copy; 2009-2015 <a href="http://amos.me/">Amos Wenger</a>. The content of this website is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0 License</a>.
+        rock is licensed under the MIT license. Design based on the <a href="http://nanoc.ws/">nanoc web site</a> by <a href="http://stoneship.org/">Denis Defreyne</a> and used with permission.
+        <a href="http://entypo.com/">Entypo</a>By Daniel Bruce.
+      </p>
+    </div>
+  </div>
+</footer>
+
+  </body>
+</html>

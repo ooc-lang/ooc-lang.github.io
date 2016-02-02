@@ -1,0 +1,555 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ooc &raquo; Debugging</title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="stylesheet" href="/assets/pygments.css">
+    <link href="http://fonts.googleapis.com/css?family=Radley:regular&text=OC" rel="stylesheet" type="text/css" >
+    <link href="http://fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,400,400italic,700,700italic,900,900italic" rel="stylesheet" type="text/css" >
+
+    <!-- Cool stats stuff for nanoc :) -->
+    <meta name="generator" content="nanoc 3.6.5"> 
+  </head>
+  <body>
+
+<header>
+  <div class="header-content">
+    <nav class="main">
+      <ol>
+        <li class="home"><a href="/"><img src="/assets/images/logo-nav.png" alt="Home"></a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/install/">Install</a></li>
+        <li><a href="/docs/">Documentation</a></li>
+        <li><a href="/community/">Community</a></li>
+        <li><a href="/development/">Development</a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+<div class="intro">
+  <div class="intro-content">
+    <h1>Debugging</h1>
+  </div>
+</div>
+<div class="article">
+  <article>
+    <nav class="side">
+  <div class="side-title">
+    Debugging
+  </div>
+
+  <div class="side-content">
+    
+      <p>↑ <a href="/docs/tools/rock/">Back to rock</a></p>
+    
+
+    <ol class="toc"><li><a href="#intro">Intro</a></li><li><a href="#debug-symbols">Debug symbols</a></li><li><a href="#fancy-backtraces">Fancy backtraces</a></li><ol><li><a href="#fancy-backtrace-principle">Fancy backtrace principle</a></li><li><a href="#fancy-backtrace-configuration">Fancy backtrace configuration</a></li></ol><li><a href="#crash-course-in-gdb">Crash course in gdb</a></li><ol><li><a href="#running">Running</a></li><li><a href="#getting-a-backtrace">Getting a backtrace</a></li><li><a href="#reading-code-with-context">Reading code with context</a></li><li><a href="#inspecting-values">Inspecting values</a></li><li><a href="#inspecting-generics">Inspecting generics</a></li><li><a href="#breakpoints">Breakpoints</a></li><li><a href="#stepping">Stepping</a></li><li><a href="#quitting">Quitting</a></li><li><a href="#attaching-to-a-process">Attaching to a process</a></li></ol><li><a href="#other-tips">Other tips</a></li><ol><li><a href="#ooc-vs-c-line-numbers">ooc vs C line numbers</a></li></ol>
+  </div>
+</nav>
+
+    <div class="article-content">
+      <h2 id="intro">Intro</h2>
+
+<p>Debugging applications is a natural cycle of writing software. One simply cannot
+anticipate every single problem they are going to run into while using an piece
+of software.</p>
+
+<p>For rock, since we compile to C, we can use traditional debugging tools like gdb,
+and the next few sections explain exactly how.</p>
+
+<h2 id="debug-symbols">Debug symbols</h2>
+
+<p>By default, rock compiles in the debug profile. The corresponding command line
+option is <code>-pg</code>.</p>
+
+<p>Not only will this pass the corresponding option to the C compiler used (gcc,
+clang, etc.) but it will also:</p>
+
+<ul>
+<li>Add <code>#line</code> directives for debuggers to map back to .ooc files</li>
+  <li>Keep produced C files around for further inspection.</li>
+  <li>On Linux, it’ll add -rdynamic so that all symbols are exported</li>
+  <li>On OSX, it’ll run dsymutil so that a <code>.dSYM</code> archive will be produced,
+  containing debug symbols.</li>
+</ul><p>When releasing a production build of your software, use the release profile
+instead, using:</p>
+
+<pre><code>rock -pr
+</code></pre>
+
+<p>This will omit debug symbols.</p>
+
+<h2 id="fancy-backtraces">Fancy backtraces</h2>
+
+<p>While the next sections cover using a debugger, which is a prerequisite for
+pretty much all hardcore problem-solving sections, there is a way to get
+information about program crashes without using a debugger.</p>
+
+<p>The fancy-backtrace rock extension produces output like this when a program crashes:</p>
+
+<pre><code>[OutOfBoundsException in ArrayList]: Trying to access an element at offset 0, but size is only 0!
+[fancy backtrace]
+0     fancy_backtrace.c                                        (from C:\msys64\home\amwenger\Dev\rock\bin\fancy_backtrace.DLL)
+1     BacktraceHandler backtrace_impl()  in lang/Backtrace     (at C:/msys64/home/amwenger/Dev/rock/sdk/lang/Backtrace.ooc:50)
+2     BacktraceHandler backtrace()       in lang/Backtrace     (at C:/msys64/home/amwenger/Dev/rock/sdk/lang/Backtrace.ooc:243)
+3     Exception addBacktrace_impl()      in lang/Exception     (at C:/msys64/home/amwenger/Dev/rock/sdk/lang/Exception.ooc:108)
+4     Exception addBacktrace()           in lang/Exception     (at C:/msys64/home/amwenger/Dev/rock/sdk/lang/Exception.ooc:212)
+5     Exception throw_impl()             in lang/Exception     (at C:/msys64/home/amwenger/Dev/rock/sdk/lang/Exception.ooc:177)
+6     Exception throw()                  in lang/Exception     (at C:/msys64/home/amwenger/Dev/rock/sdk/lang/Exception.ooc:232)
+7     ArrayList get_impl()               in structs/ArrayList  (at C:/msys64/home/amwenger/Dev/rock/sdk/structs/ArrayList.ooc:82)
+8     ArrayList get()                    in structs/ArrayList  (at C:/msys64/home/amwenger/Dev/rock/sdk/structs/ArrayList.ooc:40)
+9     __OP_IDX_ArrayList_Int__T()        in structs/ArrayList  (at C:/msys64/home/amwenger/Dev/rock/sdk/structs/ArrayList.ooc:290)
+10    foo()                              in crash              (at C:/msys64/home/amwenger/Dev/rock/test/sdk/lang/crash.ooc:32)
+11    bar()                              in crash              (at C:/msys64/home/amwenger/Dev/rock/test/sdk/lang/crash.ooc:41)
+12    App runToo_impl()                  in crash              (at C:/msys64/home/amwenger/Dev/rock/test/sdk/lang/crash.ooc:72)
+13    App runToo()                       in crash              (at C:/msys64/home/amwenger/Dev/rock/test/sdk/lang/crash.ooc:84)
+14    __crash_closure403()               in crash              (at C:/msys64/home/amwenger/Dev/rock/test/sdk/lang/crash.ooc:67)
+15    __crash_closure403_thunk()         in crash              (at C:/msys64/home/amwenger/Dev/rock/test/sdk/lang/crash.ooc:66)
+16    loop()                             in lang/Abstractions  (at C:/msys64/home/amwenger/Dev/rock/sdk/lang/Abstractions.ooc:2)
+17    App run_impl()                     in crash              (at C:/msys64/home/amwenger/Dev/rock/test/sdk/lang/crash.ooc:65)
+18    App run()                          in crash              (at C:/msys64/home/amwenger/Dev/rock/test/sdk/lang/crash.ooc:80)
+19    main()                             in                    (at C:/msys64/home/amwenger/Dev/rock/test/sdk/lang/crash.ooc:1)
+20    crtexe.c                                                 (from C:\msys64\home\amwenger\Dev\rock\test\sdk\lang\crash.exe)
+21    crtexe.c                                                 (from C:\msys64\home\amwenger\Dev\rock\test\sdk\lang\crash.exe)
+22    BaseThreadInitThunk                                      (from C:\Windows\system32\kernel32.dll)
+23    RtlUserThreadStart                                       (from C:\Windows\SYSTEM32\ntdll.dll)
+</code></pre>
+
+<p>In the case above, </p>
+
+<p>Fancy backtraces works on Windows, Linux, and OSX, on both 32 and 64-bit machines.</p>
+
+<p>To use it, simply go in the rock directory and do:</p>
+
+<pre><code>make extensions
+</code></pre>
+
+<p>A few dependencies might be needed, such as <code>binutils-dev</code> and <code>zlibg1-dev</code> on
+Debian, or a few brew formulas on OSX.</p>
+
+<h3 id="fancy-backtrace-principle">Fancy backtrace principle</h3>
+
+<p>Basically, whenever an exception is thrown, a backtrace is captured. It
+contains a list of frames, e.g. the addresses of the various function calls (as
+can be seen above).</p>
+
+<p>If an Exception isn’t caught, the program will abort, but before it does, the
+backtrace captured when the exception was thrown is formatted nicely and
+printed out to the standard error stream.</p>
+
+<p>Similarly, when the program receives a signal (such as SIGSEGV), a backtrace is
+printed to help the developer know when things were wrong.</p>
+
+<p>Since fancy-backtrace has more dependencies than rock itself, it’s a little bit
+harder to build, and that’s why it exists as a dynamic library (a .dll file on
+Windows, .dylib on OSX, and .so on Linux).</p>
+
+<p>When a program compiled in the debug profile starts up, it attempts to load the
+library. If it succeeds, it will use it to display friendly stack traces. If it
+doesn’t, it will fall back to the execinfo interface (which displays only
+function names, not source files or line numbers), or to… nothing, on
+Windows.</p>
+
+<p>By default, the fancy_backtrace.{dll,so,dylib} file is copied along to the rock
+binary, in <code>${ROCK_DIST}/bin</code>. An ooc executable will first look in its own
+directory (useful if the application is distributed on a system that doesn’t
+have rock), and will then search in the directory where the rock executable
+resides (useful on a developer system).</p>
+
+<h3 id="fancy-backtrace-configuration">Fancy backtrace configuration</h3>
+
+<p>The default setting is to display something as helpful as possible. However, if
+one wants unformatted backtraces, one may define the <code>RAW_BACKTRACE</code>
+environment variable:</p>
+
+<pre><code>RAW_BACKTRACE=1 ./myprogram
+</code></pre>
+
+<p>To disable the usage of fancy-backtrace altogether, one may use the
+<code>NO_FANCY_BACKTRACE</code> environment variable:</p>
+
+<pre><code>NO_FANCY_BACKTRACE=1 ./myprogram
+</code></pre>
+
+<h2 id="crash-course-in-gdb">Crash course in gdb</h2>
+
+<p>GDB, the <a href="https://www.gnu.org/software/gdb/">GNU Debugger</a>, is the canonical tool to debug C applications compiled with gcc
+(or even clang).</p>
+
+<p>For example, writing this in <code>dog.ooc</code></p>
+
+<pre><code class="language-ooc"><span class="nc">Dog</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+    <span class="nv">shout</span><span class="p">:</span> <span class="k">func</span> <span class="p">{</span>
+        <span class="nf">raise</span><span class="p">(</span><span class="s2">"Woops, not implemented yet"</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nv">main</span><span class="p">:</span> <span class="k">func</span> <span class="p">{</span>
+    <span class="nf">work</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="nv">work</span><span class="p">:</span> <span class="k">func</span> <span class="p">{</span>
+    <span class="nc">Dog</span> <span class="k">new</span><span class="p">()</span> <span class="nf">shout</span><span class="p">()</span>
+<span class="p">}</span></code></pre>
+
+<p>Compiling with <code>rock -pg</code> gives an executable, <code>dog</code>, and a folder with C files.</p>
+
+<h3 id="running">Running</h3>
+
+<p>We can run it with gdb like this:</p>
+
+<pre><code>gdb dog
+</code></pre>
+
+<p>If we wanted to pass arguments we could do</p>
+
+<pre><code>gdb --args dog arg1 arg2 arg3
+</code></pre>
+
+<p>Inside gdb, we are greeted with a prompt. Typing <code>run</code> (or <code>r</code>) for short, followed
+by a line feed, runs the program. In this case, it aborts and tells us where it failed:</p>
+
+<pre><code>(gdb) r
+Starting program: /Users/amos/Dev/tests/dog
+Reading symbols for shared libraries +.............................. done
+[Exception]: Woops, not implemented yet
+
+Program received signal SIGABRT, Aborted.
+0x00007fff96b82d46 in __kill ()
+</code></pre>
+
+<h3 id="getting-a-backtrace">Getting a backtrace</h3>
+
+<p>However, as-is, we don’t know much. So it died in <code>__kill</code> — that seems to be a system
+function on OSX (where this doc was written). How about a nice backtrace instead? Running
+<code>backtrace</code> or simply <code>bt</code> will give you that:</p>
+
+<pre><code>(gdb) bt
+#0  0x00007fff96b82d46 in __kill ()
+#1  0x00007fff8edfadf0 in abort ()
+#2  0x0000000100007121 in lang_Exception__Exception_throw_impl (this=0x100230030) at Exception.ooc:205
+#3  0x00000001000072a3 in lang_Exception__Exception_throw (this=0x100230030) at Exception.ooc:241
+#4  0x0000000100008090 in lang_Exception__raise (msg=0x100231600) at Exception.ooc:104
+#5  0x0000000100000e9b in dog__Dog_shout_impl (this=0x100238ff0) at dog.c:3
+#6  0x0000000100000ef0 in dog__Dog_shout (this=0x100238ff0) at dog.ooc:11
+#7  0x0000000100001131 in dog__work () at dog.ooc:12
+#8  0x0000000100001102 in main (__argc2=1, __argv3=0x7fff5fbff230) at dog.ooc:8
+</code></pre>
+
+<p>We have from left to right - the frame number, the address of the function (we
+can ignore), the name of the function, then the arguments and their values, and
+then the files where they were defined (if they can be found) along with the
+line number.</p>
+
+<h3 id="reading-code-with-context">Reading code with context</h3>
+
+<p>As expected, we can see ooc line numbers in the backtrace. What if we want to
+investigate the code without opening the .ooc file ourselves? We can just place
+ourselves in the context of frame 7 with <code>frame 7</code> or simply <code>f 7</code>:</p>
+
+<pre><code>(gdb) f 7
+#7  0x0000000100001131 in dog__work () at dog.ooc:12
+12	    Dog new() shout()
+</code></pre>
+
+<p>Want more context, e.g. the lines of code around? Use <code>list</code> (or simply <code>l</code>)</p>
+
+<pre><code>(gdb) l
+7	main: func {
+8	    work()
+9	}
+10
+11	work: func {
+12	    Dog new() shout()
+13	}
+(gdb)
+</code></pre>
+
+<h3 id="inspecting-values">Inspecting values</h3>
+
+<p>GDB can also print values. For example, going back to frame 2, we can inspect
+the exception being thrown by using <code>print</code> (or <code>p</code>, for short):</p>
+
+<pre><code>(gdb) f 2
+#2  0x0000000100007121 in lang_Exception__Exception_throw_impl (this=0x100230030) at Exception.ooc:205
+205	            abort()
+(gdb) p this
+$4 = (lang_Exception__Exception *) 0x100230030
+</code></pre>
+
+<p>Getting an address is not that useful, though, how about printing the content
+of an object instead? We can dereference the object from within gdb:</p>
+
+<pre><code>(gdb) p *this
+$10 = {
+  __super__ = {
+    class = 0x100047e60
+  },
+  backtraces = 0x100234f40,
+  origin = 0x0,
+  message = 0x100231600
+}
+</code></pre>
+
+<p>What if we want to read the message? Since it’s an ooc String, we’ll need to
+print the content of the underlying buffer:</p>
+
+<pre><code>(gdb) p *this.message._buffer
+$11 = {
+  __super__ = {
+    __super__ = {
+      class = 0x100047490
+    },
+    T = 0x1000478c0
+  },
+  size = 26,
+  capacity = 0,
+  mallocAddr = 0x0,
+  data = 0x10002fe24 "Woops, not implemented yet"
+}
+</code></pre>
+
+<h3 id="inspecting-generics">Inspecting generics</h3>
+
+<p>Inspecting generics is a bit trickier - one has to cast it directly to the
+right type. For example, the <code>Exception</code> class has a LinkedList of backtraces,
+which is a generic type. We can inspect it:</p>
+
+<pre><code>(gdb) p *this.backtraces
+$21 = {
+  __super__ = {
+    __super__ = {
+      __super__ = {
+        __super__ = {
+          class = 0x10004b2b0
+        },
+        T = 0x100047df0
+      }
+    },
+    equals__quest = {
+      thunk = 0x10001a660,
+      context = 0x0
+    }
+  },
+  _size = 0,
+  head = 0x100239f60
+}
+</code></pre>
+
+<p>Not so useful. What about head?</p>
+
+<pre><code>(gdb) p *this.backtraces.head
+$22 = {
+  __super__ = {
+    class = 0x10004b4a0
+  },
+  T = 0x100047df0,
+  prev = 0x100239f60,
+  next = 0x100239f60,
+  data = 0x100238fe0 ""
+}
+</code></pre>
+
+<p>Looks like a node from a doubly-linked list. We’re on the right track! However,
+data is printed as a C string (since generics are <code>uint8_t*</code> under the hood, and
+<code>uint8_t</code> is usually typedef’d to <code>char</code>). We can cast it:</p>
+
+<pre><code>(gdb) p (lang_types__Pointer) *this.backtraces.head.data
+$24 = (lang_types__Pointer) 0x0
+</code></pre>
+
+<p>Which seems about right, as the exception has not been re-thrown (obviously the
+example here is rather specific, but the general techniques can be applied to any
+ooc application).</p>
+
+<h3 id="breakpoints">Breakpoints</h3>
+
+<p>What if we want to inspect values somewhere the program wouldn’t stop naturally?
+In the program above, we could set up a breakpoint when the constructor of <code>Dog</code>
+is called.</p>
+
+<p>It can be non-trivial to determine the C symbol corresponding to an ooc function.
+Tab-completion is here to the rescue though - typing <code>break dog_</code> and then hitting
+Tab twice will display a helpful list of symbols:</p>
+
+<pre><code>(gdb) break dog_&lt;TAB&gt;&lt;TAB&gt;
+dog__Dog___defaults__       dog__Dog___load__           dog__Dog_init               dog__Dog_shout              dog__work
+dog__Dog___defaults___impl  dog__Dog_class              dog__Dog_new                dog__Dog_shout_impl         dog_load
+</code></pre>
+
+<p>Here, we seem to want <code>dog__Dog_new</code>. As a rule, we have <code>packagename__ClassName_methodName_suffix</code>.</p>
+
+<p>Setting up the break point does nothing until we run the program:</p>
+
+<pre><code>(gdb) break dog__Dog_new
+Breakpoint 1 at 0x100000f3a: file dog.ooc, line 1.
+(gdb) r
+Starting program: /Users/amos/Dev/tests/dog
+Reading symbols for shared libraries +.............................. done
+
+Breakpoint 1, dog__Dog_new () at dog.ooc:1
+1	Dog: class {
+</code></pre>
+
+<h3 id="stepping">Stepping</h3>
+
+<p>From there, we can investigate as before, with <code>backtrace</code>, <code>frame</code>, <code>print</code>, etc. We can also decide
+to step line by line. Using <code>step</code> will enter the functions being called, whereas <code>next</code> will skip them
+and return to the prompt when the functions have fully executed.</p>
+
+<p>The shorthand for <code>step</code> is <code>s</code>, and the shorthand for next is <code>n</code>. When we step, we can see everything
+being executed, including string and object allocation:</p>
+
+<pre><code>(gdb) s
+dog__Dog_class () at dog.ooc:25
+Line number 25 out of range; dog.ooc has 13 lines.
+(gdb)
+Line number 26 out of range; dog.ooc has 13 lines.
+(gdb)
+Line number 27 out of range; dog.ooc has 13 lines.
+(gdb)
+lang_types__Object_class () at types.ooc:55
+55	        if(object) {
+(gdb)
+dog__Dog_class () at dog.ooc:28
+Line number 28 out of range; dog.ooc has 13 lines.
+(gdb)
+Line number 29 out of range; dog.ooc has 13 lines.
+(gdb)
+lang_String__makeStringLiteral (str=0x10002fe20 "Dog", strLen=3) at String.ooc:377
+377	    String new(Buffer new(str, strLen, true))
+(gdb)
+lang_Buffer__Buffer_new_cStrWithLength (s=0x10002fe20 "Dog", length=3, stringLiteral__quest=true) at Buffer.ooc:59
+59	    init: func ~cStrWithLength(s: CString, length: Int, stringLiteral? := false) {
+(gdb)
+lang_Buffer__Buffer_class () at Buffer.ooc:157
+157	    clone: func ~withMinimum (minimumLength := size) -&gt; This {
+(gdb)
+158	        newCapa := minimumLength &gt; size ? minimumLength : size
+(gdb)
+163	        copy
+(gdb)
+0x00000001000050dd in lang_Buffer__Buffer_new_cStrWithLength (s=0x10002fe20 "Dog", length=3, stringLiteral__quest=true) at Buffer.ooc:59
+59	    init: func ~cStrWithLength(s: CString, length: Int, stringLiteral? := false) {
+(gdb)
+lang_types__Class_alloc__class (this=0x100047490) at types.ooc:54
+54	        object := gc_malloc(instanceSize) as Object
+(gdb)
+</code></pre>
+
+<p>Note that some line numbers seem to be problematic here - but we still get to see which parts of the
+code get executed and in which order. Instead of typing <code>s</code> every time, we can just hit Enter to
+re-execute the last command.</p>
+
+<p>When we’re done stepping and just want to resume program execution, we can use <code>continue</code> (or <code>c</code> for short).</p>
+
+<h3 id="quitting">Quitting</h3>
+
+<p>When we’re done running gdb, we can quit with <code>quit</code> (or <code>q</code> for short). It might ask for confirmation
+if the program is still running, but otherwise, it’s all good.</p>
+
+<h3 id="attaching-to-a-process">Attaching to a process</h3>
+
+<p>Up to there, we have seen how to run a program from gdb. What if we want to attach gdb to a process that has been
+launched somewhere else? Let’s try with this program, <code>sleep.ooc</code>:</p>
+
+<pre><code class="language-ooc"><span class="k">import</span> <span class="nv">os</span><span class="o">/</span><span class="nc">Time</span>
+<span class="nv">main</span><span class="p">:</span> <span class="k">func</span> <span class="p">{</span>
+    <span class="k">while</span> <span class="p">(</span><span class="k">true</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nf">doThing</span><span class="p">()</span>
+        <span class="nc">Time</span> <span class="nf">sleepSec</span><span class="p">(</span><span class="m-Decimal">1</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nv">doThing</span><span class="p">:</span> <span class="k">func</span> <span class="p">{</span>
+    <span class="s2">"Hey!"</span> <span class="nf">println</span><span class="p">()</span>
+<span class="p">}</span></code></pre>
+
+<p>Compiling it with <code>rock -pg</code> and running it with <code>./sleep</code> prints <code>Hey!</code> every second, as expected.</p>
+
+<p>To attach to this process, we need to find out its process ID. We can either use the <code>ps</code> command line
+utility, or we can interrupt its execution with <code>Ctrl-Z</code> (in most shells, like bash, zsh, etc.). You
+might see something like this:</p>
+
+<pre><code>amos at coyote in ~/Dev/tests
+$ ./sleep
+Hey!
+Hey!
+Hey!
+^Z
+[1]  + 48130 suspended  ./sleep
+</code></pre>
+
+<p>And the process ID is <code>48130</code> here. We can attach gdb to that process like this:</p>
+
+<pre><code>gdb attach 48130
+</code></pre>
+
+<p>When attaching to a process, GDB will pause execution, waiting for orders. Quitting gdb
+will then detach gdb from the process, which will resume execution.</p>
+
+<p>If you need to quit the process, you can bring it back to the front with the <code>fg</code> shell
+command, then exit it with <code>Ctrl-C</code>.</p>
+
+<h2 id="other-tips">Other tips</h2>
+
+<h3 id="ooc-vs-c-line-numbers">ooc vs C line numbers</h3>
+
+<p>By default, rock will output ‘sourcemaps’, mapping C code back to the original ooc
+code that generated it. This allows the debugger to display ooc line numbers, as seen
+above. This behavior can be disabled with:</p>
+
+<pre><code>rock --nolines
+</code></pre>
+
+<p>In which case gdb will fall back to displaying C line numbers (corresponding to the files
+generated by rock). This can be useful if you suspect that rock is generating invalid code,
+or if the ooc line numbers are messed up for some reason.</p>
+    </div>
+  </article>
+</div>
+<footer>
+  <div class="footer-content">
+  <nav><section class="about"><h3>About</h3>
+    <ul>
+        <li><a href="/about/#history">History</a></li>
+        <li><a href="/about/#why-use-ooc">Why use ooc?</a></li>
+        <li><a href="/about/#similar-projects">Alternatives</a></li>
+    </ul></section><section class="install"><h3>Install</h3>
+    <ul>
+        <li><a href="/install/#quick-install">Quick install</a></li>
+        <li><a href="/install/#installing-from-git">Installing from Git</a></li>
+        <li><a href="/install/#post-install-instructions">Post-install instructions</a></li>
+        <li><a href="/install/#installing-sam">Installing sam</a></li>
+    </ul></section><section class="documentation"><h3>Documentation</h3>
+    <ul>
+        <li><a href="/docs/tutorial/">Tutorial</a></li>
+        <li><a href="/docs/lang/">Language</a></li>
+        <li><a href="/docs/sdk/">SDK</a></li>
+        <li><a href="/docs/tools/">Tools</a></li>
+        <li><a href="/docs/tools/rock/">Implementation</a></li>
+        <li><a href="/docs/kaputt/">Troubleshooting</a></li>
+        <li><a href="/docs/glossary/">Glossary</a></li>
+    </ul></section><section class="community"><h3>Community</h3>
+    <ul>
+        <li><a href="http://groups.google.com/group/ooc-lang">Discussion group</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/issues">Issue tracker</a></li>
+        <li><a href="irc://chat.freenode.net/#ooc-lang">IRC channel</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/wiki">Wiki</a></li>
+        <li><a href="/development/">Development</a></li>
+        <li><a href="http://pledgie.com/campaigns/21363">Donate</a></li>
+    </ul></section></nav>
+    <div class="fine-print">
+      <p>
+        ooc &copy; 2009-2015 <a href="http://amos.me/">Amos Wenger</a>. The content of this website is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0 License</a>.
+        rock is licensed under the MIT license. Design based on the <a href="http://nanoc.ws/">nanoc web site</a> by <a href="http://stoneship.org/">Denis Defreyne</a> and used with permission.
+        <a href="http://entypo.com/">Entypo</a>By Daniel Bruce.
+      </p>
+    </div>
+  </div>
+</footer>
+
+  </body>
+</html>

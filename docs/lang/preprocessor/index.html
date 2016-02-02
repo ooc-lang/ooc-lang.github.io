@@ -1,0 +1,338 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ooc &raquo; Preprocessor</title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="stylesheet" href="/assets/pygments.css">
+    <link href="http://fonts.googleapis.com/css?family=Radley:regular&text=OC" rel="stylesheet" type="text/css" >
+    <link href="http://fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,400,400italic,700,700italic,900,900italic" rel="stylesheet" type="text/css" >
+
+    <!-- Cool stats stuff for nanoc :) -->
+    <meta name="generator" content="nanoc 3.6.5"> 
+  </head>
+  <body>
+
+<header>
+  <div class="header-content">
+    <nav class="main">
+      <ol>
+        <li class="home"><a href="/"><img src="/assets/images/logo-nav.png" alt="Home"></a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/install/">Install</a></li>
+        <li><a href="/docs/">Documentation</a></li>
+        <li><a href="/community/">Community</a></li>
+        <li><a href="/development/">Development</a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+<div class="intro">
+  <div class="intro-content">
+    <h1>Preprocessor</h1>
+  </div>
+</div>
+<div class="article">
+  <article>
+    <nav class="side">
+  <div class="side-title">
+    Preprocessor
+  </div>
+
+  <div class="side-content">
+    
+      <p>↑ <a href="/docs/lang/">Back to Language</a></p>
+    
+
+    <ol class="toc"><li><a href="#version-blocks">Version blocks</a></li><li><a href="#line-continuations">Line continuations</a></li><li><a href="#constants">Constants</a></li><li><a href="#call-chaining">Call chaining</a></li><li><a href="#slurping">Slurping</a></li></ol>
+  </div>
+</nav>
+
+    <div class="article-content">
+      <h2 id="version-blocks">Version blocks</h2>
+
+<p>Version blocks allows one to write platform-specific code. For example:</p>
+
+<pre><code class="language-ooc"><span class="nv">runThing</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+  <span class="k">version</span> <span class="p">(</span><span class="nv">windows</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c">// use CreateProcess ...</span>
+    <span class="k">return</span>
+  <span class="p">}</span>
+
+  <span class="k">version</span> <span class="p">(</span><span class="o">!</span><span class="nv">windows</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c">// use something more unix-y</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre>
+
+<p>Version blocks support complex binary expressions, like <code>&amp;&amp;</code>, <code>||</code>, <code>!</code>, and
+any depth of parenthesis nesting. For example:</p>
+
+<pre><code class="language-ooc"><span class="k">version</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="nv">osx</span> <span class="o">||</span> <span class="nv">linux</span><span class="p">))</span> <span class="p">{</span>
+  <span class="c">// not on osx, nor on linux</span>
+<span class="p">}</span></code></pre>
+
+<p>Available version blocks and their corresponding C defines are as follow:</p>
+
+<table class="pretty"><tbody>
+<tr>
+<td>Identifier</td>
+<td>Description</td>
+</tr>
+<tr>
+<td>windows</td>
+<td>Windows OS, both 32 and 64-bit</td>
+</tr>
+<tr>
+<td>linux</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>solaris</td>
+<td>Solaris</td>
+</tr>
+<tr>
+<td>unix</td>
+<td>Unices (Apple products do not define this)</td>
+</tr>
+<tr>
+<td>beos</td>
+<td>BeOS</td>
+</tr>
+<tr>
+<td>haiku</td>
+<td>Haiku (BeOS-like)</td>
+</tr>
+<tr>
+<td>apple</td>
+<td>All things apple: iOS, OSX</td>
+</tr>
+<tr>
+<td><em>ios</em></td>
+<td>iOS: iPhone, iPad</td>
+</tr>
+<tr>
+<td><em>ios_simulator</em></td>
+<td>iOS compiled for the ios simulator</td>
+</tr>
+<tr>
+<td><em>osx</em></td>
+<td>Mac OSX (consider using <tt>apple</tt> instead)</td>
+</tr>
+<tr>
+<td>freebsd</td>
+<td>FreeBSD</td>
+</tr>
+<tr>
+<td>openbsd</td>
+<td>OpenBSD</td>
+</tr>
+<tr>
+<td>netbsd</td>
+<td>NetBSD</td>
+</tr>
+<tr>
+<td>dragonfly</td>
+<td>DragonFly BSD</td>
+</tr>
+<tr>
+<td>cygwin</td>
+<td>Cygwin toolchain</td>
+</tr>
+<tr>
+<td>mingw</td>
+<td>MinGW 32 or 64-bit toolchain</td>
+</tr>
+<tr>
+<td>mingw64</td>
+<td>MinGW 64-bit toolchain</td>
+</tr>
+<tr>
+<td>gnuc</td>
+<td>GCC (GNU C)</td>
+</tr>
+<tr>
+<td>msvc</td>
+<td>Microsoft Visual C++</td>
+</tr>
+<tr>
+<td>android</td>
+<td>Android toolchain</td>
+</tr>
+<tr>
+<td>arm</td>
+<td>ARM processor architecture</td>
+</tr>
+<tr>
+<td>i386</td>
+<td>Intel x86 architecture (defined by GNU C)</td>
+</tr>
+<tr>
+<td>x86</td>
+<td>Intel x86 architecture (defined by MinGW)</td>
+</tr>
+<tr>
+<td>x86_64</td>
+<td>AMD64 architecture</td>
+</tr>
+<tr>
+<td>ppc</td>
+<td>PPC architecture</td>
+</tr>
+<tr>
+<td>ppc64</td>
+<td>PPC 64-bit architecture</td>
+</tr>
+<tr>
+<td>64</td>
+<td>64-bit processor architecture and toolchain</td>
+</tr>
+<tr>
+<td>gc</td>
+<td>Garbage Collector activated on compilation</td>
+</tr>
+</tbody></table><p>The specs in <em>italics</em> are “complex” specs - they can’t be in a composed version
+expression, e.g. this is invalid:</p>
+
+<pre><code class="language-ooc"><span class="k">version</span> <span class="p">(</span><span class="m-Decimal">64</span> <span class="o">&amp;&amp;</span> <span class="nv">osx</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c">// code here</span>
+<span class="p">}</span></code></pre>
+
+<p>Consider doing this instead:</p>
+
+<pre><code class="language-ooc"><span class="k">version</span> <span class="p">(</span><span class="m-Decimal">64</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">version</span> <span class="p">(</span><span class="nv">osx</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c">// code here</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
+
+<p>The reason for this is that <code>osx</code>, <code>ios</code>, and <code>ios_simulator</code> are not simple <code>#ifdef</code>s
+in the generated code, but they require an include and an equality test.</p>
+
+<h2 id="line-continuations">Line continuations</h2>
+
+<p>Any line can be broken down on several lines, by using the backslash character, <code>\</code>,
+as a line continuation:</p>
+
+<pre><code class="language-ooc"><span class="nv">someList</span> \
+<span class="nf">map</span><span class="p">(</span><span class="o">|</span><span class="nv">el</span><span class="o">|</span> <span class="nc">Something</span> <span class="k">new</span><span class="p">(</span><span class="nv">el</span><span class="p">))</span></code></pre>
+
+<p>If it wasn’t for that <code>\</code> before the end of the line, <code>map</code> would be interpreted as
+a separate function call, and not a method call.</p>
+
+<h2 id="constants">Constants</h2>
+
+<p>Some constants are accessible anywhere and will be replaced at compile time with
+strings. Those are:</p>
+
+<ul>
+<li><code>__BUILD_DATETIME__</code></li>
+  <li><code>__BUILD_TARGET__</code></li>
+  <li><code>__BUILD_ROCK_VERSION__</code></li>
+  <li><code>__BUILD_ROCK_CODENAME__</code></li>
+  <li><code>__BUILD_HOSTNAME__</code></li>
+</ul><h2 id="call-chaining">Call chaining</h2>
+
+<p>While not technically a preprocessor feature, the following code:</p>
+
+<pre><code class="language-ooc"><span class="nv">a</span> <span class="o">:=</span> <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="nc">Int</span><span class="o">&gt;</span> <span class="k">new</span><span class="p">()</span><span class="o">.</span> <span class="nf">add</span><span class="p">(</span><span class="m-Decimal">1</span><span class="p">)</span><span class="o">.</span> <span class="nf">add</span><span class="p">(</span><span class="m-Decimal">2</span><span class="p">)</span><span class="o">.</span> <span class="nf">add</span><span class="p">(</span><span class="m-Decimal">3</span><span class="p">)</span></code></pre>
+
+<p>Is equivalent to:</p>
+
+<pre><code class="language-ooc"><span class="nv">a</span> <span class="o">:=</span> <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="nc">Int</span><span class="o">&gt;</span> <span class="k">new</span><span class="p">()</span>
+<span class="nv">a</span> <span class="nf">add</span><span class="p">(</span><span class="m-Decimal">1</span><span class="p">)</span><span class="o">.</span> <span class="nf">add</span><span class="p">(</span><span class="m-Decimal">2</span><span class="p">)</span><span class="o">.</span> <span class="nf">add</span><span class="p">(</span><span class="m-Decimal">3</span><span class="p">)</span></code></pre>
+
+<p>Itself equivalent to:</p>
+
+<pre><code class="language-ooc"><span class="nv">a</span> <span class="o">:=</span> <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="nc">Int</span><span class="o">&gt;</span> <span class="k">new</span><span class="p">()</span>
+<span class="nv">a</span> <span class="nf">add</span><span class="p">(</span><span class="m-Decimal">1</span><span class="p">)</span>
+<span class="nv">a</span> <span class="nf">add</span><span class="p">(</span><span class="m-Decimal">2</span><span class="p">)</span>
+<span class="nv">a</span> <span class="nf">add</span><span class="p">(</span><span class="m-Decimal">3</span><span class="p">)</span></code></pre>
+
+<h2 id="slurping">Slurping</h2>
+
+<p>The compiler can read a text file at compile time, and insert it
+as a string literal in the code.</p>
+
+<pre><code class="language-ooc"><span class="c">// assuming 'secret-assets' is a directory we don't ship</span>
+<span class="nv">secrets</span> <span class="o">:=</span> <span class="nf">slurp</span><span class="p">(</span><span class="s2">"../secret-assets/secrets.txt"</span><span class="p">)</span>
+
+<span class="nv">secrets</span> <span class="nf">split</span><span class="p">(</span><span class="s2">"\n"</span><span class="p">)</span> <span class="nf">each</span><span class="p">(</span><span class="o">|</span><span class="nv">secret</span><span class="o">|</span>
+  <span class="nv">secret</span> <span class="nf">println</span><span class="p">()</span>
+<span class="p">)</span></code></pre>
+
+<p><code>slurp</code> only takes a single argument, and it <em>must</em> be a string
+literal (so you can’t compute paths, as that would requiring interpreting
+ooc code at compile time, effectively requiring macros).</p>
+
+<p>It is not guaranteed to work with non-text files as it is transformed
+into an (escaped) string literal.</p>
+
+<p>The path passed to <code>slurp</code> should be relative to the <code>SourcePath</code> of the
+.use file to which the source file using <code>slurp</code> corresponds. It is
+<em>not</em> relative to the source file itself.</p>
+
+<p>Example directory structure for the example above:</p>
+
+<pre><code>.
+├── secret-assets
+│   └── secrets.txt
+├── source
+│   └── foobar
+│       └── package
+│           └── something.ooc
+└── foobar.use
+</code></pre>
+
+<p>In this example, foobar.use contains <code>SourcePath: source</code>, as is usual
+with ooc libraries.</p>
+
+<p><code>slurp</code> is used for example in dye, to <a href="https://github.com/fasterthanlime/dye/blob/master/source/dye/shader.ooc">ship shader files in the executable</a>.
+Note that dye uses that as a fallback, only if it fails to read shader files
+from disk, which allows customization without recompiling.</p>
+    </div>
+  </article>
+</div>
+<footer>
+  <div class="footer-content">
+  <nav><section class="about"><h3>About</h3>
+    <ul>
+        <li><a href="/about/#history">History</a></li>
+        <li><a href="/about/#why-use-ooc">Why use ooc?</a></li>
+        <li><a href="/about/#similar-projects">Alternatives</a></li>
+    </ul></section><section class="install"><h3>Install</h3>
+    <ul>
+        <li><a href="/install/#quick-install">Quick install</a></li>
+        <li><a href="/install/#installing-from-git">Installing from Git</a></li>
+        <li><a href="/install/#post-install-instructions">Post-install instructions</a></li>
+        <li><a href="/install/#installing-sam">Installing sam</a></li>
+    </ul></section><section class="documentation"><h3>Documentation</h3>
+    <ul>
+        <li><a href="/docs/tutorial/">Tutorial</a></li>
+        <li><a href="/docs/lang/">Language</a></li>
+        <li><a href="/docs/sdk/">SDK</a></li>
+        <li><a href="/docs/tools/">Tools</a></li>
+        <li><a href="/docs/tools/rock/">Implementation</a></li>
+        <li><a href="/docs/kaputt/">Troubleshooting</a></li>
+        <li><a href="/docs/glossary/">Glossary</a></li>
+    </ul></section><section class="community"><h3>Community</h3>
+    <ul>
+        <li><a href="http://groups.google.com/group/ooc-lang">Discussion group</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/issues">Issue tracker</a></li>
+        <li><a href="irc://chat.freenode.net/#ooc-lang">IRC channel</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/wiki">Wiki</a></li>
+        <li><a href="/development/">Development</a></li>
+        <li><a href="http://pledgie.com/campaigns/21363">Donate</a></li>
+    </ul></section></nav>
+    <div class="fine-print">
+      <p>
+        ooc &copy; 2009-2015 <a href="http://amos.me/">Amos Wenger</a>. The content of this website is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0 License</a>.
+        rock is licensed under the MIT license. Design based on the <a href="http://nanoc.ws/">nanoc web site</a> by <a href="http://stoneship.org/">Denis Defreyne</a> and used with permission.
+        <a href="http://entypo.com/">Entypo</a>By Daniel Bruce.
+      </p>
+    </div>
+  </div>
+</footer>
+
+  </body>
+</html>

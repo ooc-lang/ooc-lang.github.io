@@ -1,0 +1,463 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ooc &raquo; Values</title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="stylesheet" href="/assets/pygments.css">
+    <link href="http://fonts.googleapis.com/css?family=Radley:regular&text=OC" rel="stylesheet" type="text/css" >
+    <link href="http://fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,400,400italic,700,700italic,900,900italic" rel="stylesheet" type="text/css" >
+
+    <!-- Cool stats stuff for nanoc :) -->
+    <meta name="generator" content="nanoc 3.6.5"> 
+  </head>
+  <body>
+
+<header>
+  <div class="header-content">
+    <nav class="main">
+      <ol>
+        <li class="home"><a href="/"><img src="/assets/images/logo-nav.png" alt="Home"></a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/install/">Install</a></li>
+        <li><a href="/docs/">Documentation</a></li>
+        <li><a href="/community/">Community</a></li>
+        <li><a href="/development/">Development</a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+<div class="intro">
+  <div class="intro-content">
+    <h1>Values</h1>
+  </div>
+</div>
+<div class="article">
+  <article>
+    <nav class="side">
+  <div class="side-title">
+    Values
+  </div>
+
+  <div class="side-content">
+    
+      <p>↑ <a href="/docs/lang/">Back to Language</a></p>
+    
+
+    <ol class="toc"><li><a href="#values">Values</a></li><li><a href="#numbers">Numbers</a></li><ol><li><a href="#integer-types">Integer types</a></li><li><a href="#floating-point-types">Floating point types</a></li><li><a href="#integer-ranges">Integer Ranges</a></li></ol><li><a href="#text">Text</a></li><ol><li><a href="#characters">Characters</a></li><li><a href="#strings">Strings</a></li><li><a href="#string-interpolation">String interpolation</a></li><li><a href="#raw-strings">Raw strings</a></li></ol><li><a href="#variables">Variables</a></li><li><a href="#functions">Functions</a></li><li><a href="#pointers">Pointers</a></li><li><a href="#references">References</a></li><li><a href="#covers-vs-classes">Covers vs Classes</a></li><li><a href="#enums">Enums</a></li></ol>
+  </div>
+</nav>
+
+    <div class="article-content">
+      <h2 id="values">Values</h2>
+
+<p>Values are just a fancy term for data - in fact, most of what programs
+do is to manipulate data, to compute numbers from other numbers, to process
+strings, etc.</p>
+
+<p>The type of nothing is <code>Void</code>, based on C’s <code>void</code> type.</p>
+
+<h2 id="numbers">Numbers</h2>
+
+<p>There are two classes of numbers built into the language. Integers, like <code>3</code>,
+<code>-45</code> or <code>124_500</code>, and reals, like <code>3.14</code> or <code>-0.124_325_963</code>. Underscores
+in number literals are ignored, thus they are purely cosmetic, allowing numbers
+to be expressed in code in a more human-friendly way.</p>
+
+<h3 id="integer-types">Integer types</h3>
+
+<p>There are fixed-length integer types, like:</p>
+
+<table class="pretty"><tbody>
+<tr>
+<td>ooc types</td>
+<td>Width</td>
+</tr>
+<tr>
+<td>Int8, UInt8</td>
+<td>8</td>
+</tr>
+<tr>
+<td>Int16, UInt16</td>
+<td>16</td>
+</tr>
+<tr>
+<td>Int32, UInt32</td>
+<td>32</td>
+</tr>
+<tr>
+<td>Int64, UInt64</td>
+<td>64</td>
+</tr>
+</tbody></table><p>And others, mapped on C types:</p>
+
+<table class="pretty"><tbody>
+<tr>
+<td>ooc types</td>
+<td>C types</td>
+<td>Width</td>
+</tr>
+<tr>
+<td>Char, UChar</td>
+<td>signed char, unsigned char</td>
+<td>8</td>
+</tr>
+<tr>
+<td>Short, UShort</td>
+<td>signed short, unsigned short</td>
+<td>at least 16</td>
+</tr>
+<tr>
+<td>Int, UInt</td>
+<td>signed int, unsigned int</td>
+<td>at least 16</td>
+</tr>
+<tr>
+<td>Long, ULong</td>
+<td>signed long, unsigned long</td>
+<td>at least 32</td>
+</tr>
+<tr>
+<td>LLong, ULLong</td>
+<td>signed long long, unsigned long long</td>
+<td>at least 32</td>
+</tr>
+</tbody></table><p>There are several type of integer literals. Decimal literals are the most
+common, but octal, hexadecimal, and binary literals exist as well, for
+example:</p>
+
+<pre><code class="language-ooc"><span class="m-Decimal">75</span> <span class="c">// decimal</span>
+<span class="mo">0c113</span> <span class="c">// octal</span>
+<span class="mh">0x4b</span> <span class="c">// hexadecimal</span>
+<span class="m-Binary">0b1001011</span> <span class="c">// binary</span></code></pre>
+
+<h3 id="floating-point-types">Floating point types</h3>
+
+<p>Similarly, real number types are based on C types:</p>
+
+<table class="pretty"><tbody>
+<tr>
+<td>ooc types</td>
+<td>C types</td>
+<td>Width</td>
+</tr>
+<tr>
+<td>Float</td>
+<td>float</td>
+<td>32</td>
+</tr>
+<tr>
+<td>Double</td>
+<td>double</td>
+<td>64</td>
+</tr>
+<tr>
+<td>Double</td>
+<td>double</td>
+<td>64</td>
+</tr>
+<tr>
+<td>LDouble</td>
+<td>long double</td>
+<td>64, 80, 96</td>
+</tr>
+</tbody></table><h3 id="integer-ranges">Integer Ranges</h3>
+
+<p>Any two values of integer type separated by two dots is a range. For example,
+this prints “Hello” ten times:</p>
+
+<pre><code class="language-ooc"><span class="k">for</span> <span class="p">(</span><span class="nv">i</span> <span class="k">in</span> <span class="m-Decimal">0</span><span class="o">..</span><span class="m-Decimal">10</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c">// i takes values from 0 to 9</span>
+    <span class="s2">"Hello"</span> <span class="nf">println</span><span class="p">()</span>
+<span class="p">}</span></code></pre>
+
+<h2 id="text">Text</h2>
+
+<h3 id="characters">Characters</h3>
+
+<p>A character in ooc is akin to a byte, it’s not a Unicode character. A character literal
+is enclosed in single quotes, and supports the following escape codes:</p>
+
+<pre><code class="language-ooc"><span class="sc">'a'</span> <span class="c">// regular character</span>
+<span class="sc">'\\'</span> <span class="c">// literal backslash</span>
+<span class="sc">'\''</span> <span class="c">// single quote</span>
+<span class="sc">'\n'</span> <span class="c">// new line</span>
+<span class="sc">'\r'</span> <span class="c">// carriage return</span>
+<span class="sc">'\b'</span> <span class="c">// backspace</span>
+<span class="sc">'\t'</span> <span class="c">// horizontal tab</span>
+<span class="sc">'\f'</span> <span class="c">// form feed</span>
+<span class="sc">'\a'</span> <span class="c">// alert (bell)</span>
+<span class="sc">'\v'</span> <span class="c">// vertical tab</span>
+<span class="err">'\</span><span class="nv">nnn</span><span class="err">'</span> <span class="c">// character with octal value nnn</span>
+<span class="err">'\</span><span class="nv">xhh</span><span class="err">'</span> <span class="c">// character with hexadecimal value hh</span></code></pre>
+
+<p>Multi-character literals are syntax errors, e.g. <code>'abcd'</code> is invalid.</p>
+
+<p>The ooc type <code>Char</code> is based on the C type <code>char</code>.</p>
+
+<h3 id="strings">Strings</h3>
+
+<p>There are two types of strings in ooc. <code>CString</code> is a cover from <code>Char*</code> and
+is a vanilla C string, null-terminated. <code>String</code> is a class that contains a
+length and may be implemented however the implementor chooses.</p>
+
+<p>A string literal is enclosed in double quotes, gives an ooc <code>String</code>, and supports
+the following escape codes:</p>
+
+<pre><code class="language-ooc"><span class="s2">"a"</span> <span class="c">// regular character</span>
+<span class="s2">"\\"</span> <span class="c">// literal backslash</span>
+<span class="s2">"\""</span> <span class="c">// double quote</span>
+<span class="s2">"\n"</span> <span class="c">// new line</span>
+<span class="s2">"\r"</span> <span class="c">// carriage return</span>
+<span class="s2">"\b"</span> <span class="c">// backspace</span>
+<span class="s2">"\t"</span> <span class="c">// horizontal tab</span>
+<span class="s2">"\f"</span> <span class="c">// form feed</span>
+<span class="s2">"\a"</span> <span class="c">// alert (bell)</span>
+<span class="s2">"\v"</span> <span class="c">// vertical tab</span>
+<span class="s2">"\nnn"</span> <span class="c">// character with octal value nnn</span>
+<span class="s2">"\xhh"</span> <span class="c">// character with hexadecimal value hh</span></code></pre>
+
+<h3 id="string-interpolation">String interpolation</h3>
+
+<p>ooc’s string interpolation syntax is inspired by Ruby’s:</p>
+
+<pre><code class="language-ooc"><span class="s2">"Hello, my name is #{name} and I am #{age} years old."</span> <span class="nf">println</span><span class="p">()</span></code></pre>
+
+<p>Numeric and stringy types are handled correctly by interpolated strings. For
+all other types, a <code>toString()</code> call is added. Object types that do not have
+a <code>toString()</code> method, when used in an interpolated string, will trigger a
+compile error.</p>
+
+<h3 id="raw-strings">Raw strings</h3>
+
+<p>A raw string literal is enclosed in double quotes and preceded by <code>c</code> without spaces,
+for example this will be of type <code>CString</code>, not <code>String</code>:</p>
+
+<pre><code class="language-ooc"><span class="nf">puts</span><span class="p">(</span><span class="nv">c</span><span class="s2">"Some like em raw."</span><span class="p">)</span></code></pre>
+
+<p>Raw strings can be used to avoid extra allocations. One would hope that one day compilers
+would be smart enough to avoid that on their own, but in the meantime, one could roll
+their own implementations using only raw strings.</p>
+
+<h2 id="variables">Variables</h2>
+
+<p>A value can also be simply a variable declaration or a variable access, for example:</p>
+
+<pre><code class="language-ooc"><span class="nv">a</span> <span class="o">:=</span> <span class="s2">"Hello"</span> <span class="c">// this evaluates to "Hello"</span>
+<span class="nv">a</span> <span class="c">// so does this</span></code></pre>
+
+<p>The <code>:=</code> operator is the declare-assign operator. It creates a new variable slot, infers
+its type from the right-hand-side value, and assigns the value to the variable. The same
+code can be rewritten like so:</p>
+
+<pre><code class="language-ooc"><span class="nv">a</span><span class="p">:</span> <span class="nc">String</span> <span class="o">=</span> <span class="s2">"Hello"</span> <span class="c">// this evaluates to "Hello"</span>
+<span class="nv">a</span> <span class="c">// this too</span></code></pre>
+
+<p>Or, in even longer form:</p>
+
+<pre><code class="language-ooc"><span class="nv">a</span><span class="p">:</span> <span class="nc">String</span>
+<span class="nv">a</span> <span class="o">=</span> <span class="s2">"Hello"</span> <span class="c">// this evaluates to "Hello"</span>
+<span class="nv">a</span> <span class="c">// this too</span></code></pre>
+
+<p>The same applies inside a class declaration:</p>
+
+<pre><code class="language-ooc"><span class="nc">Dog</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+  <span class="nv">age</span> <span class="o">:=</span> <span class="m-Decimal">23</span>
+
+  <span class="nv">init</span><span class="p">:</span> <span class="k">func</span> <span class="p">{</span>
+    <span class="nv">age</span> <span class="c">// this evalutes to 23</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nv">dog</span> <span class="o">:=</span> <span class="nc">Dog</span> <span class="k">new</span><span class="p">()</span>
+<span class="nv">dog</span> <span class="nv">age</span> <span class="c">// this evalutes to 23 as well</span></code></pre>
+
+<h2 id="functions">Functions</h2>
+
+<p>Functions are values as well. For example:</p>
+
+<pre><code class="language-ooc"><span class="nc">Dog</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+  <span class="nv">bark</span><span class="p">:</span> <span class="k">func</span> <span class="p">{</span> <span class="s2">"Woof!"</span> <span class="nf">println</span><span class="p">()</span> <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nc">Dog</span> <span class="nv">bark</span> <span class="c">// this is a value</span>
+<span class="nv">a</span> <span class="o">:=</span> <span class="k">func</span> <span class="p">{</span> <span class="s2">"Waf"</span> <span class="nf">println</span><span class="p">()</span> <span class="p">}</span> <span class="c">// this is a value as well</span>
+<span class="nv">a</span> <span class="c">// and so is this</span></code></pre>
+
+<p>Functions are of type <code>Func</code>. Its syntax resembles a function definition.
+For example, <code>Func (Int, Int) -&gt; Int</code> is the type of a function that takes
+two integers and returns an integer. Both the argument list and the return
+type are optional.</p>
+
+<h2 id="pointers">Pointers</h2>
+
+<p>Pointers are references to a region of memory. For example,</p>
+
+<pre><code class="language-ooc"><span class="nc">Dog</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+  <span class="nv">age</span> <span class="o">:=</span> <span class="m-Decimal">23</span>
+<span class="p">}</span>
+
+<span class="nv">dog</span> <span class="o">:=</span> <span class="nc">Dog</span> <span class="k">new</span><span class="p">()</span>
+<span class="nv">age</span> <span class="o">:=</span> <span class="nv">dog</span> <span class="nv">age</span>
+<span class="nv">age</span> <span class="o">=</span> <span class="m-Decimal">23</span> <span class="c">// `dog age` is still 23</span>
+
+<span class="nv">agePtr</span> <span class="o">:=</span> <span class="nv">dog</span> <span class="nv">age</span><span class="o">&amp;</span>
+<span class="nv">agePtr</span><span class="p">@</span> <span class="o">=</span> <span class="m-Decimal">42</span> <span class="c">// `dog age` is now 42</span></code></pre>
+
+<p>Post-fixing with <code>&amp;</code> takes the address of something. Post-fixing
+with <code>@</code> returns the value a pointer points to.</p>
+
+<p>The type of a pointer is <code>Type*</code> where Type is the underlying type, for
+example, <code>Int*</code> is a pointer to an Int. To accept or return any kind of
+pointer, the catch-all <code>Pointer</code> type can be used.</p>
+
+<h2 id="references">References</h2>
+
+<p>References are a variant of pointers especially useful in functions.</p>
+
+<p>Here’s a <code>mul2</code> function with pointers:</p>
+
+<pre><code class="language-ooc"><span class="nv">mul2</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">var</span><span class="p">:</span> <span class="nc">Int*</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nv">var</span><span class="p">@</span> <span class="o">*=</span> <span class="m-Decimal">2</span>
+<span class="p">}</span>
+
+<span class="nv">a</span> <span class="o">:=</span> <span class="m-Decimal">12</span>
+<span class="nf">mul2</span><span class="p">(</span><span class="nv">a</span><span class="o">&amp;</span><span class="p">)</span>
+<span class="nv">a</span> <span class="c">// now evalutes to 24</span></code></pre>
+
+<p>And here’s the same with references:</p>
+
+<pre><code class="language-ooc"><span class="nv">mul2</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">var</span><span class="p">:</span> <span class="nc">Int@</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nv">var</span> <span class="o">*=</span> <span class="m-Decimal">2</span>
+<span class="p">}</span>
+
+<span class="nv">a</span> <span class="o">:=</span> <span class="m-Decimal">12</span>
+<span class="nf">mul2</span><span class="p">(</span><span class="nv">a</span><span class="o">&amp;</span><span class="p">)</span>
+<span class="nv">a</span> <span class="c">// now evalutes to 24</span></code></pre>
+
+<p>Notice that the function still neds to be called with a pointer, in this
+case <code>a&amp;</code>. This is so that the caller is aware that the variable being
+passed might be modified by the function.</p>
+
+<p>However, inside the body of a function using a by-reference parameter, there
+is no need to dereference it (postfix it <code>@</code>) every time it is being accessed
+or assigned.</p>
+
+<h2 id="covers-vs-classes">Covers vs Classes</h2>
+
+<p>Objects are references, like in Java. For example, the following:</p>
+
+<pre><code class="language-ooc"><span class="nc">Container</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+  <span class="nv">value</span> <span class="o">:=</span> <span class="m-Decimal">19</span>
+<span class="p">}</span>
+
+<span class="nv">modify</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">c</span><span class="p">:</span> <span class="nc">Container</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nv">c</span> <span class="nv">value</span> <span class="o">=</span> <span class="m-Decimal">23</span>
+<span class="p">}</span>
+
+<span class="nv">c</span> <span class="o">:=</span> <span class="nc">Container</span> <span class="k">new</span><span class="p">()</span>
+<span class="nf">modify</span><span class="p">(</span><span class="nv">c</span><span class="p">)</span>
+<span class="nv">c</span> <span class="nv">value</span> <span class="c">// now evalutes to 23</span></code></pre>
+
+<p>However, covers are passed by value, see:</p>
+
+<pre><code class="language-ooc"><span class="nc">Container</span><span class="p">:</span> <span class="nv">cover</span> <span class="p">{</span>
+  <span class="nv">value</span><span class="p">:</span> <span class="nc">Int</span>
+<span class="p">}</span>
+
+<span class="nv">modify</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">c</span><span class="p">:</span> <span class="nc">Container</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c">// woops, we're modifying a copy of the original</span>
+  <span class="nv">c</span> <span class="nv">value</span> <span class="o">=</span> <span class="m-Decimal">23</span>
+<span class="p">}</span>
+
+<span class="nv">c</span><span class="p">:</span> <span class="nc">Container</span>
+<span class="nv">c</span> <span class="nv">value</span> <span class="o">=</span> <span class="m-Decimal">19</span>
+<span class="nf">modify</span><span class="p">(</span><span class="nv">c</span><span class="p">)</span>
+<span class="nv">c</span> <span class="nv">value</span> <span class="c">// still evalutes to 19</span></code></pre>
+
+<p>The same applies inside methods of covers - by default,
+they apply to a copy of the cover. To be able to modify
+the content of a cover, use <code>func@</code> instead.</p>
+
+<pre><code class="language-ooc"><span class="nc">Container</span><span class="p">:</span> <span class="nv">cover</span> <span class="p">{</span>
+  <span class="nv">value</span><span class="p">:</span> <span class="nc">Int</span>
+  <span class="nv">setValue</span><span class="p">:</span> <span class="k">func</span><span class="p">@</span> <span class="p">(</span><span class="o">.</span><span class="nf">value</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c">// since we're using `func@`, `this` is a reference</span>
+    <span class="k">this</span> <span class="nv">value</span> <span class="o">=</span> <span class="nv">value</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre>
+
+<p>Hence, any cover constructor should be defined with <code>func@</code>,
+like so:</p>
+
+<pre><code class="language-ooc"><span class="nc">Container</span><span class="p">:</span> <span class="nv">cover</span> <span class="p">{</span>
+  <span class="nv">value</span><span class="p">:</span> <span class="nc">Int</span>
+  <span class="nv">init</span><span class="p">:</span> <span class="k">func</span><span class="p">@</span> <span class="p">(</span><span class="o">=</span><span class="nv">value</span><span class="p">)</span>
+<span class="p">}</span></code></pre>
+
+<h2 id="enums">Enums</h2>
+
+<p>By default, enums are backed by <code>Int</code>s. However, that’s transparent.
+A value from an enum will be of the type of the enum. See:</p>
+
+<pre><code class="language-ooc"><span class="c">// defining a new type named 'State'</span>
+<span class="nc">State</span><span class="p">:</span> <span class="nv">enum</span> <span class="p">{</span>
+  <span class="c">// .. with two possible values</span>
+  <span class="no">AWAKE</span>
+  <span class="no">ASLEEP</span>
+<span class="p">}</span>
+
+<span class="c">// currentState is of type 'State'</span>
+<span class="nv">currentState</span> <span class="o">:=</span> <span class="nc">State</span> <span class="no">AWAKE</span>
+
+<span class="c">// only accepts values of type 'State'</span>
+<span class="nv">isAsleep</span><span class="o">?</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">s</span><span class="p">:</span> <span class="nc">State</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nc">Bool</span> <span class="p">{</span>
+  <span class="p">(</span><span class="nv">s</span> <span class="o">==</span> <span class="nc">State</span> <span class="no">ASLEEP</span><span class="p">)</span>
+<span class="p">}</span></code></pre>
+    </div>
+  </article>
+</div>
+<footer>
+  <div class="footer-content">
+  <nav><section class="about"><h3>About</h3>
+    <ul>
+        <li><a href="/about/#history">History</a></li>
+        <li><a href="/about/#why-use-ooc">Why use ooc?</a></li>
+        <li><a href="/about/#similar-projects">Alternatives</a></li>
+    </ul></section><section class="install"><h3>Install</h3>
+    <ul>
+        <li><a href="/install/#quick-install">Quick install</a></li>
+        <li><a href="/install/#installing-from-git">Installing from Git</a></li>
+        <li><a href="/install/#post-install-instructions">Post-install instructions</a></li>
+        <li><a href="/install/#installing-sam">Installing sam</a></li>
+    </ul></section><section class="documentation"><h3>Documentation</h3>
+    <ul>
+        <li><a href="/docs/tutorial/">Tutorial</a></li>
+        <li><a href="/docs/lang/">Language</a></li>
+        <li><a href="/docs/sdk/">SDK</a></li>
+        <li><a href="/docs/tools/">Tools</a></li>
+        <li><a href="/docs/tools/rock/">Implementation</a></li>
+        <li><a href="/docs/kaputt/">Troubleshooting</a></li>
+        <li><a href="/docs/glossary/">Glossary</a></li>
+    </ul></section><section class="community"><h3>Community</h3>
+    <ul>
+        <li><a href="http://groups.google.com/group/ooc-lang">Discussion group</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/issues">Issue tracker</a></li>
+        <li><a href="irc://chat.freenode.net/#ooc-lang">IRC channel</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/wiki">Wiki</a></li>
+        <li><a href="/development/">Development</a></li>
+        <li><a href="http://pledgie.com/campaigns/21363">Donate</a></li>
+    </ul></section></nav>
+    <div class="fine-print">
+      <p>
+        ooc &copy; 2009-2015 <a href="http://amos.me/">Amos Wenger</a>. The content of this website is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0 License</a>.
+        rock is licensed under the MIT license. Design based on the <a href="http://nanoc.ws/">nanoc web site</a> by <a href="http://stoneship.org/">Denis Defreyne</a> and used with permission.
+        <a href="http://entypo.com/">Entypo</a>By Daniel Bruce.
+      </p>
+    </div>
+  </div>
+</footer>
+
+  </body>
+</html>

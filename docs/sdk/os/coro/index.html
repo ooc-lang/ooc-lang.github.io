@@ -1,0 +1,139 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ooc &raquo; Coro</title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="stylesheet" href="/assets/pygments.css">
+    <link href="http://fonts.googleapis.com/css?family=Radley:regular&text=OC" rel="stylesheet" type="text/css" >
+    <link href="http://fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,400,400italic,700,700italic,900,900italic" rel="stylesheet" type="text/css" >
+
+    <!-- Cool stats stuff for nanoc :) -->
+    <meta name="generator" content="nanoc 3.6.5"> 
+  </head>
+  <body>
+
+<header>
+  <div class="header-content">
+    <nav class="main">
+      <ol>
+        <li class="home"><a href="/"><img src="/assets/images/logo-nav.png" alt="Home"></a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/install/">Install</a></li>
+        <li><a href="/docs/">Documentation</a></li>
+        <li><a href="/community/">Community</a></li>
+        <li><a href="/development/">Development</a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+<div class="intro">
+  <div class="intro-content">
+    <h1>Coro</h1>
+  </div>
+</div>
+<div class="article">
+  <article>
+    <nav class="side">
+  <div class="side-title">
+    Coro
+  </div>
+
+  <div class="side-content">
+    
+      <p>↑ <a href="/docs/sdk/os/">Back to The os package</a></p>
+    
+
+    <ol class="toc"><li><a href="#the-oscoro-module">The os/Coro module</a></li><li><a href="#basic-usage">Basic usage</a></li></ol>
+  </div>
+</nav>
+
+    <div class="article-content">
+      <h2 id="the-oscoro-module">The os/Coro module</h2>
+
+<p>That module was originally an ooc port of Steve Dekorte’s <a href="https://github.com/stevedekorte/coroutine">libcoroutine</a>.</p>
+
+<p>Coroutines help achieve cooperative multi-tasking, as opposed to threads, which 
+achieve preemptive multitasking. In cooperative multi-tasking, each task (or
+‘coroutine’) is responsible for handing the control to another coroutine.</p>
+
+<h2 id="basic-usage">Basic usage</h2>
+
+<p>First, we have to create a main coroutine:</p>
+
+<pre><code class="language-ooc"><span class="k">import</span> <span class="nv">os</span><span class="o">/</span><span class="nc">Coro</span>
+
+<span class="nv">mainCoro</span> <span class="o">:=</span> <span class="nc">Coro</span> <span class="k">new</span><span class="p">()</span>
+<span class="nv">mainCoro</span> <span class="nv">initializeMainCoro</span></code></pre>
+
+<p>We can then create another coroutine, which we’ll here use as a generator</p>
+
+<pre><code class="language-ooc"><span class="nv">letter</span><span class="p">:</span> <span class="nc">Char</span>
+
+<span class="nv">coro1</span> <span class="o">:=</span> <span class="nc">Coro</span> <span class="k">new</span><span class="p">()</span>
+<span class="nv">mainCoro</span> <span class="nf">startCoro</span><span class="p">(</span><span class="nv">coro1</span><span class="p">,</span> <span class="o">||</span>
+    <span class="k">for</span> <span class="p">(</span><span class="nv">c</span> <span class="k">in</span> <span class="s2">"LLAMACORE"</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">letter</span> <span class="o">=</span> <span class="nv">c</span>
+        <span class="nv">coro1</span> <span class="nf">switchTo</span><span class="p">(</span><span class="nv">mainCoro</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="nf">exit</span><span class="p">(</span><span class="m-Decimal">0</span><span class="p">)</span>
+<span class="p">)</span></code></pre>
+
+<p>Then we can retrieve those letters one by one:</p>
+
+<pre><code class="language-ooc"><span class="k">while</span> <span class="p">(</span><span class="k">true</span><span class="p">)</span> <span class="p">{</span>
+    <span class="s2">"%c"</span> <span class="nf">printfln</span><span class="p">(</span><span class="nv">letter</span><span class="p">)</span>
+    <span class="nv">mainCoro</span> <span class="nf">switchTo</span><span class="p">(</span><span class="nv">coro1</span><span class="p">)</span>
+<span class="p">}</span></code></pre>
+
+<p>This example is quite simple, just printing each letter that
+<code>coro1</code> gives us on separate lines, but complex tasks can be
+broken down in various coroutines and be achieved in a much
+more lightweight fashion than threads or processes.</p>
+    </div>
+  </article>
+</div>
+<footer>
+  <div class="footer-content">
+  <nav><section class="about"><h3>About</h3>
+    <ul>
+        <li><a href="/about/#history">History</a></li>
+        <li><a href="/about/#why-use-ooc">Why use ooc?</a></li>
+        <li><a href="/about/#similar-projects">Alternatives</a></li>
+    </ul></section><section class="install"><h3>Install</h3>
+    <ul>
+        <li><a href="/install/#quick-install">Quick install</a></li>
+        <li><a href="/install/#installing-from-git">Installing from Git</a></li>
+        <li><a href="/install/#post-install-instructions">Post-install instructions</a></li>
+        <li><a href="/install/#installing-sam">Installing sam</a></li>
+    </ul></section><section class="documentation"><h3>Documentation</h3>
+    <ul>
+        <li><a href="/docs/tutorial/">Tutorial</a></li>
+        <li><a href="/docs/lang/">Language</a></li>
+        <li><a href="/docs/sdk/">SDK</a></li>
+        <li><a href="/docs/tools/">Tools</a></li>
+        <li><a href="/docs/tools/rock/">Implementation</a></li>
+        <li><a href="/docs/kaputt/">Troubleshooting</a></li>
+        <li><a href="/docs/glossary/">Glossary</a></li>
+    </ul></section><section class="community"><h3>Community</h3>
+    <ul>
+        <li><a href="http://groups.google.com/group/ooc-lang">Discussion group</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/issues">Issue tracker</a></li>
+        <li><a href="irc://chat.freenode.net/#ooc-lang">IRC channel</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/wiki">Wiki</a></li>
+        <li><a href="/development/">Development</a></li>
+        <li><a href="http://pledgie.com/campaigns/21363">Donate</a></li>
+    </ul></section></nav>
+    <div class="fine-print">
+      <p>
+        ooc &copy; 2009-2015 <a href="http://amos.me/">Amos Wenger</a>. The content of this website is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0 License</a>.
+        rock is licensed under the MIT license. Design based on the <a href="http://nanoc.ws/">nanoc web site</a> by <a href="http://stoneship.org/">Denis Defreyne</a> and used with permission.
+        <a href="http://entypo.com/">Entypo</a>By Daniel Bruce.
+      </p>
+    </div>
+  </div>
+</footer>
+
+  </body>
+</html>

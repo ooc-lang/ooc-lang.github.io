@@ -1,0 +1,209 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ooc &raquo; Testing</title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="stylesheet" href="/assets/pygments.css">
+    <link href="http://fonts.googleapis.com/css?family=Radley:regular&text=OC" rel="stylesheet" type="text/css" >
+    <link href="http://fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,400,400italic,700,700italic,900,900italic" rel="stylesheet" type="text/css" >
+
+    <!-- Cool stats stuff for nanoc :) -->
+    <meta name="generator" content="nanoc 3.6.5"> 
+  </head>
+  <body>
+
+<header>
+  <div class="header-content">
+    <nav class="main">
+      <ol>
+        <li class="home"><a href="/"><img src="/assets/images/logo-nav.png" alt="Home"></a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/install/">Install</a></li>
+        <li><a href="/docs/">Documentation</a></li>
+        <li><a href="/community/">Community</a></li>
+        <li><a href="/development/">Development</a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+<div class="intro">
+  <div class="intro-content">
+    <h1>Testing</h1>
+  </div>
+</div>
+<div class="article">
+  <article>
+    <nav class="side">
+  <div class="side-title">
+    Testing
+  </div>
+
+  <div class="side-content">
+    
+      <p>↑ <a href="/docs/tools/sam/">Back to sam</a></p>
+    
+
+    <ol class="toc"><li><a href="#concepts">Concepts</a></li><li><a href="#writing-tests">Writing tests</a></li><li><a href="#sam-assert">sam-assert</a></li><li><a href="#running-specific-tests">Running specific tests</a></li><li><a href="#debugging-sam">Debugging sam</a></li><li><a href="#passing-arguments-to-rock">Passing arguments to rock</a></li></ol>
+  </div>
+</nav>
+
+    <div class="article-content">
+      <h2 id="concepts">Concepts</h2>
+
+<p>Let me start off this section by admitting that testing in ooc is unfortunately
+more painful than in many other languages, and hasn’t been a big enough part of
+the culture. As rock development progresses, its test suite improves, but it’s
+still ways off of where I (amos) would like it to be.</p>
+
+<p>One of the reasons is that running a test involves a lot of steps. Parsing
+the whole sdk and the test. Resolving all those. Generating C code. Compiling
+it with a C compiler. And finally, running the executable. It’s not uncommon
+for an individual test to take around one second to run on a modern machine,
+and that’s obviously a hindrance.</p>
+
+<p>To alleviate that, sam will precompile the SDK when running several tests
+in sequence. This shaves a significant amount of time off the rock test
+suite for example.</p>
+
+<p>As for all its other features, sam makes some assumption about the structure
+of your project:</p>
+
+<pre><code>.
+├── source
+│   └── foobar
+│       └── foo.ooc
+├── test
+│   └── basic
+│       └── bar.ooc
+│       └── kux.ooc
+│   └── advanced
+│       └── barkux.ooc
+│       └── kuxbar.ooc
+└── foobar.use
+</code></pre>
+
+<p>When running:</p>
+
+<pre><code class="language-bash">sam <span class="nb">test</span></code></pre>
+
+<p>sam will look for a <a href="/tools/rock/usefiles/">.use file</a> in its usual way, then look for a <code>test</code> folder
+next to the .use file, and try to run all tests contained in it, by walking the
+file tree recursively.</p>
+
+<h2 id="writing-tests">Writing tests</h2>
+
+<p>Tests are simply ooc programs, that exit with code 0 on success, and code 1 on
+failure. The simplest passing test is an empty file, and the simplest failing
+test is:</p>
+
+<pre><code class="language-ooc"><span class="nf">exit</span><span class="p">(</span><span class="m-Decimal">1</span><span class="p">)</span></code></pre>
+
+<p>Or:</p>
+
+<pre><code class="language-ooc"><span class="nv">main</span><span class="p">:</span> <span class="k">func</span> <span class="o">-&gt;</span> <span class="nc">Int</span> <span class="p">{</span> <span class="m-Decimal">1</span> <span class="p">}</span></code></pre>
+
+<p>For tests that should fail to compile with a compile error from rock (there
+are many of those in rock’s test suite), the comment <code>//! shouldfail</code> is
+recognized by sam. It inverts the outcome of the test: if the test compiles
+successfully, it’ll count as a failure, and vice versa. <code>shouldfail</code> tests
+are never ran, even if they compile successfully.</p>
+
+<p><code>//! shouldcrash</code> is another special comment that lets sam know that the
+test should compile correctly, but return a non-zero exit code (for example,
+throw an ooc exception at runtime).</p>
+
+<h2 id="sam-assert">sam-assert</h2>
+
+<p>sam ships with a basic assertion library, that contains both <code>describe</code>
+(accepting a textual description of a particular test), and <code>expect</code>, that
+compares given values with expected values and fails with a message if they
+don’t match.</p>
+
+<p>A simple passing test with sam-assert looks like:</p>
+
+<pre><code class="language-ooc"><span class="nf">describe</span><span class="p">(</span><span class="s2">"42 should always equal 42"</span><span class="p">,</span> <span class="o">||</span>
+  <span class="nf">expect</span><span class="p">(</span><span class="m-Decimal">42</span><span class="p">,</span> <span class="m-Decimal">42</span><span class="p">)</span> 
+<span class="p">)</span></code></pre>
+
+<p>A failing test with sam-assert looks like:</p>
+
+<pre><code class="language-ooc"><span class="c">//! shouldfail</span>
+
+<span class="nf">describe</span><span class="p">(</span><span class="s2">"should always fail"</span><span class="p">,</span> <span class="o">||</span>
+  <span class="nf">expect</span><span class="p">(</span><span class="m-Decimal">1</span><span class="p">,</span> <span class="m-Decimal">0</span><span class="p">)</span> 
+<span class="p">)</span></code></pre>
+
+<h2 id="running-specific-tests">Running specific tests</h2>
+
+<p>sam accepts a <code>--test</code> argument to specify a particular test .ooc file:</p>
+
+<pre><code class="language-bash">sam <span class="nb">test</span> --test <span class="nb">test</span>/advanced/barkux.ooc</code></pre>
+
+<p>Or a folder, which it’ll walk recursively:</p>
+
+<pre><code class="language-bash">sam <span class="nb">test</span> --test <span class="nb">test</span>/advanced <span class="c"># runs both advanced/barkux and advanced/kuxbar</span></code></pre>
+
+<p>When running a single test, sam skips ooc precompilation, as it would be slower.</p>
+
+<h2 id="debugging-sam">Debugging sam</h2>
+
+<p>To find out exactly what commands sam are running, the <code>-v</code> (verbose) flag can
+be used.</p>
+
+<pre><code class="language-bash">sam <span class="nb">test</span> -v</code></pre>
+
+<h2 id="passing-arguments-to-rock">Passing arguments to rock</h2>
+
+<p>For all sam commands that run an instance of rock (check, test), the <code>--rockargs</code>
+flag can be used.</p>
+
+<pre><code class="language-bash"><span class="c"># let rock be very verbose and force usage of our own test lib</span>
+sam <span class="nb">test</span> --rockargs<span class="o">=</span>-vv,--use<span class="o">=</span>foobar-assert</code></pre>
+    </div>
+  </article>
+</div>
+<footer>
+  <div class="footer-content">
+  <nav><section class="about"><h3>About</h3>
+    <ul>
+        <li><a href="/about/#history">History</a></li>
+        <li><a href="/about/#why-use-ooc">Why use ooc?</a></li>
+        <li><a href="/about/#similar-projects">Alternatives</a></li>
+    </ul></section><section class="install"><h3>Install</h3>
+    <ul>
+        <li><a href="/install/#quick-install">Quick install</a></li>
+        <li><a href="/install/#installing-from-git">Installing from Git</a></li>
+        <li><a href="/install/#post-install-instructions">Post-install instructions</a></li>
+        <li><a href="/install/#installing-sam">Installing sam</a></li>
+    </ul></section><section class="documentation"><h3>Documentation</h3>
+    <ul>
+        <li><a href="/docs/tutorial/">Tutorial</a></li>
+        <li><a href="/docs/lang/">Language</a></li>
+        <li><a href="/docs/sdk/">SDK</a></li>
+        <li><a href="/docs/tools/">Tools</a></li>
+        <li><a href="/docs/tools/rock/">Implementation</a></li>
+        <li><a href="/docs/kaputt/">Troubleshooting</a></li>
+        <li><a href="/docs/glossary/">Glossary</a></li>
+    </ul></section><section class="community"><h3>Community</h3>
+    <ul>
+        <li><a href="http://groups.google.com/group/ooc-lang">Discussion group</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/issues">Issue tracker</a></li>
+        <li><a href="irc://chat.freenode.net/#ooc-lang">IRC channel</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/wiki">Wiki</a></li>
+        <li><a href="/development/">Development</a></li>
+        <li><a href="http://pledgie.com/campaigns/21363">Donate</a></li>
+    </ul></section></nav>
+    <div class="fine-print">
+      <p>
+        ooc &copy; 2009-2015 <a href="http://amos.me/">Amos Wenger</a>. The content of this website is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0 License</a>.
+        rock is licensed under the MIT license. Design based on the <a href="http://nanoc.ws/">nanoc web site</a> by <a href="http://stoneship.org/">Denis Defreyne</a> and used with permission.
+        <a href="http://entypo.com/">Entypo</a>By Daniel Bruce.
+      </p>
+    </div>
+  </div>
+</footer>
+
+  </body>
+</html>

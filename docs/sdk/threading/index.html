@@ -1,0 +1,354 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ooc &raquo; The threading package</title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="stylesheet" href="/assets/pygments.css">
+    <link href="http://fonts.googleapis.com/css?family=Radley:regular&text=OC" rel="stylesheet" type="text/css" >
+    <link href="http://fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,400,400italic,700,700italic,900,900italic" rel="stylesheet" type="text/css" >
+
+    <!-- Cool stats stuff for nanoc :) -->
+    <meta name="generator" content="nanoc 3.6.5"> 
+  </head>
+  <body>
+
+<header>
+  <div class="header-content">
+    <nav class="main">
+      <ol>
+        <li class="home"><a href="/"><img src="/assets/images/logo-nav.png" alt="Home"></a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/install/">Install</a></li>
+        <li><a href="/docs/">Documentation</a></li>
+        <li><a href="/community/">Community</a></li>
+        <li><a href="/development/">Development</a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+<div class="intro">
+  <div class="intro-content">
+    <h1>The threading package</h1>
+  </div>
+</div>
+<div class="article">
+  <article>
+    <nav class="side">
+  <div class="side-title">
+    The threading package
+  </div>
+
+  <div class="side-content">
+    
+      <p>↑ <a href="/docs/sdk/">Back to SDK</a></p>
+    
+
+    <ol class="toc"><li><a href="#the-threading-package">The threading package</a></li><li><a href="#thread">Thread</a></li><ol><li><a href="#creating-starting-and-waiting">Creating, starting, and waiting</a></li><li><a href="#check-if-a-thread-is-still-running">Check if a thread is still running</a></li><li><a href="#timed-wait">Timed wait</a></li><li><a href="#retrieve-the-current-thread">Retrieve the current thread</a></li><li><a href="#yielding-to-other-threads">Yielding to other threads</a></li></ol><li><a href="#threadlocal">ThreadLocal</a></li><li><a href="#mutex">Mutex</a></li><li><a href="#recursivemutex">RecursiveMutex</a></li></ol>
+  </div>
+</nav>
+
+    <div class="article-content">
+      <h2 id="the-threading-package">The threading package</h2>
+
+<p>As far as concurrency goes, threads are usually lighter than processes,
+but heavier than coroutines.</p>
+
+<p>Programming with threads is subjecting yourself to preemptive multithreading,
+which means any thread might give up control to another thread (e.g. be
+pre-empted) at any time.</p>
+
+<p>Threads also imply shared memory - a variable might be accessed by several
+threads concurrently at the same time. Either seemingly, on single processor
+machines, or actually in parallel, on multicore machines.</p>
+
+<p>For that reason, threads have a reputation to be tricky - one has to be
+careful what is accessed, from where, and when. To prevent the same data
+being accessed by multiple threads, one can use a mutex - but those also
+tend to open other cans of worms.</p>
+
+<h2 id="thread">Thread</h2>
+
+<p>The following section describes how to create threads, wait on them, and
+how to wait for them to finish, or just for a little while. You’ll also
+learn how to check if a thread is still alive, and how to retrieve the
+current thread.</p>
+
+<h3 id="creating-starting-and-waiting">Creating, starting, and waiting</h3>
+
+<p>Creating a thread is as simple as calling <code>Thread new</code> and passing a closure -
+the code that will get executed in the new thread.</p>
+
+<pre><code class="language-ooc"><span class="k">import</span> <span class="nv">threading</span><span class="o">/</span><span class="nc">Thread</span><span class="p">,</span> <span class="nv">os</span><span class="o">/</span><span class="nc">Time</span>
+
+<span class="nv">thread</span> <span class="o">:=</span> <span class="nc">Thread</span> <span class="k">new</span><span class="p">(</span><span class="o">||</span>
+  <span class="s2">"Doing some long work..."</span> <span class="nf">println</span><span class="p">()</span>
+  <span class="nc">Time</span> <span class="nf">sleepSec</span><span class="p">(</span><span class="m-Decimal">2</span><span class="p">)</span>
+  <span class="s2">"Done!"</span> <span class="nf">println</span><span class="p">()</span>
+<span class="p">)</span></code></pre>
+
+<p>Start the thread with <code>start()</code>:</p>
+
+<pre><code class="language-ooc"><span class="nv">thread</span> <span class="nf">start</span><span class="p">()</span></code></pre>
+
+<p>And wait for it to finish with <code>wait()</code> (which will block until the
+thread terminates):</p>
+
+<pre><code class="language-ooc"><span class="s2">"Waiting for thread to finish..."</span> <span class="nf">println</span><span class="p">()</span> 
+<span class="nv">thread</span> <span class="nf">wait</span><span class="p">()</span>
+<span class="s2">"All done!"</span> <span class="nf">println</span><span class="p">()</span></code></pre>
+
+<h3 id="check-if-a-thread-is-still-running">Check if a thread is still running</h3>
+
+<p>Instead of calling wait, one can poll for a thread’s existence with
+<code>alive?()</code></p>
+
+<pre><code class="language-ooc"><span class="s2">"Waiting for thread to finish..."</span> <span class="nf">println</span><span class="p">()</span>
+<span class="k">while</span> <span class="p">(</span><span class="nv">thread</span> <span class="nv">alive</span><span class="o">?</span><span class="p">())</span> <span class="p">{</span>
+  <span class="s2">"Waiting..."</span> <span class="nf">println</span><span class="p">()</span>
+  <span class="nc">Time</span> <span class="nf">sleepSec</span><span class="p">(</span><span class="m-Decimal">1</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="s2">"All done!"</span> <span class="nf">println</span><span class="p">()</span></code></pre>
+
+<h3 id="timed-wait">Timed wait</h3>
+
+<p>And instead of polling to see if a thread is still a live, one can
+wait for the thread to terminate for a certain maximum amount of time:</p>
+
+<pre><code class="language-ooc"><span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="nv">thread</span> <span class="nf">wait</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span> <span class="p">{</span>
+  <span class="s2">"Waiting..."</span> <span class="nf">println</span><span class="p">()</span>
+<span class="p">}</span></code></pre>
+
+<p>This is pretty much equivalent to the <code>alive?()</code> version, except more
+elegant.</p>
+
+<h3 id="retrieve-the-current-thread">Retrieve the current thread</h3>
+
+<p>The current thread can be retrieved with <code>Thread currentThread()</code>:</p>
+
+<pre><code class="language-ooc"><span class="nv">thread</span> <span class="o">:=</span> <span class="nc">Thread</span> <span class="nf">currentThread</span><span class="p">()</span>
+<span class="nf">match</span> <span class="p">(</span><span class="nv">thread</span> <span class="nv">alive</span><span class="o">?</span><span class="p">())</span> <span class="p">{</span>
+  <span class="k">case</span> <span class="k">true</span> <span class="o">=&gt;</span> <span class="s2">"Good!"</span>
+  <span class="k">case</span> <span class="o">=&gt;</span> <span class="s2">"Wait, what?"</span>
+<span class="p">}</span> <span class="nf">println</span><span class="p">()</span></code></pre>
+
+<h3 id="yielding-to-other-threads">Yielding to other threads</h3>
+
+<p>In some situations it might be useful to give a hint to the operating
+system’s scheduler, and let it know that the current thread is ready
+to be preempted right now - and that the next thread in line can become
+active now.</p>
+
+<p>Typically, the following code will usually print <code>ABCABC</code>:</p>
+
+<pre><code class="language-ooc"><span class="nv">create</span><span class="p">:</span> <span class="k">func</span> <span class="o">-&gt;</span> <span class="nc">Thread</span> <span class="p">{</span>
+  <span class="nc">Thread</span> <span class="k">new</span><span class="p">(</span><span class="o">||</span>
+    <span class="k">for</span> <span class="p">(</span><span class="nv">letter</span> <span class="k">in</span> <span class="s2">"ABC"</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nv">letter</span> <span class="nf">print</span><span class="p">()</span>
+    <span class="p">}</span>
+  <span class="p">)</span>
+<span class="p">}</span>
+
+<span class="p">(</span><span class="nv">t1</span><span class="p">,</span> <span class="nv">t2</span><span class="p">)</span> <span class="o">:=</span> <span class="p">(</span><span class="nf">create</span><span class="p">(),</span> <span class="nf">create</span><span class="p">())</span>
+<span class="nv">t1</span> <span class="nf">start</span><span class="p">();</span> <span class="nv">t2</span> <span class="nf">start</span><span class="p">()</span>
+<span class="nv">t1</span> <span class="nf">wait</span><span class="p">();</span> <span class="nv">t2</span> <span class="nf">wait</span><span class="p">()</span></code></pre>
+
+<p>Whereas adding <code>Thread yield</code> in the for loop, like this:</p>
+
+<pre><code class="language-ooc"><span class="nv">create</span><span class="p">:</span> <span class="k">func</span> <span class="o">-&gt;</span> <span class="nc">Thread</span> <span class="p">{</span>
+  <span class="nc">Thread</span> <span class="k">new</span><span class="p">(</span><span class="o">||</span>
+    <span class="k">for</span> <span class="p">(</span><span class="nv">letter</span> <span class="k">in</span> <span class="s2">"ABC"</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nv">letter</span> <span class="nf">print</span><span class="p">()</span>
+      <span class="nc">Thread</span> <span class="nf">yield</span><span class="p">()</span>
+    <span class="p">}</span>
+  <span class="p">)</span>
+<span class="p">}</span></code></pre>
+
+<p>Might produce something more along the lines of <code>AABBCC</code>. Then again,
+the problem with preemptive multitasking is that it is impossible to
+predict exactly what will happen, so seeing <code>AABCBC</code>, <code>ABABCC</code>, and even
+<code>ABCABC</code> happen are not out of the question either.</p>
+
+<h2 id="threadlocal">ThreadLocal</h2>
+
+<p>By default, global variables are shared among all threads. To make a global
+that is specific to each thread, use ThreadLocal:</p>
+
+<pre><code class="language-ooc"><span class="nv">val</span> <span class="o">:=</span> <span class="nc">ThreadLocal</span><span class="o">&lt;</span><span class="nc">Int</span><span class="o">&gt;</span> <span class="k">new</span><span class="p">(</span><span class="m-Decimal">42</span><span class="p">)</span>
+
+<span class="nv">threads</span> <span class="o">:=</span> <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="nc">Thread</span><span class="o">&gt;</span> <span class="k">new</span><span class="p">()</span>
+<span class="k">for</span> <span class="p">(</span><span class="nv">i</span> <span class="k">in</span> <span class="m-Decimal">1</span><span class="o">..</span><span class="m-Decimal">3</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">threads</span> <span class="nf">add</span><span class="p">(</span><span class="nc">Thread</span> <span class="k">new</span><span class="p">(</span><span class="o">||</span>
+        <span class="nv">val</span> <span class="nf">set</span><span class="p">(</span><span class="nv">i</span><span class="p">)</span> 
+    <span class="p">))</span>
+<span class="p">}</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="nv">t</span> <span class="k">in</span> <span class="nv">threads</span><span class="p">)</span> <span class="nv">t</span> <span class="nf">start</span><span class="p">()</span>
+<span class="k">for</span> <span class="p">(</span><span class="nv">t</span> <span class="k">in</span> <span class="nv">threads</span><span class="p">)</span> <span class="nv">t</span> <span class="nf">wait</span><span class="p">()</span>
+
+<span class="c">// prints val = 42</span>
+<span class="s2">"val = %d"</span> <span class="nf">printfln</span><span class="p">(</span><span class="nv">val</span> <span class="nf">get</span><span class="p">())</span></code></pre>
+
+<p>In this case, val is initialized from the main application thread, then set by
+three other OS threads, and yet the value is still 42 at the end of the program,
+in the main thread.</p>
+
+<p>Inside each of these threads, though, the value is still 1 and 2 respectively.</p>
+
+<h2 id="mutex">Mutex</h2>
+
+<p>A mutex allows to control access to resources that are shared between threads,
+to avoid two threads modifying the same resource, which could potentially result
+in invalid state.</p>
+
+<pre><code class="language-ooc"><span class="nv">counter</span> <span class="o">:=</span> <span class="m-Decimal">0</span>
+
+<span class="nv">threads</span> <span class="o">:=</span> <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="nc">Thread</span><span class="o">&gt;</span> <span class="k">new</span><span class="p">()</span>
+<span class="k">for</span> <span class="p">(</span><span class="nv">i</span> <span class="k">in</span> <span class="m-Decimal">0</span><span class="o">..</span><span class="m-Decimal">10</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">threads</span> <span class="nf">add</span><span class="p">(</span><span class="nc">Thread</span> <span class="k">new</span><span class="p">(</span><span class="o">||</span>
+        <span class="k">for</span> <span class="p">(</span><span class="nv">i</span> <span class="k">in</span> <span class="m-Decimal">0</span><span class="o">..</span><span class="m-Decimal">1000</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">counter</span> <span class="o">+=</span> <span class="m-Decimal">1</span>   
+            <span class="nc">Thread</span> <span class="nf">yield</span><span class="p">()</span>
+        <span class="p">}</span>
+    <span class="p">))</span>
+<span class="p">}</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="nv">t</span> <span class="k">in</span> <span class="nv">threads</span><span class="p">)</span> <span class="nv">t</span> <span class="nf">start</span><span class="p">()</span>
+<span class="k">for</span> <span class="p">(</span><span class="nv">t</span> <span class="k">in</span> <span class="nv">threads</span><span class="p">)</span> <span class="nv">t</span> <span class="nf">wait</span><span class="p">()</span>
+
+<span class="c">// prints counter = ???</span>
+<span class="s2">"counter = %d"</span> <span class="nf">printfln</span><span class="p">(</span><span class="nv">counter</span><span class="p">)</span></code></pre>
+
+<p>The code above has a problem - many threads may access the counter at the same time,
+hence the resulting counter value isn’t reliably 10000. In actual testing, it gave
+values such as 7064, 6111, 5986, etc.</p>
+
+<p>This happens because a thread might be reading the value of counter, then another
+thread runs and increments it, then the thread who read the value sets the counter
+to the value it reads plus one, resulting in “lost iterations”.</p>
+
+<p>To alleviate that problem, we can use a mutex:</p>
+
+<pre><code class="language-ooc"><span class="nv">counter</span> <span class="o">:=</span> <span class="m-Decimal">0</span>
+
+<span class="nv">mutex</span> <span class="o">:=</span> <span class="nc">Mutex</span> <span class="k">new</span><span class="p">()</span>
+
+<span class="nv">threads</span> <span class="o">:=</span> <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="nc">Thread</span><span class="o">&gt;</span> <span class="k">new</span><span class="p">()</span>
+<span class="k">for</span> <span class="p">(</span><span class="nv">i</span> <span class="k">in</span> <span class="m-Decimal">0</span><span class="o">..</span><span class="m-Decimal">10</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">threads</span> <span class="nf">add</span><span class="p">(</span><span class="nc">Thread</span> <span class="k">new</span><span class="p">(</span><span class="o">||</span>
+        <span class="k">for</span> <span class="p">(</span><span class="nv">i</span> <span class="k">in</span> <span class="m-Decimal">0</span><span class="o">..</span><span class="m-Decimal">1000</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">mutex</span> <span class="nf">lock</span><span class="p">()</span>
+            <span class="nv">counter</span> <span class="o">+=</span> <span class="m-Decimal">1</span>   
+            <span class="nv">mutex</span> <span class="nf">unlock</span><span class="p">()</span>
+            <span class="nc">Thread</span> <span class="nf">yield</span><span class="p">()</span>
+        <span class="p">}</span>
+    <span class="p">))</span>
+<span class="p">}</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="nv">t</span> <span class="k">in</span> <span class="nv">threads</span><span class="p">)</span> <span class="nv">t</span> <span class="nf">start</span><span class="p">()</span>
+<span class="k">for</span> <span class="p">(</span><span class="nv">t</span> <span class="k">in</span> <span class="nv">threads</span><span class="p">)</span> <span class="nv">t</span> <span class="nf">wait</span><span class="p">()</span>
+
+<span class="c">// prints counter = ???</span>
+<span class="s2">"counter = %d"</span> <span class="nf">printfln</span><span class="p">(</span><span class="nv">counter</span><span class="p">)</span></code></pre>
+
+<p>Here, we have protected the counter incrementation with <code>mutex lock()</code> and
+<code>mutex unlock()</code> calls. This is known as a critical section. In there, only one
+thread can execute at a time - the other threads will block on the <code>lock</code> call,
+waiting to be able to acquire it exclusively.</p>
+
+<p>Instead of using <code>lock</code> and <code>unlock</code> by hand, one might want to use the <code>with</code>
+method, that takes a block:</p>
+
+<pre><code class="language-ooc"><span class="k">for</span> <span class="p">(</span><span class="nv">i</span> <span class="k">in</span> <span class="m-Decimal">0</span><span class="o">..</span><span class="m-Decimal">1000</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">mutex</span> <span class="nf">with</span><span class="p">(</span><span class="o">||</span>
+        <span class="nv">counter</span> <span class="o">+=</span> <span class="m-Decimal">1</span>
+    <span class="p">)</span>
+<span class="p">}</span></code></pre>
+
+<p>With any of these last two versions, the counter is reliably set to 10000
+at the end of every run.</p>
+
+<p>For more information about this problem, read the <a href="http://en.wikipedia.org/wiki/Mutual_exclusion">Mutual exclusion</a>
+Wikipedia page.</p>
+
+<h2 id="recursivemutex">RecursiveMutex</h2>
+
+<p>With a regular mutex, locking multiple times from the same thread results in
+undefined behaviour on some platforms (e.g. pthreads).</p>
+
+<p>A recursive mutex, on the other hand, can be locked multiple times, as long
+as it’s unlocked a corresponding number of times, all by the same thread.</p>
+
+<p>A trivial (non-useful) test might look like:</p>
+
+<pre><code class="language-ooc"><span class="nv">threads</span> <span class="o">:=</span> <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="nc">Thread</span><span class="o">&gt;</span> <span class="k">new</span><span class="p">()</span>
+
+<span class="nv">mutex</span> <span class="o">:=</span> <span class="nc">RecursiveMutex</span> <span class="k">new</span><span class="p">()</span>
+<span class="nv">counter</span> <span class="o">:=</span> <span class="m-Decimal">0</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="nv">i</span> <span class="k">in</span> <span class="m-Decimal">0</span><span class="o">..</span><span class="m-Decimal">42</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">threads</span> <span class="nf">add</span><span class="p">(</span><span class="nc">Thread</span> <span class="k">new</span><span class="p">(</span><span class="o">||</span>
+        <span class="k">for</span> <span class="p">(</span><span class="nv">i</span> <span class="k">in</span> <span class="m-Decimal">0</span><span class="o">..</span><span class="m-Decimal">10</span><span class="p">)</span> <span class="nv">mutex</span> <span class="nf">lock</span><span class="p">()</span>
+        <span class="nv">counter</span> <span class="o">+=</span> <span class="m-Decimal">1</span>
+        <span class="k">for</span> <span class="p">(</span><span class="nv">i</span> <span class="k">in</span> <span class="m-Decimal">0</span><span class="o">..</span><span class="m-Decimal">10</span><span class="p">)</span> <span class="nv">mutex</span> <span class="nf">unlock</span><span class="p">()</span>
+    <span class="p">))</span>
+<span class="p">}</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="nv">t</span> <span class="k">in</span> <span class="nv">threads</span><span class="p">)</span> <span class="nv">t</span> <span class="nf">start</span><span class="p">()</span>
+<span class="k">for</span> <span class="p">(</span><span class="nv">t</span> <span class="k">in</span> <span class="nv">threads</span><span class="p">)</span> <span class="nv">t</span> <span class="nf">wait</span><span class="p">()</span>
+
+<span class="c">// prints counter = 42</span>
+<span class="s2">"counter = %d"</span> <span class="nf">printfln</span><span class="p">(</span><span class="nv">counter</span><span class="p">)</span></code></pre>
+
+<p>This program correctly prints <code>counter = 42</code> at the end. If we weren’t using
+a recursive mutex, more funky behaviour could happen. For example, on OSX, the
+program enters an infinite waiting loop, as we are trying to lock an already
+locked non-recursive mutex acquired by the current thread, resulting in a
+deadlock.</p>
+    </div>
+  </article>
+</div>
+<footer>
+  <div class="footer-content">
+  <nav><section class="about"><h3>About</h3>
+    <ul>
+        <li><a href="/about/#history">History</a></li>
+        <li><a href="/about/#why-use-ooc">Why use ooc?</a></li>
+        <li><a href="/about/#similar-projects">Alternatives</a></li>
+    </ul></section><section class="install"><h3>Install</h3>
+    <ul>
+        <li><a href="/install/#quick-install">Quick install</a></li>
+        <li><a href="/install/#installing-from-git">Installing from Git</a></li>
+        <li><a href="/install/#post-install-instructions">Post-install instructions</a></li>
+        <li><a href="/install/#installing-sam">Installing sam</a></li>
+    </ul></section><section class="documentation"><h3>Documentation</h3>
+    <ul>
+        <li><a href="/docs/tutorial/">Tutorial</a></li>
+        <li><a href="/docs/lang/">Language</a></li>
+        <li><a href="/docs/sdk/">SDK</a></li>
+        <li><a href="/docs/tools/">Tools</a></li>
+        <li><a href="/docs/tools/rock/">Implementation</a></li>
+        <li><a href="/docs/kaputt/">Troubleshooting</a></li>
+        <li><a href="/docs/glossary/">Glossary</a></li>
+    </ul></section><section class="community"><h3>Community</h3>
+    <ul>
+        <li><a href="http://groups.google.com/group/ooc-lang">Discussion group</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/issues">Issue tracker</a></li>
+        <li><a href="irc://chat.freenode.net/#ooc-lang">IRC channel</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/wiki">Wiki</a></li>
+        <li><a href="/development/">Development</a></li>
+        <li><a href="http://pledgie.com/campaigns/21363">Donate</a></li>
+    </ul></section></nav>
+    <div class="fine-print">
+      <p>
+        ooc &copy; 2009-2015 <a href="http://amos.me/">Amos Wenger</a>. The content of this website is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0 License</a>.
+        rock is licensed under the MIT license. Design based on the <a href="http://nanoc.ws/">nanoc web site</a> by <a href="http://stoneship.org/">Denis Defreyne</a> and used with permission.
+        <a href="http://entypo.com/">Entypo</a>By Daniel Bruce.
+      </p>
+    </div>
+  </div>
+</footer>
+
+  </body>
+</html>

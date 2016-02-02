@@ -1,0 +1,232 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ooc &raquo; About ooc</title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="stylesheet" href="/assets/pygments.css">
+    <link href="http://fonts.googleapis.com/css?family=Radley:regular&text=OC" rel="stylesheet" type="text/css" >
+    <link href="http://fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,400,400italic,700,700italic,900,900italic" rel="stylesheet" type="text/css" >
+
+    <!-- Cool stats stuff for nanoc :) -->
+    <meta name="generator" content="nanoc 3.6.5"> 
+  </head>
+  <body>
+
+<header>
+  <div class="header-content">
+    <nav class="main">
+      <ol>
+        <li class="home"><a href="/"><img src="/assets/images/logo-nav.png" alt="Home"></a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/install/">Install</a></li>
+        <li><a href="/docs/">Documentation</a></li>
+        <li><a href="/community/">Community</a></li>
+        <li><a href="/development/">Development</a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+<div class="intro">
+  <div class="intro-content">
+    <h1>About ooc</h1>
+  </div>
+</div>
+<div class="article">
+  <article>
+    <nav class="side">
+  <div class="side-title">
+    About ooc
+  </div>
+
+  <div class="side-content">
+    
+
+    <ol class="toc"><li><a href="#what-is-ooc">What is ooc?</a></li><li><a href="#history">History</a></li><li><a href="#why-use-ooc">Why use ooc?</a></li><li><a href="#similar-projects">Similar projects</a></li></ol>
+  </div>
+</nav>
+
+    <div class="article-content">
+      <h2 id="what-is-ooc">What is ooc?</h2>
+
+<p>ooc was born out of the desire to write cross-platform applications with
+a concise, yet clear syntax, and to produce native binaries rather than
+relying on a downloadable runtime.</p>
+
+<p>It’s a general-purpose, language with a source-to-source compiler (to C99),
+and a portable SDK, readily available bindings for quite a few C libraries,
+a flexible module system, testing facilities and a set of utilities to make
+one’s life easier.</p>
+
+<h2 id="history">History</h2>
+
+<p>It was 2009, <abbr title="Amos Wenger (also - wow, you can aim).">I</abbr> had
+just started studying micro-engineering at <abbr title="Ecole Polytechnique Fédérale de Lausanne">EPFL</abbr>,
+and we were given a programming assignment, something about a prey/predator
+simulation.</p>
+
+<p>After having spent years using Java in my spare time, I did not want to go
+back to something as low-level as C, so I did what any lazy programmer would
+have done: I spent the first few months writing a source-to-source compiler
+from a Java-ish language to C, and then the last 48 hours actually coding the
+project.</p>
+
+<p>Everything turned out fine - I got the maximum grade, and immediately began
+rewriting the compiler (<a href="https://github.com/fasterthanlime/jooc-legacy">implemented in Java</a>, back then). And then I
+rewrote it again.</p>
+
+<p>A community started to form around it. By 2011, we were overy fourty regulars
+on the IRC channel. Then, time passed, some of us got jobs, we had our share
+of leadership problems within the project, and interest in the project slowly
+faded.</p>
+
+<p>A small team kept maintaining the compiler and SDK in the background. Bugs were
+fixed, long-awaited features were implemented. Development has quietly continued,
+and the project was never actually abandoned. After a long while with just
+a single page website, we decided to rebuild a proper one to help newcomers
+get up and running quickly. You are reading it right now!</p>
+
+<h2 id="why-use-ooc">Why use ooc?</h2>
+
+<p>It’s a hard choice to make nowadays, to spend a chunk of your time learning
+and writing a codebase in a language that isn’t “mainstream”. Some would
+argue, not without reason, that it is a dangerous enterprise - that choosing
+a more established platform is the right thing to do. That hobby programming
+language skills aren’t marketable, etc., etc.</p>
+
+<p>However, a good programmer is a good programmer in any language. Discovering
+new ways of perceiving, designing, and manufacturing pieces of software is
+always a worthy pursuit.</p>
+
+<p>Hence, for small to medium-sized, personal projects - a personal command-line
+utility, a graphical front-end for an application you like, a custom piece of
+zeromq-powered network infrastructure, or an indie game - ooc is a practical
+alternative to what’s out there.</p>
+
+<p>It’s been a while since the “marketing” phase of the ooc project has been
+abandoned. Although it is motivating to push for adoption, imperatives like
+paying the bills, maintaining healthy relationships, and preserving one’s
+sanity, have pushed for a more intimate approach to development.</p>
+
+<p>Since its inception, many novelty programming languages have come and gone.
+The naiveté of youth, combined with a relentless thirst for experimentation,
+have inspired many developers to try and do their own thing. ooc survived
+through sheer, continued usefulness.</p>
+
+<p>I sincerely hope you find it useful, quirky, and enlightening as well.</p>
+
+<h2 id="similar-projects">Similar projects</h2>
+
+<p>There are several new-ish, general-purpose programming languages floating
+around. Some of them are similar to ooc, and some of them are very different.
+If ooc doesn’t fulfill your needs, perhaps some of these do:</p>
+
+<table class="comparison">
+<tr class="header">
+<th>Name</th>
+  <th>Target</th>
+  <th>Notes</th>
+</tr>
+<tr>
+<td><a href="https://wiki.gnome.org/Vala">Vala</a></td>
+  <td>C / GLib</td>
+  <td>Gnome backed</td>
+</tr>
+<tr>
+<td><a href="https://wiki.gnome.org/Genie">Genie</a></td>
+  <td>C / GLib</td>
+  <td>Vala with a python syntax</td>
+</tr>
+<tr>
+<td><a href="http://haxe.org/">Haxe</a></td>
+  <td>Multi-backend</td>
+  <td>Game oriented</td>
+</tr>
+<tr>
+<td><a href="http://www.rust-lang.org/">Rust</a></td>
+  <td>Native</td>
+  <td>Mozilla backed</td>
+</tr>
+<tr>
+<td><a href="http://golang.org/">Go</a></td>
+  <td>Native</td>
+  <td>Google backed</td>
+</tr>
+<tr>
+<td><a href="http://coffeescript.org/">CoffeeScript</a></td>
+  <td>JavaScript</td>
+  <td>The ooc of JavaScript</td>
+</tr>
+<tr>
+<td><a href="http://iolanguage.org/">Io</a></td>
+  <td>VM</td>
+  <td>Minimal</td>
+</tr>
+<tr>
+<td><a href="http://www.lua.org/">Lua</a></td>
+  <td>VM</td>
+  <td>Embedded in many games</td>
+</tr>
+<tr>
+<td><a href="http://www.bitc-lang.org/">BitC</a></td>
+  <td>Native</td>
+  <td>Gave up LISP</td>
+</tr>
+<tr>
+<td><a href="http://claylabs.com/clay/">Clay</a></td>
+  <td>Native</td>
+  <td>Abandoned?</td>
+</tr>
+<tr>
+<td><a href="http://ec-lang.org/">eC</a></td>
+  <td>Native</td>
+  <td>Bundled with Ecere SDK</td>
+</tr>
+</table>
+    </div>
+  </article>
+</div>
+<footer>
+  <div class="footer-content">
+  <nav><section class="about"><h3>About</h3>
+    <ul>
+        <li><a href="/about/#history">History</a></li>
+        <li><a href="/about/#why-use-ooc">Why use ooc?</a></li>
+        <li><a href="/about/#similar-projects">Alternatives</a></li>
+    </ul></section><section class="install"><h3>Install</h3>
+    <ul>
+        <li><a href="/install/#quick-install">Quick install</a></li>
+        <li><a href="/install/#installing-from-git">Installing from Git</a></li>
+        <li><a href="/install/#post-install-instructions">Post-install instructions</a></li>
+        <li><a href="/install/#installing-sam">Installing sam</a></li>
+    </ul></section><section class="documentation"><h3>Documentation</h3>
+    <ul>
+        <li><a href="/docs/tutorial/">Tutorial</a></li>
+        <li><a href="/docs/lang/">Language</a></li>
+        <li><a href="/docs/sdk/">SDK</a></li>
+        <li><a href="/docs/tools/">Tools</a></li>
+        <li><a href="/docs/tools/rock/">Implementation</a></li>
+        <li><a href="/docs/kaputt/">Troubleshooting</a></li>
+        <li><a href="/docs/glossary/">Glossary</a></li>
+    </ul></section><section class="community"><h3>Community</h3>
+    <ul>
+        <li><a href="http://groups.google.com/group/ooc-lang">Discussion group</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/issues">Issue tracker</a></li>
+        <li><a href="irc://chat.freenode.net/#ooc-lang">IRC channel</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/wiki">Wiki</a></li>
+        <li><a href="/development/">Development</a></li>
+        <li><a href="http://pledgie.com/campaigns/21363">Donate</a></li>
+    </ul></section></nav>
+    <div class="fine-print">
+      <p>
+        ooc &copy; 2009-2015 <a href="http://amos.me/">Amos Wenger</a>. The content of this website is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0 License</a>.
+        rock is licensed under the MIT license. Design based on the <a href="http://nanoc.ws/">nanoc web site</a> by <a href="http://stoneship.org/">Denis Defreyne</a> and used with permission.
+        <a href="http://entypo.com/">Entypo</a>By Daniel Bruce.
+      </p>
+    </div>
+  </div>
+</footer>
+
+  </body>
+</html>

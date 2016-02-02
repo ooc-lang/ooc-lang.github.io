@@ -1,0 +1,556 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ooc &raquo; Tutorial</title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="stylesheet" href="/assets/pygments.css">
+    <link href="http://fonts.googleapis.com/css?family=Radley:regular&text=OC" rel="stylesheet" type="text/css" >
+    <link href="http://fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,400,400italic,700,700italic,900,900italic" rel="stylesheet" type="text/css" >
+
+    <!-- Cool stats stuff for nanoc :) -->
+    <meta name="generator" content="nanoc 3.6.5"> 
+  </head>
+  <body>
+
+<header>
+  <div class="header-content">
+    <nav class="main">
+      <ol>
+        <li class="home"><a href="/"><img src="/assets/images/logo-nav.png" alt="Home"></a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/install/">Install</a></li>
+        <li><a href="/docs/">Documentation</a></li>
+        <li><a href="/community/">Community</a></li>
+        <li><a href="/development/">Development</a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+<div class="intro">
+  <div class="intro-content">
+    <h1>Tutorial</h1>
+  </div>
+</div>
+<div class="article">
+  <article>
+    <nav class="side">
+  <div class="side-title">
+    Tutorial
+  </div>
+
+  <div class="side-content">
+    
+      <p>↑ <a href="/docs/">Back to Documentation</a></p>
+    
+
+    <ol class="toc"><li><a href="#once-upon-a-time">Once Upon A Time…</a></li><li><a href="#the-great-illusion">The Great Illusion</a></li><li><a href="#form-follows-function">Form Follows Function</a></li><li><a href="#corgi-ever-watching">Corgi Ever Watching</a></li><li><a href="#the-littlest-things">The Littlest Things</a></li><li><a href="#all-together-now">All Together Now</a></li><li><a href="#when-features-creep">When Features Creep</a></li><li><a href="#to-give-back">To Give Back</a></li></ol>
+  </div>
+</nav>
+
+    <div class="article-content">
+      <h2 id="once-upon-a-time">Once Upon A Time…</h2>
+
+<p>Once upon a time, there was a sysadmin who wanted to make sure her website
+was always online. However, she figured that she was pretty good at compiling,
+installing, and configuring software, but that her programming skills were a bit
+rusty.</p>
+
+<p>Oh, sure, she remembered her days at university where she learned a bit of Java,
+and C++, and the cool mind-bending exercises in LISP, but today she felt like trying
+something new. She followed the <a href="/install/">installation instructions</a> carefully, and then
+jumped in without waiting.</p>
+
+<p>After fishing online for information, she decided to start with the following
+program:</p>
+
+<pre><code class="language-ooc"><span class="s2">"The website may or may not be online."</span> <span class="nf">println</span><span class="p">()</span></code></pre>
+
+<p>Saving it as <code>watchcorgi.ooc</code> and running <code>rock -v watchcorgi</code> sure produced a lot
+of output. And - as a token of its appreciation, the compiler even left an executable
+on the hard drive. What a promising relationship, she thought.</p>
+
+<p>However, not one to be overly chatty, she decided that instead of having to type
+<code>rock watchcorgi</code> every time she wanted to compile her new program, she was going
+to write a <a href="/docs/tools/rock/usefiles">usefile</a> for it, and put them both together in a directory.</p>
+
+<pre><code class="language-yaml"><span class="l-Scalar-Plain">Name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">Watch Corgi</span>
+<span class="l-Scalar-Plain">Description</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">Tells on the bad websites that go down</span>
+<span class="l-Scalar-Plain">Version</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">0.1.0</span>
+<span class="l-Scalar-Plain">SourcePath</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">source</span>
+<span class="l-Scalar-Plain">Main</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">watchcorgi</span></code></pre>
+
+<p>Saving it as <code>watchcorgi.use</code>, she realized that, if she wanted her usefile to be
+valid, she needed to move her ooc module into <code>source/watchcorgi.ooc</code>. So then, her
+folder hierarchy now looked like:</p>
+
+<pre><code>.
+├── source
+│   └── watchcorgi.ooc
+└── watchcorgi.use
+</code></pre>
+
+<p>Now, all she had to do was type <code>rock</code> to have her program compiled. If she felt
+like reading a bit, all she had to do was <code>rock -v</code> - it reminded her of the countless
+hours spent installing packages on Gentoo.</p>
+
+<h2 id="the-great-illusion">The Great Illusion</h2>
+
+<p>However, that program was not quite as useful as she had hoped so far. While it was
+technically correct — the best kind of correct — it did not, in fact, bring any new
+information to the table.</p>
+
+<p>That was not meant to last, though, as she quickly devised a devious scheme. Before
+the era of watchcorgi, she was using <code>curl</code>, a command-line utility, to check if the
+website was still online. It looked a little something like this:</p>
+
+<pre><code class="language-bash">curl -I http://example.org/</code></pre>
+
+<p>(Of course, that wasn’t her website’s actual URL, which we have sneakingly substituted
+with something a tad more common, in order to protect our heroine’s privacy.)</p>
+
+<p>Running that simple command was enough to let her know, with a simple look, whether
+the website was up and running or down in the ground — in which case prompt maintenance
+was needed as soon as humanly possible.</p>
+
+<p>She decided that if she could run that command herself, there was no reason why her
+program couldn’t do so as well. After a second documentation hunt, she quickly jotted
+down a few more lines, replacing the contents of <code>source/watchcorgi.ooc</code> with this:</p>
+
+<pre><code class="language-ooc"><span class="k">import</span> <span class="nv">os</span><span class="o">/</span><span class="nc">Process</span>
+
+<span class="nv">exitCode</span> <span class="o">:=</span> <span class="nc">Process</span> <span class="k">new</span><span class="p">([</span><span class="s2">"curl"</span><span class="p">,</span> <span class="s2">"-I"</span><span class="p">,</span> <span class="s2">"http://example.org/"</span><span class="p">])</span> <span class="nf">execute</span><span class="p">()</span>
+<span class="s2">"Sir Curl exited with: #{exitCode}"</span> <span class="nf">println</span><span class="p">()</span></code></pre>
+
+<p>And sure enough, after a quick recompilation, she saw the expected result: <code>Sir Curl
+exited with: 0</code>. Curious, she disconnected from the internet, and tried launching
+<code>./watchcorgi</code> again. This time, she saw: <code>Sir Curl exited with: 6</code>.</p>
+
+<p>“It’s just like it always is with Unix-like tools” she thought. “An exit code of 0
+is a good sign, anything else… not so much. It sure is convenient to be able
+to import another ooc module for almost everything. Apparently, this <code>Process</code> class
+takes an array with the command arguments. And this <code>execute</code> method returns the
+exit code. Neato!” And so it was.</p>
+
+<h2 id="form-follows-function">Form Follows Function</h2>
+
+<p>She was starting to be happy with her program. For all intents and purposes, was doing
+its job, and it was doing its job well. However, she could not deny that her program
+could have put a little more effort in the presentation. Just because a program does
+not have a will of its own, doesn’t mean it’s okay for it to be rude.</p>
+
+<p>“Time to get to work”, she said out loud, forgetting that it was past 2 in the morning,
+and that nobody could probably hear her - and even if they could, there was no
+certainty that they would agree. While she thought about that, her fingers had kept
+tapping on the keyboard. Her program now looked a little bit like that:</p>
+
+<pre><code class="language-ooc"><span class="k">import</span> <span class="nv">os</span><span class="o">/</span><span class="p">[</span><span class="nc">Process</span><span class="p">,</span> <span class="nc">Terminal</span><span class="p">]</span>
+
+<span class="nv">exitCode</span> <span class="o">:=</span> <span class="nc">Process</span> <span class="k">new</span><span class="p">([</span><span class="s2">"curl"</span><span class="p">,</span> <span class="s2">"-I"</span><span class="p">,</span> <span class="s2">"http://example.org/"</span><span class="p">])</span> <span class="nf">execute</span><span class="p">()</span>
+
+<span class="nf">match</span> <span class="p">(</span><span class="nv">exitCode</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">case</span> <span class="m-Decimal">0</span> <span class="o">=&gt;</span>
+    <span class="s2">"Everything is fine."</span> <span class="nf">println</span><span class="p">()</span>
+
+  <span class="k">case</span> <span class="o">=&gt;</span>
+    <span class="nc">Terminal</span> <span class="nf">setFgColor</span><span class="p">(</span><span class="nc">Color</span> <span class="nv">red</span><span class="p">)</span>
+    <span class="s2">"[ERROR] The website is down!"</span> <span class="nf">println</span><span class="p">()</span>
+    <span class="nc">Terminal</span> <span class="nf">reset</span><span class="p">()</span>
+<span class="p">}</span></code></pre>
+
+<p>It didn’t blink, and there were no 3D effects: disappointing maybe for a sci-fi
+fan like her little brother, but having alerts in red, and a human-readable message
+was fine enough for her.</p>
+
+<p>While carefully proofreading her code to check if she hadn’t missed anything, she
+thought about the syntax of the <code>match</code> construct. “It’s pretty smart, in fact.
+Cases are tested from top to bottom - the first that matches, wins. And a case with
+no value simply matches everything”. It just made sense.</p>
+
+<p>She was also particularly happy with the way she was able to import both <code>os/Process</code>
+and <code>os/Terminal</code> from the same line. Sure, she could have written two different
+<code>import</code> directives, but she had been promised a concise programming language and it
+was about time it delivered.</p>
+
+<h2 id="corgi-ever-watching">Corgi Ever Watching</h2>
+
+<p>Now that the program was polite, our programmer felt good enough to take a
+small break. As she was looking out the window, waiting for her 3rd cup of
+nocturnal coffee to brew, it came to her: “Wait a minute… what good is my
+program if I have to keep running it manually?”</p>
+
+<p>A quick sip out of her coffee cup finished to clear her mind completely.
+“I am going to need some sort of loop. And I think watchcorgi should shut
+up if everything is fine, and only complain if something goes wrong.”</p>
+
+<p>As she looked at her timer, waiting for it to run out and allow her to go back
+to hacking (self-discipline is important, after all), she came to a second
+realization: that there were two main tasks in her program - the checking, and
+the notifying. Surely there must be some way to write that in a more modular
+way?</p>
+
+<p>She decided to go for broke, and split her program into three different ooc
+modules. She started with <code>source/watchcorgi/checker.ooc</code>:</p>
+
+<pre><code class="language-ooc"><span class="k">import</span> <span class="nv">os</span><span class="o">/</span><span class="p">[</span><span class="nc">Process</span><span class="p">]</span>
+
+<span class="nc">Checker</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+  <span class="nv">url</span><span class="p">:</span> <span class="nc">String</span>
+
+  <span class="nv">init</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="o">=</span><span class="nv">url</span><span class="p">)</span>
+
+  <span class="cm">/**</span>
+<span class="cm">   * @return true if the url is reachable, false otherwise</span>
+<span class="cm">   */</span>
+  <span class="nv">check</span><span class="p">:</span> <span class="k">func</span> <span class="o">-&gt;</span> <span class="nc">Bool</span> <span class="p">{</span>
+    <span class="m-Decimal">0</span> <span class="o">==</span> <span class="nc">Process</span> <span class="k">new</span><span class="p">([</span><span class="s2">"curl"</span><span class="p">,</span> <span class="s2">"-I"</span><span class="p">,</span> <span class="nv">url</span><span class="p">])</span> <span class="nf">execute</span><span class="p">()</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre>
+
+<p>Then went on with <code>source/watchcorgi/notifier.ooc</code>:</p>
+
+<pre><code class="language-ooc"><span class="k">import</span> <span class="nv">os</span><span class="o">/</span><span class="p">[</span><span class="nc">Terminal</span><span class="p">]</span>
+
+<span class="nc">Notifier</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+  <span class="nv">quiet</span><span class="p">:</span> <span class="nc">Bool</span>
+
+  <span class="nv">init</span><span class="p">:</span> <span class="k">func</span>
+
+  <span class="nv">notify</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">online</span><span class="p">:</span> <span class="nc">Bool</span><span class="p">,</span> <span class="nv">url</span><span class="p">:</span> <span class="nc">String</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">online</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nv">quiet</span><span class="p">)</span> <span class="k">return</span>
+
+      <span class="nc">Terminal</span> <span class="nf">setFgColor</span><span class="p">(</span><span class="nc">Color</span> <span class="nv">green</span><span class="p">)</span>
+      <span class="s2">"[ OK  ] %s is online."</span> <span class="nf">printfln</span><span class="p">(</span><span class="nv">url</span><span class="p">)</span>
+      <span class="nc">Terminal</span> <span class="nf">reset</span><span class="p">()</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="nc">Terminal</span> <span class="nf">setFgColor</span><span class="p">(</span><span class="nc">Color</span> <span class="nv">red</span><span class="p">)</span>
+      <span class="s2">"[ERROR] %s is not reachable! You may panic now."</span> <span class="nf">printfln</span><span class="p">(</span><span class="nv">url</span><span class="p">)</span>
+      <span class="nc">Terminal</span> <span class="nf">reset</span><span class="p">()</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre>
+
+<p>And finally, thought it was better to rewrite <code>source/watchcorgi.ooc</code> from
+scratch using those new modules:</p>
+
+<pre><code class="language-ooc"><span class="k">import</span> <span class="nv">watchcorgi</span><span class="o">/</span><span class="p">[</span><span class="nv">checker</span><span class="p">,</span> <span class="nv">notifier</span><span class="p">]</span>
+<span class="k">import</span> <span class="nv">os</span><span class="o">/</span><span class="nc">Time</span>
+
+<span class="nv">notifier</span> <span class="o">:=</span> <span class="nc">Notifier</span> <span class="k">new</span><span class="p">()</span>
+<span class="nv">notifier</span> <span class="nv">quiet</span> <span class="o">=</span> <span class="k">true</span> <span class="c">// only bother me if something goes wrong</span>
+<span class="nv">checker</span> <span class="o">:=</span> <span class="nc">Checker</span> <span class="k">new</span><span class="p">(</span><span class="s2">"http://example.org/"</span><span class="p">)</span>
+
+<span class="k">while</span> <span class="p">(</span><span class="k">true</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nv">notifier</span> <span class="nf">notify</span><span class="p">(</span><span class="nv">checker</span> <span class="nf">check</span><span class="p">(),</span> <span class="nv">checker</span> <span class="nv">url</span><span class="p">)</span>
+  <span class="nc">Time</span> <span class="nf">sleepSec</span><span class="p">(</span><span class="m-Decimal">5</span><span class="p">)</span>
+<span class="p">}</span></code></pre>
+
+<p>There. All good. Not only was her program now constantly vigilant, checking
+for potential problems every five seconds, she felt that the various components
+were just as flexible as needed, small enough, and that it made the main program
+file short and sweet.</p>
+
+<h2 id="the-littlest-things">The Littlest Things</h2>
+
+<p>There was one area of the code she wasn’t entirely happy with - in the
+notifier, she was using the same pattern twice. First <code>Terminal setFgColor</code>,
+then <code>String printfln</code>, then <code>Terminal reset</code>.  She decided to extract that
+pattern into a function instead, and added it to the end of the the <code>Notifier</code>
+class definition:</p>
+
+<pre><code class="language-ooc"><span class="nv">say</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">color</span><span class="p">:</span> <span class="nc">Color</span><span class="p">,</span> <span class="nv">message</span><span class="p">:</span> <span class="nc">String</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nc">Terminal</span> <span class="nf">setFgColor</span><span class="p">(</span><span class="nv">color</span><span class="p">)</span>
+  <span class="nv">message</span> <span class="nf">println</span><span class="p">()</span>
+  <span class="nc">Terminal</span> <span class="nf">reset</span><span class="p">()</span>
+<span class="p">}</span></code></pre>
+
+<p>With that new neighbor, the notify function was happy to be reduced to:</p>
+
+<pre><code class="language-ooc"><span class="nv">notify</span><span class="p">:</span> <span class="p">(</span><span class="nv">online</span><span class="p">:</span> <span class="nc">Bool</span><span class="p">,</span> <span class="nv">url</span><span class="p">:</span> <span class="nc">String</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nv">online</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">quiet</span><span class="p">)</span> <span class="k">return</span>
+    <span class="nf">say</span><span class="p">(</span><span class="nc">Color</span> <span class="nv">green</span><span class="p">,</span> <span class="s2">"[ OK  ] %s is online"</span> <span class="nf">format</span><span class="p">(</span><span class="nv">url</span><span class="p">))</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nf">say</span><span class="p">(</span><span class="nc">Color</span> <span class="nv">red</span><span class="p">,</span> <span class="s2">"[ERROR] %s is not reachable! You may panic now."</span> \
+      <span class="nf">format</span><span class="p">(</span><span class="nv">url</span><span class="p">))</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre>
+
+<p>While this was better, she wasn’t satisfied yet - calling <code>format</code> like this
+(she thought of it as a version of <code>printfln</code> that returned the formatted string
+instead of printing it) wasn’t particularly pretty.</p>
+
+<p>Like with everything that bothered her, she decided to do something about it:</p>
+
+<pre><code class="language-ooc"><span class="nv">say</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">color</span><span class="p">:</span> <span class="nc">Color</span><span class="p">,</span> <span class="nv">message</span><span class="p">:</span> <span class="nc">String</span><span class="p">,</span> <span class="nv">args</span><span class="p">:</span> <span class="o">..</span><span class="p">.)</span> <span class="p">{</span>
+  <span class="nc">Terminal</span> <span class="nf">setFgColor</span><span class="p">(</span><span class="nv">color</span><span class="p">)</span>
+  <span class="nv">message</span> <span class="nf">printfln</span><span class="p">(</span><span class="nv">args</span><span class="p">)</span>
+  <span class="nc">Terminal</span> <span class="nf">reset</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="nv">notify</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">online</span><span class="p">:</span> <span class="nc">Bool</span><span class="p">,</span> <span class="nv">url</span><span class="p">:</span> <span class="nc">String</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nv">online</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">quiet</span><span class="p">)</span> <span class="k">return</span>
+    <span class="nf">say</span><span class="p">(</span><span class="nc">Color</span> <span class="nv">green</span><span class="p">,</span> <span class="s2">"[ OK  ] %s is online"</span><span class="p">,</span> <span class="nv">url</span><span class="p">)</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nf">say</span><span class="p">(</span><span class="nc">Color</span> <span class="nv">red</span><span class="p">,</span> <span class="s2">"[ERROR] %s is not reachable! You may panic now."</span><span class="p">,</span> <span class="nv">url</span><span class="p">)</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre>
+
+<p>It was subtle, but for her, it made all the difference. Being able to relay
+any number of arguments like that? This language might actually be comfortable
+after all.</p>
+
+<h2 id="all-together-now">All Together Now</h2>
+
+<p>“So, that was nice. For the life of me, I can’t think of a single thing my program
+is missing.” Her eyes closed gently, and she leaned back, as if overwhelmed by bliss.</p>
+
+<p>Wait. Her eyes, suddenly inquisitive, were perfectly open now. “What if I want
+to monitor several websites? Then I would need a config file so that I could modify
+the list of websites to monitor… and it would need to check them in parallel, so
+it doesn’t get stuck on any one of them.”</p>
+
+<p>She decided she needed one more module: <code>source/watchcorgi/config.ooc</code>:</p>
+
+<pre><code class="language-ooc"><span class="k">import</span> <span class="nv">io</span><span class="o">/</span><span class="nc">File</span>
+<span class="k">import</span> <span class="nv">os</span><span class="o">/</span><span class="nc">Env</span>
+<span class="k">import</span> <span class="nv">structs</span><span class="o">/</span><span class="nc">List</span>
+<span class="k">import</span> <span class="nv">text</span><span class="o">/</span><span class="nc">StringTokenizer</span>
+
+<span class="no">DEFAULT_PATH</span> <span class="o">:=</span> <span class="nc">Env</span> <span class="nf">get</span><span class="p">(</span><span class="s2">"HOME"</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"/.config/corgirc"</span>
+
+<span class="nc">Config</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+  <span class="nv">websites</span><span class="p">:</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span>
+
+  <span class="nv">init</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">path</span> <span class="o">:=</span> <span class="no">DEFAULT_PATH</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">content</span> <span class="o">:=</span> <span class="nc">File</span> <span class="k">new</span><span class="p">(</span><span class="nv">path</span><span class="p">)</span> <span class="nf">read</span><span class="p">()</span>
+    <span class="nv">websites</span> <span class="o">=</span> <span class="nv">content</span> <span class="nf">split</span><span class="p">(</span><span class="sc">'\n'</span><span class="p">)</span> \
+               <span class="nf">map</span><span class="p">(</span><span class="o">|</span><span class="nv">line</span><span class="o">|</span> <span class="nv">line</span> <span class="nf">trim</span><span class="p">(</span><span class="s2">"\t "</span><span class="p">))</span> \
+               <span class="nf">filter</span><span class="p">(</span><span class="o">|</span><span class="nv">line</span><span class="o">|</span> <span class="o">!</span><span class="nv">line</span> <span class="nv">empty</span><span class="o">?</span><span class="p">())</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre>
+
+<p>Armed with that new weapon, checking multiple websites in parallel was just a
+matter of making threads behave. Since she didn’t have much experience in the
+domain, and the documentation seemed a little bit obscure, she decided to ask
+for help in the <a href="https://groups.google.com/group/ooc-lang">ooc discussion group</a></p>
+
+<p>Almost immediately, a response sprung with numerous code examples she could use
+as inspiration for her own endeavor. And so she embarked courageously,
+rewriting <code>source/watchcorgi.ooc</code> once again:</p>
+
+<pre><code class="language-ooc"><span class="k">import</span> <span class="nv">watchcorgi</span><span class="o">/</span><span class="p">[</span><span class="nv">config</span><span class="p">,</span> <span class="nv">checker</span><span class="p">,</span> <span class="nv">notifier</span><span class="p">]</span>
+<span class="k">import</span> <span class="nv">os</span><span class="o">/</span><span class="nc">Time</span>
+<span class="k">import</span> <span class="nv">threading</span><span class="o">/</span><span class="nc">Thread</span>
+<span class="k">import</span> <span class="nv">structs</span><span class="o">/</span><span class="p">[</span><span class="nc">ArrayList</span><span class="p">]</span>
+
+<span class="nv">threads</span> <span class="o">:=</span> <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="nc">Thread</span><span class="o">&gt;</span> <span class="k">new</span><span class="p">()</span>
+<span class="nv">config</span> <span class="o">:=</span> <span class="nc">Config</span> <span class="k">new</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="nv">url</span> <span class="k">in</span> <span class="nv">config</span> <span class="nv">websites</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nv">threads</span> <span class="nf">add</span><span class="p">(</span><span class="nc">Thread</span> <span class="k">new</span><span class="p">(</span><span class="o">||</span>
+    <span class="nv">guard</span> <span class="o">:=</span> <span class="nc">Guard</span> <span class="k">new</span><span class="p">(</span><span class="nv">url</span><span class="p">,</span> <span class="m-Decimal">5</span><span class="p">)</span>
+    <span class="nv">guard</span> <span class="nf">run</span><span class="p">()</span>
+  <span class="p">))</span>
+<span class="p">}</span>
+
+<span class="c">// start all the threads</span>
+<span class="k">for</span> <span class="p">(</span><span class="nv">thread</span> <span class="k">in</span> <span class="nv">threads</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nv">thread</span> <span class="nf">start</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="c">// wait for all threads to complete</span>
+<span class="nv">threads</span> <span class="nf">each</span><span class="p">(</span><span class="o">|</span><span class="nv">thread</span><span class="o">|</span> <span class="nv">thread</span> <span class="nf">wait</span><span class="p">())</span>
+
+<span class="nc">Guard</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+    <span class="nv">delay</span><span class="p">:</span> <span class="nc">Int</span>
+    <span class="nv">checker</span><span class="p">:</span> <span class="nc">Checker</span>
+    <span class="nv">notifier</span><span class="p">:</span> <span class="nc">Notifier</span>
+
+    <span class="nv">init</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="nc">String</span><span class="p">,</span> <span class="o">=</span><span class="nv">delay</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nv">checker</span> <span class="o">=</span> <span class="nc">Checker</span> <span class="k">new</span><span class="p">(</span><span class="nv">url</span><span class="p">)</span>
+      <span class="nv">notifier</span> <span class="o">=</span> <span class="nc">Notifier</span> <span class="k">new</span><span class="p">()</span>
+      <span class="nv">notifier</span> <span class="nv">quiet</span> <span class="o">=</span> <span class="k">true</span>
+    <span class="p">}</span>
+    
+    <span class="nv">run</span><span class="p">:</span> <span class="k">func</span> <span class="p">{</span>
+      <span class="k">while</span> <span class="p">(</span><span class="k">true</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">notifier</span> <span class="nf">notify</span><span class="p">(</span><span class="nv">checker</span> <span class="nf">check</span><span class="p">(),</span> <span class="nv">checker</span> <span class="nv">url</span><span class="p">)</span>
+        <span class="nc">Time</span> <span class="nf">sleepSec</span><span class="p">(</span><span class="nv">delay</span><span class="p">)</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
+
+<p>As she began to write down a list of websites to check in <code>~/.config/corgirc</code>,
+she started to list the new things she had learned during that last refactoring:</p>
+
+<ul>
+<li>
+    <p>That classes can be used before they are defined - in order word, the order
+in which classes are defined does not matter! </p>
+  </li>
+  <li>
+    <p>That threads, while really old fashioned, were quite easy to use - all you
+had to do was create a new <code>Thread</code> object and pass a function that takes
+zero arguments.</p>
+  </li>
+  <li>
+    <p>That some functions are anonymous - and that they can be defined as an
+argument to a function call like this: <code>[1, 2, 3] reduce(|a, b| a + b)</code></p>
+  </li>
+  <li>
+    <p>That using a foreach, such as <code>for (element in iterable) { /* code */ }</code> or
+using the each method, like so <code>iterable each(|element| /* code */ )</code>, where
+pretty much equivalent.</p>
+  </li>
+</ul><h2 id="when-features-creep">When Features Creep</h2>
+
+<p>As magnificent as the program was, she couldn’t shake an eerie feeling. It
+seemed so perfect, so concise, so damn practical - what could possibly go
+wrong?</p>
+
+<p>“Oh, right!” she whispered. The program assumes that the <code>curl</code> command-line
+utility is installed and in the <code>$PATH</code>. While on most Linux distributions,
+that’s a safe bet, it might not be there on OSX. Or, god forbid, on Windows.</p>
+
+<p>But it was almost 6AM, and rays of sunlight would soon come and disturb the
+oh so peaceful (yet eventful) night of coding. Obviously, she could not afford
+to write her own HTTP library.</p>
+
+<p>Sure, in theory, a simple usage of <code>net/TCPSocket</code> from the SDK, writing
+something like</p>
+
+<pre><code>HEAD / HTTP/1.0\r\n\r\n
+</code></pre>
+
+<p>..and seeing if you get a non-empty response, would suffice. But what about
+parsing empty, yet worrying responses, like an HTTP 404, or an HTTP 502? What
+about HTTP 1.1 and the Host header, essential when several websites are running
+on the same IP address? And most importantly, what about HTTPS, which runs on a
+different port, and what’s more, over SSL?</p>
+
+<p>No, definitely, writing an HTTP library was not part of the plan. But maybe
+there was something she could use… maybe curl existed also as a library. A
+quick search for <code>ooc curl</code> revealed the existence of
+<a href="https://github.com/fasterthanlime/ooc-curl">fasterthanlime/ooc-curl</a>. Jackpot!</p>
+
+<p>A quick clone and.. wait. She knew better. Why not use <a href="/docs/tools/sam/">sam</a> instead?
+A simple <code>sam clone curl</code> would suffice. Or, better yet, she could add the
+dependency in the .use file, and run <code>sam get</code> from the watchcorgi folder
+afterwards.</p>
+
+<p>Her .use file now looked a little bit like this:</p>
+
+<pre><code class="language-yaml"><span class="l-Scalar-Plain">Name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">Watch Corgi</span>
+<span class="l-Scalar-Plain">Description</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">Multi-threaded website monitoring system</span>
+<span class="l-Scalar-Plain">Version</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">0.2.0</span>
+
+<span class="l-Scalar-Plain">SourcePath</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">source</span>
+<span class="l-Scalar-Plain">Main</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">watchcorgi</span>
+<span class="l-Scalar-Plain">Requires</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">curl</span></code></pre>
+
+<p>And sure enough, after <code>sam get</code>, she saw the <code>ooc-curl</code> folder appear in her
+<code>$OOC_LIBS</code> directory. It was time to rewrite <code>source/watchcorgi/checker.ooc</code>:</p>
+
+<pre><code class="language-ooc"><span class="k">use</span> <span class="nv">curl</span>
+<span class="k">import</span> <span class="nv">curl</span><span class="o">/</span><span class="nc">Highlevel</span>
+
+<span class="nc">Checker</span><span class="p">:</span> <span class="k">class</span> <span class="p">{</span>
+    <span class="nv">url</span><span class="p">:</span> <span class="nc">String</span>
+
+    <span class="nv">init</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="o">=</span><span class="nv">url</span><span class="p">)</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * @return true if the url is reachable, false otherwise</span>
+<span class="cm">     */</span>
+    <span class="nv">check</span><span class="p">:</span> <span class="k">func</span> <span class="o">-&gt;</span> <span class="nc">Bool</span> <span class="p">{</span>
+      <span class="m-Decimal">200</span> <span class="o">==</span> <span class="p">(</span><span class="no">HTTPR</span><span class="nv">equest</span> <span class="k">new</span><span class="p">(</span><span class="nv">url</span><span class="p">)</span><span class="o">.</span> <span class="nf">perform</span><span class="p">()</span><span class="o">.</span> <span class="nf">getResponseCode</span><span class="p">())</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
+
+<p>This piece of code was one of her favorites yet. She had used one of the
+features she had just learned about - call chaining. “In fact”, she would
+later explain to a colleague, “you can think of the dot as a comma - it
+separates several method calls, but they all happen on the same object,
+sequentially”.</p>
+
+<p>Recompiling the program after this change was exciting. There was no
+configuration dialog to fill out. No complicated command-line option to add
+when compiling. As a matter of fact, the single line added to the use file was
+enough to make sam happy - and rock itself seemed pretty content with the <code>use
+curl</code> directive now sitting at the top of the checker module.</p>
+
+<p>A simple <code>rock -v</code> did the trick. And there she had it. The perfect website
+monitoring system. At last. Oh, sure, part of her brain fully realized that
+the impression of perfectness would fade out over the days, but as far as
+discovering a new language goes, she thought this was a pretty good run.</p>
+
+<p>There was just one thing left to do…</p>
+
+<h2 id="to-give-back">To Give Back</h2>
+
+<p>At this point, she felt that watchcorgi it was worth it to publish her program
+somewhere. Of course, all along, she had been keeping track of it using
+<a href="http://git-scm.org/">git</a>. In this case, she was using <a href="https://github.com/">GitHub</a> as a host.</p>
+
+<p>She decided to make it easy for other people who might want to use
+<code>watchcorgi</code>, to get it. After a quick search, it quickly became evident that
+the process itself was trivial. She just had to send a pull request to the
+<a href="https://github.com/ooc-lang/sam">sam repository</a> that added a formula for her new pet project.</p>
+
+<p>So, after forking sam on GitHub, changing the origin of her sam repository,
+she opened a new file in <code>$OOC_LIBS/sam/library/watchcorgi.yml</code>, and wrote:</p>
+
+<pre><code class="language-yaml"><span class="l-Scalar-Plain">Origin</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">https://github.com/example/watchcorgi.git</span></code></pre>
+
+<p>And then, she <a href="https://help.github.com/articles/creating-a-pull-request">submitted the pull request</a>. The sun was rising.
+It felt warm. I think - she thought - I just might like it here.</p>
+    </div>
+  </article>
+</div>
+<footer>
+  <div class="footer-content">
+  <nav><section class="about"><h3>About</h3>
+    <ul>
+        <li><a href="/about/#history">History</a></li>
+        <li><a href="/about/#why-use-ooc">Why use ooc?</a></li>
+        <li><a href="/about/#similar-projects">Alternatives</a></li>
+    </ul></section><section class="install"><h3>Install</h3>
+    <ul>
+        <li><a href="/install/#quick-install">Quick install</a></li>
+        <li><a href="/install/#installing-from-git">Installing from Git</a></li>
+        <li><a href="/install/#post-install-instructions">Post-install instructions</a></li>
+        <li><a href="/install/#installing-sam">Installing sam</a></li>
+    </ul></section><section class="documentation"><h3>Documentation</h3>
+    <ul>
+        <li><a href="/docs/tutorial/">Tutorial</a></li>
+        <li><a href="/docs/lang/">Language</a></li>
+        <li><a href="/docs/sdk/">SDK</a></li>
+        <li><a href="/docs/tools/">Tools</a></li>
+        <li><a href="/docs/tools/rock/">Implementation</a></li>
+        <li><a href="/docs/kaputt/">Troubleshooting</a></li>
+        <li><a href="/docs/glossary/">Glossary</a></li>
+    </ul></section><section class="community"><h3>Community</h3>
+    <ul>
+        <li><a href="http://groups.google.com/group/ooc-lang">Discussion group</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/issues">Issue tracker</a></li>
+        <li><a href="irc://chat.freenode.net/#ooc-lang">IRC channel</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/wiki">Wiki</a></li>
+        <li><a href="/development/">Development</a></li>
+        <li><a href="http://pledgie.com/campaigns/21363">Donate</a></li>
+    </ul></section></nav>
+    <div class="fine-print">
+      <p>
+        ooc &copy; 2009-2015 <a href="http://amos.me/">Amos Wenger</a>. The content of this website is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0 License</a>.
+        rock is licensed under the MIT license. Design based on the <a href="http://nanoc.ws/">nanoc web site</a> by <a href="http://stoneship.org/">Denis Defreyne</a> and used with permission.
+        <a href="http://entypo.com/">Entypo</a>By Daniel Bruce.
+      </p>
+    </div>
+  </div>
+</footer>
+
+  </body>
+</html>

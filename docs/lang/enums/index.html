@@ -1,0 +1,229 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ooc &raquo; Enums</title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="stylesheet" href="/assets/pygments.css">
+    <link href="http://fonts.googleapis.com/css?family=Radley:regular&text=OC" rel="stylesheet" type="text/css" >
+    <link href="http://fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,400,400italic,700,700italic,900,900italic" rel="stylesheet" type="text/css" >
+
+    <!-- Cool stats stuff for nanoc :) -->
+    <meta name="generator" content="nanoc 3.6.5"> 
+  </head>
+  <body>
+
+<header>
+  <div class="header-content">
+    <nav class="main">
+      <ol>
+        <li class="home"><a href="/"><img src="/assets/images/logo-nav.png" alt="Home"></a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/install/">Install</a></li>
+        <li><a href="/docs/">Documentation</a></li>
+        <li><a href="/community/">Community</a></li>
+        <li><a href="/development/">Development</a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+<div class="intro">
+  <div class="intro-content">
+    <h1>Enums</h1>
+  </div>
+</div>
+<div class="article">
+  <article>
+    <nav class="side">
+  <div class="side-title">
+    Enums
+  </div>
+
+  <div class="side-content">
+    
+      <p>↑ <a href="/docs/lang/">Back to Language</a></p>
+    
+
+    <ol class="toc"><li><a href="#enums">Enums</a></li><ol><li><a href="#members">Members</a></li><li><a href="#methods">Methods</a></li></ol><li><a href="#backing-type">Backing type</a></li><ol><li><a href="#custom-values">Custom values</a></li><li><a href="#custom-increment">Custom increment</a></li></ol><li><a href="#aliasing">Aliasing</a></li></ol>
+  </div>
+</nav>
+
+    <div class="article-content">
+      <h2 id="enums">Enums</h2>
+
+<p>A set of values that a variable of that type can take. Useful when there are
+three values or more, so a <code>Bool</code> doesn’t make sense.</p>
+
+<pre><code class="language-ooc"><span class="nc">DoorState</span><span class="p">:</span> <span class="nv">enum</span> <span class="p">{</span>
+  <span class="no">OPEN</span>
+  <span class="no">CLOSED</span>
+  <span class="no">UNKNOWN</span>
+<span class="p">}</span></code></pre>
+
+<p>One can think of enum values as static members. Enums have their own types.</p>
+
+<pre><code class="language-ooc"><span class="nv">state</span><span class="p">:</span> <span class="nc">DoorState</span>
+<span class="nv">state</span> <span class="o">=</span> <span class="nc">DoorState</span> <span class="no">OPEN</span>
+
+<span class="c">// or, simply</span>
+<span class="nv">state</span> <span class="o">:=</span> <span class="nc">DoorState</span> <span class="no">OPEN</span>
+
+<span class="nv">match</span> <span class="nv">state</span> <span class="p">{</span>
+  <span class="k">case</span> <span class="nc">DoorState</span> <span class="no">OPEN</span> <span class="o">=&gt;</span>
+    <span class="s2">"It's open!"</span>
+  <span class="k">case</span> <span class="nc">DoorState</span> <span class="no">CLOSED</span> <span class="o">=&gt;</span>
+    <span class="s2">"It's closed."</span>
+  <span class="k">case</span> <span class="o">=&gt;</span> <span class="s2">"Who knows..."</span>
+<span class="p">}</span> <span class="nf">println</span><span class="p">()</span></code></pre>
+
+<p>More example code:</p>
+
+<pre><code class="language-ooc"><span class="nv">isOpen</span><span class="o">?</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">state</span><span class="p">:</span> <span class="nc">DoorState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nc">Bool</span> <span class="p">{</span>
+  <span class="nv">state</span> <span class="o">==</span> <span class="nc">DoorState</span> <span class="no">OPEN</span>
+<span class="p">}</span></code></pre>
+
+<h3 id="members">Members</h3>
+
+<p>Enums can’t have members - they are just values without any added metadata.</p>
+
+<h3 id="methods">Methods</h3>
+
+<p>Enums, however, can have methods:</p>
+
+<pre><code class="language-ooc"><span class="nc">DoorState</span><span class="p">:</span> <span class="nv">enum</span> <span class="p">{</span>
+  <span class="no">OPEN</span>
+  <span class="no">CLOSED</span>
+  <span class="no">UNKNOWN</span>
+
+  <span class="nv">chance</span><span class="p">:</span> <span class="k">func</span> <span class="o">-&gt;</span> <span class="nc">Float</span> <span class="p">{</span>
+    <span class="nv">match</span> <span class="k">this</span> <span class="p">{</span>
+      <span class="k">case</span> <span class="nc">This</span> <span class="no">OPEN</span> <span class="o">=&gt;</span> <span class="mf">1.0</span>
+      <span class="k">case</span> <span class="nc">This</span> <span class="no">CLOSED</span> <span class="o">=&gt;</span> <span class="mf">0.0</span>
+      <span class="k">case</span> <span class="o">=&gt;</span> <span class="mf">0.5</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="nv">random</span><span class="p">:</span> <span class="k">static</span> <span class="k">func</span> <span class="o">-&gt;</span> <span class="nc">Float</span> <span class="p">{</span>
+    <span class="nc">Random</span> <span class="nf">randInt</span><span class="p">(</span><span class="m-Decimal">0</span><span class="p">,</span> <span class="m-Decimal">3</span><span class="p">)</span> <span class="k">as</span> <span class="nc">This</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre>
+
+<p>They can be used like regular objects:</p>
+
+<pre><code class="language-ooc"><span class="nv">state</span> <span class="o">:=</span> <span class="nc">DoorState</span> <span class="nf">random</span><span class="p">()</span>
+
+<span class="s2">"Generated a random door."</span> <span class="nf">println</span><span class="p">()</span>
+<span class="s2">"Chance we're passing through = %.2f"</span> <span class="nf">printfln</span><span class="p">(</span><span class="nv">state</span> <span class="nf">chance</span><span class="p">())</span></code></pre>
+
+<h2 id="backing-type">Backing type</h2>
+
+<p>By defaults, enums are backed by ints. That’s why they can be cast to
+<code>Int</code>, and vice versa.</p>
+
+<h3 id="custom-values">Custom values</h3>
+
+<p>Custom values are specified with the assignment operator:</p>
+
+<pre><code class="language-ooc"><span class="nc">Number</span><span class="p">:</span> <span class="nv">enum</span> <span class="p">{</span>
+  <span class="no">ONE</span>
+  <span class="no">TWO</span>
+  <span class="no">FOUR</span> <span class="o">=</span> <span class="m-Decimal">4</span>
+  <span class="no">FIVE</span>
+<span class="p">}</span></code></pre>
+
+<p>Values are computed like this:</p>
+
+<ul>
+<li>the first value is <code>increment(0)</code> if unspecified</li>
+  <li>every value after that is <code>increment(previousValue)</code>
+</li>
+  <li>by default, the increment is <code>+1</code>
+</li>
+</ul><p>Read below for more on increments</p>
+
+<h3 id="custom-increment">Custom increment</h3>
+
+<p>Custom increments can be specified after the <code>enum</code> keyword:</p>
+
+<pre><code class="language-ooc"><span class="nc">Odds</span><span class="p">:</span> <span class="nf">enum</span> <span class="p">(</span><span class="o">+</span><span class="m-Decimal">2</span><span class="p">)</span> <span class="p">{</span>
+  <span class="no">ONE</span> <span class="o">=</span> <span class="m-Decimal">1</span>
+  <span class="no">THREE</span>
+  <span class="no">FIVE</span>
+  <span class="no">SEVEN</span>
+  <span class="no">NINE</span>
+<span class="p">}</span></code></pre>
+
+<p>Multiplication increments are valid as well:</p>
+
+<pre><code class="language-ooc"><span class="nc">Powers</span><span class="p">:</span> <span class="nf">enum</span> <span class="p">(</span><span class="o">*</span><span class="m-Decimal">2</span><span class="p">)</span> <span class="p">{</span>
+  <span class="no">ONE</span> <span class="o">=</span> <span class="m-Decimal">1</span>
+  <span class="no">TWO</span>
+  <span class="no">FOUR</span>
+  <span class="no">EIGHT</span>
+  <span class="no">SIXTEEN</span>
+<span class="p">}</span></code></pre>
+
+<p>And multiplication increments are actually quite handy for things like bitsets.</p>
+
+<h2 id="aliasing">Aliasing</h2>
+
+<p>When writing bindings for a C api that uses various integer constants
+as enums, one can map them to ooc this way:</p>
+
+<pre><code class="language-ooc"><span class="nc">ShutdownParam</span><span class="p">:</span> <span class="nv">enum</span> <span class="p">{</span>
+  <span class="nv">read</span><span class="p">:</span>      <span class="k">extern</span><span class="p">(</span><span class="no">SHUT_RD</span><span class="p">)</span>
+  <span class="nv">write</span><span class="p">:</span>     <span class="k">extern</span><span class="p">(</span><span class="no">SHUT_WR</span><span class="p">)</span>
+  <span class="nv">readWrite</span><span class="p">:</span> <span class="k">extern</span><span class="p">(</span><span class="no">SHUT_RDWR</span><span class="p">)</span>
+<span class="p">}</span></code></pre>
+
+<p>Then pass them as parameters using <code>ShutdownParam read</code> instead of C’s
+short-form. Using the enum’s name in function signatures also allows additional
+type checking (that C compilers don’t do, since for them, enum values are just
+ints).</p>
+    </div>
+  </article>
+</div>
+<footer>
+  <div class="footer-content">
+  <nav><section class="about"><h3>About</h3>
+    <ul>
+        <li><a href="/about/#history">History</a></li>
+        <li><a href="/about/#why-use-ooc">Why use ooc?</a></li>
+        <li><a href="/about/#similar-projects">Alternatives</a></li>
+    </ul></section><section class="install"><h3>Install</h3>
+    <ul>
+        <li><a href="/install/#quick-install">Quick install</a></li>
+        <li><a href="/install/#installing-from-git">Installing from Git</a></li>
+        <li><a href="/install/#post-install-instructions">Post-install instructions</a></li>
+        <li><a href="/install/#installing-sam">Installing sam</a></li>
+    </ul></section><section class="documentation"><h3>Documentation</h3>
+    <ul>
+        <li><a href="/docs/tutorial/">Tutorial</a></li>
+        <li><a href="/docs/lang/">Language</a></li>
+        <li><a href="/docs/sdk/">SDK</a></li>
+        <li><a href="/docs/tools/">Tools</a></li>
+        <li><a href="/docs/tools/rock/">Implementation</a></li>
+        <li><a href="/docs/kaputt/">Troubleshooting</a></li>
+        <li><a href="/docs/glossary/">Glossary</a></li>
+    </ul></section><section class="community"><h3>Community</h3>
+    <ul>
+        <li><a href="http://groups.google.com/group/ooc-lang">Discussion group</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/issues">Issue tracker</a></li>
+        <li><a href="irc://chat.freenode.net/#ooc-lang">IRC channel</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/wiki">Wiki</a></li>
+        <li><a href="/development/">Development</a></li>
+        <li><a href="http://pledgie.com/campaigns/21363">Donate</a></li>
+    </ul></section></nav>
+    <div class="fine-print">
+      <p>
+        ooc &copy; 2009-2015 <a href="http://amos.me/">Amos Wenger</a>. The content of this website is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0 License</a>.
+        rock is licensed under the MIT license. Design based on the <a href="http://nanoc.ws/">nanoc web site</a> by <a href="http://stoneship.org/">Denis Defreyne</a> and used with permission.
+        <a href="http://entypo.com/">Entypo</a>By Daniel Bruce.
+      </p>
+    </div>
+  </div>
+</footer>
+
+  </body>
+</html>

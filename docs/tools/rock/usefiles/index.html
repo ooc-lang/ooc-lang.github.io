@@ -1,0 +1,261 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ooc &raquo; Usefiles</title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/assets/main.css">
+    <link rel="stylesheet" href="/assets/pygments.css">
+    <link href="http://fonts.googleapis.com/css?family=Radley:regular&text=OC" rel="stylesheet" type="text/css" >
+    <link href="http://fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,400,400italic,700,700italic,900,900italic" rel="stylesheet" type="text/css" >
+
+    <!-- Cool stats stuff for nanoc :) -->
+    <meta name="generator" content="nanoc 3.6.5"> 
+  </head>
+  <body>
+
+<header>
+  <div class="header-content">
+    <nav class="main">
+      <ol>
+        <li class="home"><a href="/"><img src="/assets/images/logo-nav.png" alt="Home"></a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/install/">Install</a></li>
+        <li><a href="/docs/">Documentation</a></li>
+        <li><a href="/community/">Community</a></li>
+        <li><a href="/development/">Development</a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+<div class="intro">
+  <div class="intro-content">
+    <h1>Usefiles</h1>
+  </div>
+</div>
+<div class="article">
+  <article>
+    <nav class="side">
+  <div class="side-title">
+    Usefiles
+  </div>
+
+  <div class="side-content">
+    
+      <p>↑ <a href="/docs/tools/rock/">Back to rock</a></p>
+    
+
+    <ol class="toc"><li><a href="#usefiles-explained">Usefiles explained</a></li><li><a href="#examples">Examples</a></li><li><a href="#fields">Fields</a></li><li><a href="#version-blocks">Version blocks</a></li></ol>
+  </div>
+</nav>
+
+    <div class="article-content">
+      <h2 id="usefiles-explained">Usefiles explained</h2>
+
+<p>A usefile describes an ooc package, ie. a collection of modules and contains information
+how to compile and link that specific collection of ooc files.
+It also denotes if the package should compile to an executable or a shared/static library.</p>
+
+<p>Usefiles are not a totally novel concept. They are comparable to <code>pkg-config</code> files or, to
+some degree, similar to build system files like CMake or SCons.</p>
+
+<p>However, in ooc, (and this is a pretty new thing!),
+the compiler rock itself reads and handles these usefiles.</p>
+
+<h2 id="examples">Examples</h2>
+
+<p>Let’s start off with some examples. Following is the repository structure of
+<a href="https://github.com/fasterthanlime/ooc-zeromq">ooc-zeromq</a>, a <a href="http://zeromq.org">zeromq</a> binding
+for ooc:</p>
+
+<pre><code>.
+├── LICENSE
+├── README.md
+├── samples
+│   ├── ...
+├── source
+│   └── zeromq.ooc
+└── zeromq.use
+</code></pre>
+
+<p>Let’s assume that you cloned the repository into a subdirectory of your ooc library path
+(which consists of the paths in the <code>OOC_LIBS</code> environment variable).</p>
+
+<p>And here are the contents of <code>zeromq.use</code> (shortened for brevity):</p>
+
+<pre><code class="language-yaml"><span class="l-Scalar-Plain">Name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">zeromq</span>
+<span class="l-Scalar-Plain">Description</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">The 0MQ lightweight messaging kernel</span>
+<span class="l-Scalar-Plain">Version</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">2010-06-16</span>
+<span class="l-Scalar-Plain">SourcePath</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">source</span>
+<span class="l-Scalar-Plain">Includes</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">zmq.h</span>
+<span class="l-Scalar-Plain">Libs</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">-lzmq</span></code></pre>
+
+<p>A usefile should always contain the name, description and version of its package.</p>
+
+<p>In addition, this usefile tells rock that the actual ooc files reside in the subdirectory
+<code>source</code> (which will be added to the so-called sourcepath).</p>
+
+<p>Also, since this is a C library binding, the zeromq C header needs to be included,
+and the <code>-lzmq</code> flag needs to be passed to the linker.</p>
+
+<p>So far so good. But what are the benefits of writing such a file?</p>
+
+<p>If you now want to use this package in any of your projects, you can just write:</p>
+
+<pre><code class="language-ooc"><span class="k">use</span> <span class="nv">zeromq</span></code></pre>
+
+<p>at the top of your ooc file, and rock will automatically look through your library path
+(the paths in the <code>OOC_LIBS</code> environment variable) for a file called <code>zeromq.use</code> and find
+the usefile above. Now it parses this usefile and instantly knows not only where it can
+find the ooc-zeromq ooc files, but also what C headers need to be included and
+what libraries need to be linked.</p>
+
+<p>As a result, you can now just import the ooc-zeromq ooc file like this:</p>
+
+<pre><code class="language-ooc"><span class="k">import</span> <span class="nv">zeromq</span></code></pre>
+
+<p>and hack away.</p>
+
+<p>Another simpler example is the <a href="https://github.com/ooc-lang/sam">sam</a> usefile. sam is
+different because it compiles to an executable file:</p>
+
+<pre><code class="language-yaml"><span class="l-Scalar-Plain">Name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">sam</span>
+<span class="l-Scalar-Plain">Description</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">Sam keeps your ooc repos up to date</span>
+<span class="l-Scalar-Plain">SourcePath</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">source</span>
+<span class="l-Scalar-Plain">Main</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">sam.ooc</span></code></pre>
+
+<p>Once again, the usefile contains name and description (no version here, though!) and
+the sourcepath.</p>
+
+<p>The new thing: <code>Main</code> denotes the entry point for the executable, e.g. the file
+containing the <code>main</code> function. rock looks for a file named this in the source path,
+which here contains the subdirectory source/.</p>
+
+<p>To build sam, you can now just run:</p>
+
+<pre><code class="language-bash">rock -v</code></pre>
+
+<p>which will look for a usefile in your current directory and build the package. As a result,
+you get a <code>sam</code> executable – and all of that without using a third party build system!</p>
+
+<h2 id="fields">Fields</h2>
+
+<p>A list of all currently supported fields in usefiles follows.</p>
+
+<ul>
+<li>
+<code>Name</code>, <code>Description</code> and <code>Version</code> contain metadata about the package
+and version</li>
+  <li>
+<code>Pkgs</code> contains a comma-separated list of <code>pkg-config</code> packages this
+package depends on. rock will invoke <code>pkg-config</code> with these packages
+and add the resulting C flags and linker flags to its pipeline</li>
+  <li>
+<code>CustomPkg</code> can be used to specify the name of a <code>pkg-config</code>-like tool
+that should be used instead. For example, the ooc sdl2 binding sets
+this to <code>sdl2-config</code>
+</li>
+  <li>
+<code>Libs</code> contains a comma-separated list of linker flags like <code>-lSDL2_image</code>
+</li>
+  <li>
+<code>Frameworks</code>: OSX-only, specify Frameworks to be linked with (example: <code>OpenGL</code>)</li>
+  <li>
+<code>Includes</code> can be used to specify C headers that should be included
+(as a comma-separated list)</li>
+  <li>
+<code>PreMains</code>: List of compiler flags that, if specified from a .pc file or a .use file,
+(maybe conditioned by a version block), must appear before the main compilation unit.
+Example: <code>-lSDL2main</code> on Windows.</li>
+  <li>
+<code>Linker</code> can be used to specify a <code>ld</code> replacement</li>
+  <li>
+<code>LibPaths</code> and <code>IncludePaths</code> are comma-separated lists and contain
+paths that should be added to the linker or C include paths</li>
+  <li>
+<code>AndroidLibs</code>, <code>AndroidIncludePaths</code>: Android-specific properties that are
+only used with the Android driver.</li>
+  <li>
+<code>Additionals</code>: can be used to add <code>.c</code> files to be compiled along with the .ooc code.
+Relative paths (starting with <code>./</code>) will have the .c file be copied locally.</li>
+  <li>
+<code>Requires</code> can be used to specify requirements (denoted by usefile
+names), for example for sam</li>
+  <li>
+<code>SourcePath</code> can be used to add a path to the source path</li>
+  <li>
+<code>Imports</code> contains list of modules that should be implicitly imported when
+<code>use yourusefile</code> is used. Grouping syntax (e.g. <code>folder/[a, b, c]</code>) is
+supported, just as regular ooc imports.</li>
+  <li>
+<code>Origin</code> is ignored by rock, but it traditionally specifies the
+git repository url of that package</li>
+  <li>
+<code>Main</code> is the name of the entrypoint file</li>
+  <li>all fields starting with <code>_</code> are ignored by rock</li>
+</ul><h2 id="version-blocks">Version blocks</h2>
+
+<p>Similarily to ooc’s <a href="/docs/lang/preprocessor/#version-blocks">version blocks</a>, usefile version blocks
+can be used to work with different requirements on different platforms.</p>
+
+<p>The syntax is similar to version blocks in ooc. Here is an example from
+<a href="https://github.com/fasterthanlime/isaac-paper">Paper Isaac</a>’s usefile:</p>
+
+<pre><code class="language-ooc"><span class="nc">Name</span><span class="p">:</span> <span class="nv">isaac</span>
+<span class="nc">Version</span><span class="p">:</span> <span class="mf">0.1</span>
+<span class="nc">Requires</span><span class="p">:</span> <span class="nv">dye</span><span class="p">,</span> <span class="nv">bleep</span><span class="p">,</span> <span class="nv">gnaar</span>
+<span class="nc">SourcePath</span><span class="p">:</span> <span class="nv">source</span>
+<span class="nc">Main</span><span class="p">:</span> <span class="nv">isaac</span>
+
+<span class="k">version</span> <span class="p">(</span><span class="nv">windows</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nc">Libs</span><span class="p">:</span> <span class="p">.</span><span class="o">/</span><span class="nv">isaac</span><span class="o">.</span><span class="nf">res</span>
+<span class="p">}</span></code></pre>
+
+<p>Compiling under windows, the linker command line will contain the additional file
+<code>./isaac.res</code>.</p>
+    </div>
+  </article>
+</div>
+<footer>
+  <div class="footer-content">
+  <nav><section class="about"><h3>About</h3>
+    <ul>
+        <li><a href="/about/#history">History</a></li>
+        <li><a href="/about/#why-use-ooc">Why use ooc?</a></li>
+        <li><a href="/about/#similar-projects">Alternatives</a></li>
+    </ul></section><section class="install"><h3>Install</h3>
+    <ul>
+        <li><a href="/install/#quick-install">Quick install</a></li>
+        <li><a href="/install/#installing-from-git">Installing from Git</a></li>
+        <li><a href="/install/#post-install-instructions">Post-install instructions</a></li>
+        <li><a href="/install/#installing-sam">Installing sam</a></li>
+    </ul></section><section class="documentation"><h3>Documentation</h3>
+    <ul>
+        <li><a href="/docs/tutorial/">Tutorial</a></li>
+        <li><a href="/docs/lang/">Language</a></li>
+        <li><a href="/docs/sdk/">SDK</a></li>
+        <li><a href="/docs/tools/">Tools</a></li>
+        <li><a href="/docs/tools/rock/">Implementation</a></li>
+        <li><a href="/docs/kaputt/">Troubleshooting</a></li>
+        <li><a href="/docs/glossary/">Glossary</a></li>
+    </ul></section><section class="community"><h3>Community</h3>
+    <ul>
+        <li><a href="http://groups.google.com/group/ooc-lang">Discussion group</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/issues">Issue tracker</a></li>
+        <li><a href="irc://chat.freenode.net/#ooc-lang">IRC channel</a></li>
+        <li><a href="http://github.com/ooc-lang/rock/wiki">Wiki</a></li>
+        <li><a href="/development/">Development</a></li>
+        <li><a href="http://pledgie.com/campaigns/21363">Donate</a></li>
+    </ul></section></nav>
+    <div class="fine-print">
+      <p>
+        ooc &copy; 2009-2015 <a href="http://amos.me/">Amos Wenger</a>. The content of this website is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0 License</a>.
+        rock is licensed under the MIT license. Design based on the <a href="http://nanoc.ws/">nanoc web site</a> by <a href="http://stoneship.org/">Denis Defreyne</a> and used with permission.
+        <a href="http://entypo.com/">Entypo</a>By Daniel Bruce.
+      </p>
+    </div>
+  </div>
+</footer>
+
+  </body>
+</html>
