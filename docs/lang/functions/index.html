@@ -106,9 +106,9 @@ before anything else, to set up stuff).</p>
 
 <p>If we do want command-line arguments, we can do it the C way:</p>
 
-<pre><code class="language-ooc"><span class="nv">main</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">argv</span><span class="p">:</span> <span class="nc">Int</span><span class="p">,</span> <span class="nv">argc</span><span class="p">:</span> <span class="no">CS</span><span class="nv">tring</span><span class="o">*</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">for</span> <span class="p">(</span><span class="nv">i</span> <span class="k">in</span> <span class="m-Decimal">0</span><span class="o">..</span><span class="nv">argv</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nv">arg</span> <span class="o">=</span> <span class="nv">argc</span><span class="p">[</span><span class="nv">i</span><span class="p">]</span>
+<pre><code class="language-ooc"><span class="nv">main</span><span class="p">:</span> <span class="k">func</span> <span class="p">(</span><span class="nv">argc</span><span class="p">:</span> <span class="nc">Int</span><span class="p">,</span> <span class="nv">argv</span><span class="p">:</span> <span class="no">CS</span><span class="nv">tring</span><span class="o">*</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">for</span> <span class="p">(</span><span class="nv">i</span> <span class="k">in</span> <span class="m-Decimal">0</span><span class="o">..</span><span class="nv">argc</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">arg</span> <span class="o">=</span> <span class="nv">argv</span><span class="p">[</span><span class="nv">i</span><span class="p">]</span>
     <span class="s2">"Got argument: #{arg toString()}"</span> <span class="nf">println</span><span class="p">()</span>
   <span class="p">}</span>
 <span class="p">}</span></code></pre>

@@ -180,7 +180,7 @@ expression pattern, passing some options as a bitmask if you want to:</p>
 
 <pre><code class="language-ooc"><span class="k">import</span> <span class="nv">text</span><span class="o">/</span><span class="nc">Regexp</span>
 
-<span class="nv">pattern</span> <span class="o">:=</span> <span class="nc">Regexp</span> <span class="nf">compile</span><span class="p">(</span><span class="s2">"on (?P&lt;year&gt;[0-9]{4})-?P&lt;month&gt;[0-9]{1,2})-(?P&lt;day&gt;[0-9]{1,2})"</span><span class="p">,</span> <span class="nc">RegexOptions</span> <span class="no">CASELESS</span><span class="p">)</span>
+<span class="nv">pattern</span> <span class="o">:=</span> <span class="nc">Regexp</span> <span class="nf">compile</span><span class="p">(</span><span class="s2">"on (?P&lt;year&gt;[0-9]{4})-?P&lt;month&gt;[0-9]{1,2})-(?P&lt;day&gt;[0-9]{1,2})"</span><span class="p">,</span> <span class="nc">RegexpOption</span> <span class="no">CASELESS</span><span class="p">)</span>
 <span class="nv">pattern</span> <span class="nf">matches</span><span class="p">(</span><span class="s2">"foo"</span><span class="p">)</span> <span class="c">// this will return null, since the pattern could not be matched</span>
 
 <span class="nv">someDate</span> <span class="o">:=</span> <span class="nv">pattern</span> <span class="nf">matches</span><span class="p">(</span><span class="s2">"On 2013-08-07"</span><span class="p">)</span>
